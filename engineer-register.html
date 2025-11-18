@@ -1,0 +1,575 @@
+### 3. engineer-register.html (技術者登録)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技術者登録 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .skill-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-input-group input {
+            flex: 1;
+        }
+
+        .btn-add {
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 2rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 0.3rem;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .register-container {
+                padding: 2rem;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">👨‍💻 TechJob</div>
+        <h2>技術者登録</h2>
+        
+        <div id="successMessage" class="success-message">
+            登録が完了しました！プロフィールページに移動します...
+        </div>
+
+        <form id="engineerRegisterForm">
+            <!-- 基本情報 -->
+            <div class="form-section">
+                <h3 class="section-title">📋 基本情報</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lastName">姓<span class="required">*</span></label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">名<span class="required">*</span></label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lastNameKana">セイ<span class="required">*</span></label>
+                        <input type="text" id="lastNameKana" name="lastNameKana" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstNameKana">メイ<span class="required">*</span></label>
+                        <input type="text" id="firstNameKana" name="firstNameKana" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="birthDate">生年月日<span class="required">*</span></label>
+                        <input type="date" id="birthDate" name="birthDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">性別</label>
+                        <select id="gender" name="gender">
+                            <option value="">選択してください</option>
+                            <option value="male">男性</option>
+                            <option value="female">女性</option>
+                            <option value="other">その他</option>
+                            <option value="no-answer">回答しない</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">電話番号<span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="090-1234-5678">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">メールアドレス<span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">パスワード<span class="required">*</span></label>
+                        <input type="password" id="password" name="password" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">パスワード確認<span class="required">*</span></label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">現住所</label>
+                    <input type="text" id="address" name="address" placeholder="例: 東京都渋谷区...">
+                </div>
+            </div>
+
+            <!-- スキル情報 -->
+            <div class="form-section">
+                <h3 class="section-title">💻 スキル情報</h3>
+                
+                <div class="form-group">
+                    <label for="experience">実務経験年数<span class="required">*</span></label>
+                    <select id="experience" name="experience" required>
+                        <option value="">選択してください</option>
+                        <option value="0-1">1年未満</option>
+                        <option value="1-3">1-3年</option>
+                        <option value="3-5">3-5年</option>
+                        <option value="5-10">5-10年</option>
+                        <option value="10+">10年以上</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>プログラミング言語</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-javascript" name="languages" value="JavaScript">
+                            <label for="lang-javascript">JavaScript</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-python" name="languages" value="Python">
+                            <label for="lang-python">Python</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-java" name="languages" value="Java">
+                            <label for="lang-java">Java</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-php" name="languages" value="PHP">
+                            <label for="lang-php">PHP</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-ruby" name="languages" value="Ruby">
+                            <label for="lang-ruby">Ruby</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-go" name="languages" value="Go">
+                            <label for="lang-go">Go</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-csharp" name="languages" value="C#">
+                            <label for="lang-csharp">C#</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-cpp" name="languages" value="C++">
+                            <label for="lang-cpp">C++</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>フレームワーク・ライブラリ</label>
+                    <div class="skill-input-group">
+                        <input type="text" id="frameworkInput" placeholder="例: React, Vue.js, Django">
+                        <button type="button" class="btn-add" onclick="addSkill('framework')">追加</button>
+                    </div>
+                    <div id="frameworkTags" class="skill-tags"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>データベース</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="db-mysql" name="databases" value="MySQL">
+                            <label for="db-mysql">MySQL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="db-postgresql" name="databases" value="PostgreSQL">
+                            <label for="db-postgresql">PostgreSQL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="db-mongodb" name="databases" value="MongoDB">
+                            <label for="db-mongodb">MongoDB</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="db-oracle" name="databases" value="Oracle">
+                            <label for="db-oracle">Oracle</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>その他のスキル</label>
+                    <div class="skill-input-group">
+                        <input type="text" id="otherSkillInput" placeholder="例: Docker, AWS, Git">
+                        <button type="button" class="btn-add" onclick="addSkill('other')">追加</button>
+                    </div>
+                    <div id="otherSkillTags" class="skill-tags"></div>
+                </div>
+            </div>
+
+            <!-- 希望条件 -->
+            <div class="form-section">
+                <h3 class="section-title">🎯 希望条件</h3>
+                
+                <div class="form-group">
+                    <label for="desiredJobType">希望職種<span class="required">*</span></label>
+                    <select id="desiredJobType" name="desiredJobType" required>
+                        <option value="">選択してください</option>
+                        <option value="frontend">フロントエンドエンジニア</option>
+                        <option value="backend">バックエンドエンジニア</option>
+                        <option value="fullstack">フルスタックエンジニア</option>
+                        <option value="mobile">モバイルアプリ開発</option>
+                        <option value="infrastructure">インフラエンジニア</option>
+                        <option value="data">データサイエンティスト</option>
+                        <option value="ai">AI/機械学習エンジニア</option>
+                        <option value="pm">プロジェクトマネージャー</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="desiredSalary">希望年収</label>
+                        <select id="desiredSalary" name="desiredSalary">
+                            <option value="">選択してください</option>
+                            <option value="300-400">300-400万円</option>
+                            <option value="400-500">400-500万円</option>
+                            <option value="500-600">500-600万円</option>
+                            <option value="600-700">600-700万円</option>
+                            <option value="700-800">700-800万円</option>
+                            <option value="800-1000">800-1000万円</option>
+                            <option value="1000+">1000万円以上</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workStyle">希望勤務形態</label>
+                        <select id="workStyle" name="workStyle">
+                            <option value="">選択してください</option>
+                            <option value="office">オフィス勤務</option>
+                            <option value="remote">フルリモート</option>
+                            <option value="hybrid">ハイブリッド</option>
+                            <option value="flexible">どれでも可</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="desiredLocation">希望勤務地</label>
+                    <input type="text" id="desiredLocation" name="desiredLocation" placeholder="例: 東京都, 大阪府">
+                </div>
+            </div>
+
+            <!-- 自己PR -->
+            <div class="form-section">
+                <h3 class="section-title">✨ 自己PR</h3>
+                
+                <div class="form-group">
+                    <label for="selfPR">自己PR</label>
+                    <textarea id="selfPR" name="selfPR" placeholder="あなたの強みや経験をアピールしてください"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="portfolio">ポートフォリオURL</label>
+                    <input type="url" id="portfolio" name="portfolio" placeholder="https://github.com/yourname">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">登録する</button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← トップページに戻る</a> | 
+            <a href="login.html">既にアカウントをお持ちの方</a>
+        </div>
+    </div>
+
+    <script>
+        const frameworks = [];
+        const otherSkills = [];
+
+        function addSkill(type) {
+            const inputId = type === 'framework' ? 'frameworkInput' : 'otherSkillInput';
+            const tagsId = type === 'framework' ? 'frameworkTags' : 'otherSkillTags';
+            const skillsArray = type === 'framework' ? frameworks : otherSkills;
+            
+            const input = document.getElementById(inputId);
+            const skill = input.value.trim();
+            
+            if (skill && !skillsArray.includes(skill)) {
+                skillsArray.push(skill);
+                renderSkills(type);
+                input.value = '';
+            }
+        }
+
+        function removeSkill(type, skill) {
+            const skillsArray = type === 'framework' ? frameworks : otherSkills;
+            const index = skillsArray.indexOf(skill);
+            if (index > -1) {
+                skillsArray.splice(index, 1);
+                renderSkills(type);
+            }
+        }
+
+        function renderSkills(type) {
+            const tagsId = type === 'framework' ? 'frameworkTags' : 'otherSkillTags';
+            const skillsArray = type === 'framework' ? frameworks : otherSkills;
+            const container = document.getElementById(tagsId);
+            
+            container.innerHTML = skillsArray.map(skill => `
+                <div class="skill-tag">
+                    ${skill}
+                    <button type="button" onclick="removeSkill('${type}', '${skill}')">&times;</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('engineerRegisterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('パスワードが一致しません');
+                return;
+            }
+
+            // チェックボックスの値を取得
+            const languages = Array.from(document.querySelectorAll('input[name="languages"]:checked'))
+                .map(cb => cb.value);
+            const databases = Array.from(document.querySelectorAll('input[name="databases"]:checked'))
+                .map(cb => cb.value);
+
+            // フォームデータを収集
+            const formData = {
+                lastName: document.getElementById('lastName').value,
+                firstName: document.getElementById('firstName').value,
+                lastNameKana: document.getElementById('lastNameKana').value,
+                firstNameKana: document.getElementById('firstNameKana').value,
+                birthDate: document.getElementById('birthDate').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                password: password,
+                address: document.getElementById('address').value,
+                experience: document.getElementById('experience').value,
+                languages: languages,
+                frameworks: frameworks,
+                databases: databases,
+                otherSkills: otherSkills,
+                desiredJobType: document.getElementById('desiredJobType').value,
+                desiredSalary: document.getElementById('desiredSalary').value,
+                workStyle: document.getElementById('workStyle').value,
+                desiredLocation: document.getElementById('desiredLocation').value,
+                selfPR: document.getElementById('selfPR').value,
+                portfolio: document.getElementById('portfolio').value,
+                registeredDate: new Date().toISOString()
+            };
+
+            // LocalStorageに保存
+            let engineers = JSON.parse(localStorage.getItem('engineers') || '[]');
+            engineers.push(formData);
+            localStorage.setItem('engineers', JSON.stringify(engineers));
+
+            // 成功メッセージを表示
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // 3秒後にプロフィールページへリダイレクト
+            setTimeout(function() {
+                window.location.href = 'engineer-profile.html?email=' + formData.email;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

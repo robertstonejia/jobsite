@@ -1,0 +1,405 @@
+## 13. payment-wechat.html (WeChat Pay決済)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeChat Pay決済 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #09B83E 0%, #078031 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .wechat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .wechat-logo {
+            width: 150px;
+            height: 50px;
+            background: #09B83E;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .amount-display {
+            background: #e8f5e9;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .amount-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-value {
+            font-size: 3rem;
+            color: #09B83E;
+            font-weight: bold;
+        }
+
+        .currency-note {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .qr-code-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 2rem auto;
+        }
+
+        .qr-code-wechat {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 4px solid #09B83E;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            position: relative;
+        }
+
+        .wechat-icon-overlay {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #09B83E;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instructions h3 {
+            color: #09B83E;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .instruction-item:hover {
+            transform: translateX(5px);
+        }
+
+        .item-number {
+            width: 28px;
+            height: 28px;
+            background: #09B83E;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .language-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .lang-tab {
+            padding: 0.5rem 1.2rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .lang-tab.active {
+            background: #09B83E;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-wechat {
+            width: 100%;
+            padding: 1.2rem;
+            background: #09B83E;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-wechat:hover {
+            background: #078031;
+        }
+
+        .btn-cancel-wechat {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel-wechat:hover {
+            border-color: #09B83E;
+            color: #09B83E;
+        }
+
+        .status-indicator-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #e8f5e9;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #09B83E;
+            border-radius: 50%;
+            animation: pulse-animation 1.5s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.5;
+            }
+        }
+
+        .status-text {
+            color: #09B83E;
+            font-weight: 500;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="wechat-container">
+        <div class="wechat-logo">WeChat Pay</div>
+        
+        <div class="language-tabs">
+            <button class="lang-tab active" onclick="switchLang('ja')">日本語</button>
+            <button class="lang-tab" onclick="switchLang('zh')">中文</button>
+            <button class="lang-tab" onclick="switchLang('en')">English</button>
+        </div>
+
+        <h2 id="mainTitle">WeChat Payでお支払い</h2>
+        <p class="subtitle" id="mainSubtitle">微信支付 / WeChat Payment</p>
+
+        <div class="amount-display">
+            <div class="amount-label" id="amountLabelText">支付金额 / Payment Amount</div>
+            <div class="amount-value" id="paymentAmountValue">¥29,800</div>
+            <div class="currency-note" id="currencyNoteText">
+                ※ 将按照当前汇率以人民币结算
+            </div>
+        </div>
+
+        <div class="qr-code-container">
+            <div class="qr-code-wechat">
+                <div class="wechat-icon-overlay">💬</div>
+                📱
+            </div>
+        </div>
+
+        <div class="status-indicator-bar">
+            <div class="pulse-dot"></div>
+            <span class="status-text" id="statusIndicatorText">等待扫码支付...</span>
+        </div>
+
+        <div class="instructions">
+            <h3 id="instructionsTitle">💡 支付步骤</h3>
+            <div class="instruction-item">
+                <div class="item-number">1</div>
+                <div class="item-content">
+                    <div class="item-title" id="step1Title">打开微信</div>
+                    <div class="item-description" id="step1Desc">启动微信应用程序</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">2</div>
+                <div class="item-content">
+                    <div class="item-title" id="step2Title">扫一扫</div>
+                    <div class="item-description" id="step2Desc">点击右上角"+"选择"扫一扫"</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">3</div>
+                <div class="item-content">
+                    <div class="item-title" id="step3Title">扫描二维码</div>
+                    <div class="item-description" id="step3Desc">将摄像头对准上方二维码</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">4</div>
+                <div class="item-content">
+                    <div class="item-title" id="step4Title">确认支付</div>
+                    <div class="item-description" id="step4Desc">核对金额后输入密码完成支付</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-wechat" onclick="openWeChatApp()" id="openWeChatBtn">
+                <span>💬</span>
+                <span id="openBtnText">打开微信 / Open WeChat</span>
+            </button>
+            <button class="btn-cancel-wechat" onclick="cancelWeChatPayment()" id="cancelWeChatBtn">
+                <span id="cancelBtnText">取消 / Cancel</span>
+            </button>
+        </div>
+
+        <div class="security-badge">
+            🔒 <span id="securityText">安全加密支付</span>
+        </div>
+    </div>
+
+    <script>
+        const wechatTranslations = {
+            ja: {
+                mainTitle: 'WeChat Payでお支払い',
+                mainSubtitle: '微信支付でお支払い',
+                amountLabelText: '支払金額',
+                currencyNoteText: '※ 為替レートに応じて人民元で請求されます',
+                statusIndicatorText: '支付状態確認中...',
+                instructionsTitle: '💡 支付手順',
+                step1Title: 'WeChatを開く',
+                step1Desc: 'WeChatアプリを起動',
+                step2Title: 'スキャン機能',
+                step2Desc: '右上の「+」から「スキャン」を選択',
+                step3Title: 'QRコードをスキャン',
+                step3Desc: 'カメラで上のQRコードを読み取り',
+                step4Title: '支払い確認',
+                step4Desc: '金額を確認しパスワードを入力',
+                openBtnText: 'WeChatを開く',
+                cancelBtnText: 'キャンセル',
+                securityText: '安全な暗号化決済'
+            },
+            zh: {
+                mainTitle: '使用微信支付',
+                mainSubtitle: 'WeChat Pay',
+                amountLabelText: '支付金额',
+                currencyNoteText: '※ 将按照当前汇率以人民币结算',
+                statusIndicatorText: '等待扫码支付...',
+                instructionsTitle: '💡 支付步骤',
+                step1Title: '打开微信',
+                step1Desc: '启动微信应用程序',
+                step2Title: '扫一扫',
+                step2Desc: '点击右上角"+"选择"扫一扫"',
+                step3Title: '扫描二维码',
+                step3Desc: '将摄

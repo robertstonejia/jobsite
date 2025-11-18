@@ -1,0 +1,989 @@
+# job-detail.html (求人詳細) - 完全版
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求人詳細 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .detail-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .main-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .job-header {
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 2rem;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .company-logo-large {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .company-name-large {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .company-name-large:hover {
+            opacity: 0.7;
+        }
+
+        .job-title-large {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .job-meta-large {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #666;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-content {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .requirements-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements-list li {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .requirements-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0.8rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .requirements-list.optional li::before {
+            content: '○';
+            color: #999;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .skill-badge-large {
+            background: #e8eaf6;
+            color: #667eea;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .skill-badge-large.required {
+            background: #667eea;
+            color: white;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .benefit-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .benefit-text h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-text p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .company-description {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .company-description h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .company-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .apply-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .salary-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .salary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .salary-note {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .btn-apply-large {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .btn-apply-large:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-bookmark-large {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-bookmark-large:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            transition: opacity 0.3s;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        .tags-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .application-process {
+            background: #e8f5e9;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .application-process h3 {
+            color: #2e7d32;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+
+        .step-title {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .arrow-right {
+            font-size: 2rem;
+            color: #4caf50;
+            align-self: center;
+        }
+
+        .similar-jobs {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .similar-jobs h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .similar-job-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .similar-job-item:hover {
+            background: #f8f9fa;
+        }
+
+        .similar-job-item:last-child {
+            border-bottom: none;
+        }
+
+        .similar-job-title {
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .similar-job-company {
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .similar-job-salary {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .share-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 1024px) {
+            .detail-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 2rem;
+            }
+
+            .job-title-large {
+                font-size: 1.5rem;
+            }
+
+            .company-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .process-steps {
+                flex-direction: column;
+            }
+
+            .arrow-right {
+                transform: rotate(90deg);
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo" onclick="location.href='index.html'">💼 TechJob</div>
+            <div class="nav-menu">
+                <a href="job-search.html">求人検索</a>
+                <a href="engineer-profile.html">マイページ</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="login.html">ログイン</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="detail-container">
+        <div class="main-content">
+            <a href="job-search.html" class="back-link">
+                ← 検索結果に戻る
+            </a>
+
+            <div class="job-header">
+                <div class="company-info">
+                    <div class="company-logo-large">🏢</div>
+                    <div>
+                        <div class="company-name-large" onclick="viewCompany()">
+                            株式会社テックイノベーション
+                        </div>
+                        <div style="color: #999; font-size: 0.9rem;">
+                            IT・通信 | 従業員数: 101-500名 | 設立: 2015年
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="job-title-large">フロントエンドエンジニア（React）</h1>
+
+                <div class="job-meta-large">
+                    <div class="meta-item">📍 東京都渋谷区</div>
+                    <div class="meta-item">💰 500-700万円</div>
+                    <div class="meta-item">🏠 リモート可</div>
+                    <div class="meta-item">⏰ 正社員</div>
+                    <div class="meta-item">📅 2日前に投稿</div>
+                </div>
+            </div>
+
+            <!-- 仕事内容 -->
+            <div class="section">
+                <h2 class="section-title">📋 仕事内容</h2>
+                <div class="section-content">
+                    <p>
+                        自社開発のWebサービスのフロントエンド開発をお任せします。
+                        最新のReactとTypeScriptを使用した、ユーザー体験を重視した開発環境で、
+                        あなたのスキルを存分に発揮していただけます。
+                    </p>
+                    <br>
+                    <p>
+                        <strong>【具体的な業務内容】</strong>
+                    </p>
+                    <ul style="padding-left: 2rem; margin-top: 1rem;">
+                        <li>自社Webサービスの新機能開発・既存機能の改善</li>
+                        <li>UIコンポーネントの設計・実装</li>
+                        <li>API連携の実装</li>
+                        <li>パフォーマンス最適化</li>
+                        <li>コードレビュー・技術的な知見の共有</li>
+                        <li>デザイナー・バックエンドエンジニアとの協業</li>
+                    </ul>
+                    <br>
+                    <p>
+                        <strong>【開発環境】</strong><br>
+                        言語: TypeScript, JavaScript<br>
+                        フレームワーク: React, Next.js<br>
+                        状態管理: Redux, Recoil<br>
+                        UI: Material-UI, Styled Components<br>
+                        テスト: Jest, React Testing Library<br>
+                        インフラ: AWS, Vercel<br>
+                        その他: Git, GitHub, Docker, Figma
+                    </p>
+                </div>
+            </div>
+
+            <!-- 必須スキル -->
+            <div class="section">
+                <h2 class="section-title">✅ 必須スキル・経験</h2>
+                <ul class="requirements-list">
+                    <li>Reactを使用した実務経験 2年以上</li>
+                    <li>TypeScriptの使用経験</li>
+                    <li>HTML/CSSの深い理解</li>
+                    <li>Git/GitHubを使用したチーム開発経験</li>
+                    <li>RESTful APIの利用経験</li>
+                    <li>レスポンシブデザインの実装経験</li>
+                </ul>
+            </div>
+
+            <!-- 歓迎スキル -->
+            <div class="section">
+                <h2 class="section-title">🎯 歓迎スキル・経験</h2>
+                <ul class="requirements-list optional">
+                    <li>Next.jsの使用経験</li>
+                    <li>Redux、Recoilなどの状態管理ライブラリの経験</li>
+                    <li>GraphQLの使用経験</li>
+                    <li>テスト駆動開発の経験</li>
+                    <li>パフォーマンス最適化の経験</li>
+                    <li>UI/UXデザインへの理解</li>
+                    <li>アジャイル開発の経験</li>
+                    <li>技術ブログ執筆やOSS活動</li>
+                </ul>
+            </div>
+
+            <!-- 求めるスキルセット -->
+            <div class="section">
+                <h2 class="section-title">🛠️ 使用技術・スキルセット</h2>
+                <div class="skills-grid">
+                    <span class="skill-badge-large required">React</span>
+                    <span class="skill-badge-large required">TypeScript</span>
+                    <span class="skill-badge-large required">JavaScript</span>
+                    <span class="skill-badge-large">Next.js</span>
+                    <span class="skill-badge-large">Redux</span>
+                    <span class="skill-badge-large">Recoil</span>
+                    <span class="skill-badge-large">HTML/CSS</span>
+                    <span class="skill-badge-large">Material-UI</span>
+                    <span class="skill-badge-large">Styled Components</span>
+                    <span class="skill-badge-large">Jest</span>
+                    <span class="skill-badge-large">Git</span>
+                    <span class="skill-badge-large">AWS</span>
+                    <span class="skill-badge-large">Docker</span>
+                    <span class="skill-badge-large">Figma</span>
+                </div>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                    ※ 色付きのスキルは必須、その他は歓迎スキルです
+                </p>
+            </div>
+
+            <!-- 福利厚生 -->
+            <div class="section">
+                <h2 class="section-title">🎁 福利厚生・待遇</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">💰</div>
+                        <div class="benefit-text">
+                            <h4>給与・賞与</h4>
+                            <p>年収500-700万円<br>昇給年1回、賞与年2回</p>
+                        </div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🏠</div>
+                        <div class="benefit-text">
+                            <h4>リモートワーク</h4>
+                            <p>週2-3日のリモート勤務可能<br>フレックスタイム制度あり</p>
+                        </div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">📚</div>
+                        <div class="benefit-text">
+                            <h4>学習支援</h4>
+                            <p>書籍購入補助（月1万円）<br>技術カンファレンス参加費全額負担</p>
+                        </div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🏥</div>
+                        <div class="benefit-text">
+                            <h4>保険・休暇</h4>
+                            <p>各種社会保険完備<br>年間休日125日</p>
+                        </div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">💻</div>
+                        <div class="benefit-text">
+                            <h4>開発環境</h4>
+                            <p>MacBook Pro支給<br>デュアルディスプレイ</p>
+                        </div>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🎉</div>
+                        <div class="benefit-text">
+                            <h4>その他</h4>
+                            <p>ドリンク・軽食無料<br>社内イベント多数</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 勤務条件 -->
+            <div class="section">
+                <h2 class="section-title">🏢 勤務条件</h2>
+                <div class="section-content">
+                    <p><strong>勤務地：</strong><br>
+                    東京都渋谷区道玄坂1-2-3 渋谷駅より徒歩5分<br>
+                    ※リモートワーク可（週2-3日）</p>
+                    <br>
+                    <p><strong>勤務時間：</strong><br>
+                    フレックスタイム制（コアタイム 11:00-16:00）<br>
+                    標準労働時間 8時間/日</p>
+                    <br>
+                    <p><strong>休日・休暇：</strong><br>
+                    完全週休2日制（土日祝）<br>
+                    年間休日125日<br>
+                    夏季休暇、年末年始休暇<br>
+                    有給休暇（入社時10日付与）<br>
+                    慶弔休暇、産休・育休制度</p>
+                </div>
+            </div>
+
+            <!-- 選考プロセス -->
+            <div class="application-process">
+                <h3>📝 選考プロセス</h3>
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div class="step-title">書類選考</div>
+                        <div class="step-description">3営業日以内にご連絡</div>
+                    </div>
+                    <div class="arrow-right">→</div>
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">一次面接</div>
+                        <div class="step-description">現場エンジニアと面談</div>
+                    </div>
+                    <div class="arrow-right">→</div>
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">コーディング面接</div>
+                        <div class="step-description">実技試験（2時間程度）</div>
+                    </div>
+                    <div class="arrow-right">→</div>
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">最終面接</div>
+                        <div class="step-description">役員面接・条件面談</div>
+                    </div>
+                </div>
+                <p style="margin-top: 1.5rem; color: #666; text-align: center;">
+                    ※ 応募から内定まで約2-3週間を予定しています
+                </p>
+            </div>
+
+            <!-- 会社情報 -->
+            <div class="company-description">
+                <h3>🏢 会社について</h3>
+                <p>
+                    株式会社テックイノベーションは、2015年設立のWebサービス開発企業です。
+                    「技術で社会をより良く」をミッションに、BtoB SaaSプロダクトを中心に
+                    事業を展開しています。エンジニアファーストの文化を大切にし、
+                    最新技術への挑戦と学習機会の提供に力を入れています。
+                </p>
+                <div class="company-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">250+</div>
+                        <div class="stat-label">従業員数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2015</div>
+                        <div class="stat-label">設立年</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">15億円</div>
+                        <div class="stat-label">資本金</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">120社</div>
+                        <div class="stat-label">導入企業数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- タグ -->
+            <div class="tags-section">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">🏷️ タグ</h3>
+                <div class="skills-grid">
+                    <span class="skill-badge-large">#自社サービス</span>
+                    <span class="skill-badge-large">#リモートワーク</span>
+                    <span class="skill-badge-large">#フレックスタイム</span>
+                    <span class="skill-badge-large">#モダン技術スタック</span>
+                    <span class="skill-badge-large">#学習支援充実</span>
+                    <span class="skill-badge-large">#フラットな組織</span>
+                    <span class="skill-badge-large">#エンジニアファースト</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- サイドバー -->
+        <div class="sidebar">
+            <div class="apply-card">
+                <div class="salary-highlight">
+                    <div class="salary-amount">¥500-700万</div>
+                    <div class="salary-note">想定年収 / 経験・スキルにより優遇</div>
+                </div>
+                <button class="btn-apply-large" onclick="applyJob()">
+                    この求人に応募する
+                </button>
+                <button class="btn-bookmark-large" onclick="bookmarkJob()">
+                    🔖 ブックマーク
+                </button>
+                <div class="share-buttons">
+                    <button class="share-btn" onclick="shareTwitter()" title="Twitterで共有">🐦</button>
+                    <button class="share-btn" onclick="shareFacebook()" title="Facebookで共有">📘</button>
+                    <button class="share-btn" onclick="shareLinkedIn()" title="LinkedInで共有">💼</button>
+                    <button class="share-btn" onclick="copyLink()" title="リンクをコピー">🔗</button>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>📊 求人情報</h3>
+                <div class="info-item">
+                    <div class="info-label">雇用形態</div>
+                    <div class="info-value">正社員</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">試用期間</div>
+                    <div class="info-value">3ヶ月（条件変更なし）</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">募集人数</div>
+                    <div class="info-value">2-3名</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">応募締切</div>
+                    <div class="info-value">2024年2月28日</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">掲載開始</div>
+                    <div class="info-value">2024年1月20日</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ページビュー</div>
+                    <div class="info-value">1,245回</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">応募数</div>
+                    <div class="info-value">23名</div>
+                </div>
+            </div>
+
+            <div class="similar-jobs">
+                <h3>🔍 類似の求人</h3>
+                <div class="similar-job-item" onclick="viewJob(2)">
+                    <div class="similar-job-title">Reactエンジニア（自社サービス）</div>
+                    <div class="similar-job-company">株式会社ウェブテック</div>
+                    <div class="similar-job-salary">💰 600-800万円</div>
+                </div>
+                <div class="similar-job-item" onclick="viewJob(3)">
+                    <div class="similar-job-title">フロントエンド開発リーダー</div>
+                    <div class="similar-job-company">デジタルソリューションズ</div>
+                    <div class="similar-job-salary">💰 700-900万円</div>
+                </div>
+                <div class="similar-job-item" onclick="viewJob(4)">
+                    <div class="similar-job-title">Vue.jsエンジニア</div>
+                    <div class="similar-job-company">株式会社モダンウェブ</div>
+                    <div class="similar-job-salary">💰 550-750万円</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function applyJob() {
+            // ログインチェック
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                if (confirm('応募するにはログインが必要です。ログインページに移動しますか？')) {
+                    sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            // 応募確認
+            if (confirm('この求人に応募しますか？\n\n株式会社テックイノベーション\nフロントエンドエンジニア（React）')) {
+                // 応募情報を保存
+                const applicationData = {
+                    jobId: 1,
+                    jobTitle: 'フロントエンドエンジニア（React）',
+                    companyName: '株式会社テックイノベーション',
+                    appliedDate: new Date().toISOString(),
+                    status: 'pending'
+                };
+
+                let applications = JSON.parse(localStorage.getItem('applications') || '[]');
+                applications.push(applicationData);
+                localStorage.setItem('applications', JSON.stringify(applications));
+
+                alert('応募が完了しました！\n\n企業からの連絡をお待ちください。\n応募状況は「マイページ」からご確認いただけます。');
+            }
+        }
+
+        function bookmarkJob() {
+            // ブックマーク処理
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const jobId = 1;
+
+            if (bookmarks.includes(jobId)) {
+                alert('この求人は既にブックマークされています');
+                return;
+            }
+
+            bookmarks.push(jobId);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            alert('ブックマークに追加しました！');
+            
+            // ボタンのテキストを変更
+            event.target.innerHTML = '✓ ブックマーク済み';
+            event.target.style.background = '#667eea';
+            event.target.style.color = 'white';
+        }
+
+        function shareTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('フロントエンドエンジニア（React）｜株式会社テックイノベーション #TechJob #求人');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+        }
+
+        function shareFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('リンクをコピーしました！');
+            });
+        }
+
+        function viewCompany() {
+            // 企業詳細ページへ遷移（別途実装可能）
+            alert('企業詳細ページへ遷移（実装予定）');
+        }
+
+        function viewJob(jobId) {
+            window.location.href = `job-detail.html?id=${jobId}`;
+        }
+
+        // ページビューをカウント（実際のシステムでは、サーバー側で処理）
+        window.onload = function() {
+            const jobId = new URLSearchParams(window.location.search).get('id') || 1;
+            let views = JSON.parse(localStorage.getItem('jobViews') || '{}');
+            views[jobId] = (views[jobId] || 0) + 1;
+            localStorage.setItem('jobViews', JSON.stringify(views));
+        };
+    </script>
+</body>
+</html>

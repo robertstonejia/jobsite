@@ -1,0 +1,2203 @@
+# 支払い機能追加 - PayPay、Alipay、WeChat Pay対応
+
+## 9. payment-plan.html (料金プラン選択)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>料金プラン - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .user-type-selector {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .user-type-tab {
+            padding: 1rem 3rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .user-type-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .plan-card.recommended {
+            border: 3px solid #667eea;
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .plan-name {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            margin-bottom: 2rem;
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .price-period {
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .plan-description {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.8rem 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .plan-features li.disabled {
+            color: #ccc;
+        }
+
+        .plan-features li.disabled::before {
+            content: '×';
+            color: #ccc;
+        }
+
+        .btn-select-plan {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-select-plan:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-select-plan.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 4rem;
+        }
+
+        .comparison-section h2 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-table th {
+            background: #f8f9fa;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .comparison-table td {
+            color: #555;
+        }
+
+        .check-icon {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .cross-icon {
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-type-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">💳 TechJob - 料金プラン</div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>最適なプランを選択してください</h1>
+            <p>14日間の無料トライアル付き。いつでもキャンセル可能です。</p>
+        </div>
+
+        <div class="user-type-selector">
+            <button class="user-type-tab active" onclick="switchUserType('company')">
+                🏢 企業プラン
+            </button>
+            <button class="user-type-tab" onclick="switchUserType('engineer')">
+                👨‍💻 技術者プラン
+            </button>
+        </div>
+
+        <!-- 企業プラン -->
+        <div id="companyPlans" class="plans-grid">
+            <div class="plan-card">
+                <div class="plan-name">フリー</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥0</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    小規模企業や試験的に利用したい企業向け
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 1件まで</li>
+                    <li>応募者閲覧 月10名まで</li>
+                    <li>基本サポート</li>
+                    <li class="disabled">スカウト機能</li>
+                    <li class="disabled">詳細分析レポート</li>
+                    <li class="disabled">優先サポート</li>
+                </ul>
+                <button class="btn-select-plan secondary" onclick="selectPlan('company', 'free', 0)">
+                    無料で始める
+                </button>
+            </div>
+
+            <div class="plan-card recommended">
+                <div class="recommended-badge">おすすめ</div>
+                <div class="plan-name">スタンダード</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥29,800</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    継続的に採用活動を行う企業に最適
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 5件まで</li>
+                    <li>応募者閲覧 無制限</li>
+                    <li>スカウト機能（月50通）</li>
+                    <li>基本分析レポート</li>
+                    <li>メールサポート</li>
+                    <li class="disabled">専任コンサルタント</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('company', 'standard', 29800)">
+                    14日間無料で試す
+                </button>
+            </div>
+
+            <div class="plan-card">
+                <div class="plan-name">プレミアム</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥59,800</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    大規模採用を行う企業向けの完全パッケージ
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 無制限</li>
+                    <li>応募者閲覧 無制限</li>
+                    <li>スカウト機能（無制限）</li>
+                    <li>詳細分析レポート</li>
+                    <li>優先サポート（24時間以内対応）</li>
+                    <li>専任コンサルタント</li>
+                    <li>企業ページカスタマイズ</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('company', 'premium', 59800)">
+                    14日間無料で試す
+                </button>
+            </div>
+        </div>
+
+        <!-- 技術者プラン -->
+        <div id="engineerPlans" class="plans-grid" style="display: none;">
+            <div class="plan-card">
+                <div class="plan-name">フリー</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥0</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    求人検索と基本機能を無料で利用
+                </div>
+                <ul class="plan-features">
+                    <li>求人検索・応募 無制限</li>
+                    <li>プロフィール作成</li>
+                    <li>企業からのスカウト受信</li>
+                    <li class="disabled">プロフィール優先表示</li>
+                    <li class="disabled">詳細応募状況分析</li>
+                    <li class="disabled">キャリア相談</li>
+                </ul>
+                <button class="btn-select-plan secondary" onclick="selectPlan('engineer', 'free', 0)">
+                    無料で始める
+                </button>
+            </div>
+
+            <div class="plan-card recommended">
+                <div class="recommended-badge">おすすめ</div>
+                <div class="plan-name">プレミアム</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥980</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    本気で転職活動をする技術者向け
+                </div>
+                <ul class="plan-features">
+                    <li>すべてのフリー機能</li>
+                    <li>プロフィール優先表示</li>
+                    <li>非公開求人へのアクセス</li>
+                    <li>詳細応募状況分析</li>
+                    <li>月1回のキャリア相談</li>
+                    <li>履歴書・職務経歴書添削</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('engineer', 'premium', 980)">
+                    14日間無料で試す
+                </button>
+            </div>
+
+            <div class="plan-card">
+                <div class="plan-name">プロフェッショナル</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥2,980</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    最高のキャリア支援を受けたい方へ
+                </div>
+                <ul class="plan-features">
+                    <li>すべてのプレミアム機能</li>
+                    <li>専任キャリアアドバイザー</li>
+                    <li>企業への直接推薦</li>
+                    <li>面接対策（無制限）</li>
+                    <li>年収交渉サポート</li>
+                    <li>VIP専用イベント招待</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('engineer', 'professional', 2980)">
+                    14日間無料で試す
+                </button>
+            </div>
+        </div>
+
+        <!-- 比較表 -->
+        <div class="comparison-section">
+            <h2>詳細機能比較</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>機能</th>
+                        <th>フリー</th>
+                        <th>スタンダード</th>
+                        <th>プレミアム</th>
+                    </tr>
+                </thead>
+                <tbody id="comparisonBody">
+                    <tr>
+                        <td>求人掲載数</td>
+                        <td>1件</td>
+                        <td>5件</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>応募者閲覧</td>
+                        <td>月10名</td>
+                        <td>無制限</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>スカウト機能</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td>月50通</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>分析レポート</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="check-icon">✓</span> 基本</td>
+                        <td><span class="check-icon">✓</span> 詳細</td>
+                    </tr>
+                    <tr>
+                        <td>サポート</td>
+                        <td>基本</td>
+                        <td>メール</td>
+                        <td>優先（24h）</td>
+                    </tr>
+                    <tr>
+                        <td>専任コンサルタント</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="check-icon">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentUserType = 'company';
+
+        function switchUserType(type) {
+            currentUserType = type;
+            
+            // タブの切り替え
+            document.querySelectorAll('.user-type-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // プランの表示切り替え
+            if (type === 'company') {
+                document.getElementById('companyPlans').style.display = 'grid';
+                document.getElementById('engineerPlans').style.display = 'none';
+            } else {
+                document.getElementById('companyPlans').style.display = 'none';
+                document.getElementById('engineerPlans').style.display = 'grid';
+            }
+        }
+
+        function selectPlan(userType, planType, amount) {
+            // プラン情報を保存
+            const planData = {
+                userType: userType,
+                planType: planType,
+                amount: amount,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('selectedPlan', JSON.stringify(planData));
+
+            if (amount === 0) {
+                // 無料プランの場合は直接登録ページへ
+                if (userType === 'company') {
+                    window.location.href = 'company-register.html';
+                } else {
+                    window.location.href = 'engineer-register.html';
+                }
+            } else {
+                // 有料プランの場合は支払いページへ
+                window.location.href = `payment-method.html?type=${userType}&plan=${planType}&amount=${amount}`;
+            }
+        }
+    </script>
+</body>
+</html>
+```
+
+## 10. payment-method.html (支払い方法選択)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お支払い方法 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .order-summary h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #667eea;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid #667eea;
+        }
+
+        .payment-methods {
+            margin-bottom: 2rem;
+        }
+
+        .payment-methods h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-method-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .payment-method {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-method:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .payment-icon {
+            font-size: 3rem;
+            width: 80px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .payment-description {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .radio-indicator {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-method.selected .radio-indicator {
+            border-color: #667eea;
+        }
+
+        .payment-method.selected .radio-indicator::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .credit-card-form {
+            display: none;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .credit-card-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .security-note {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 5px;
+        }
+
+        .security-note p {
+            color: #2e7d32;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .trial-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .trial-notice p {
+            color: #856404;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .payment-container {
+                padding: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-method {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="logo">💳</div>
+        <h2>お支払い方法を選択</h2>
+
+        <div class="trial-notice">
+            <p>⭐ 14日間の無料トライアル期間中はお支払いは発生しません</p>
+        </div>
+
+        <div class="order-summary">
+            <h3>ご注文内容</h3>
+            <div class="summary-item">
+                <span>プラン</span>
+                <span id="planName">スタンダードプラン</span>
+            </div>
+            <div class="summary-item">
+                <span>期間</span>
+                <span>月額</span>
+            </div>
+            <div class="summary-item">
+                <span>無料トライアル</span>
+                <span>14日間</span>
+            </div>
+            <div class="summary-item">
+                <span>合計金額</span>
+                <span id="totalAmount">¥29,800/月</span>
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <h3>お支払い方法</h3>
+            
+            <div class="payment-method-grid">
+                <!-- クレジットカード -->
+                <div class="payment-method" onclick="selectPaymentMethod('creditcard')">
+                    <div class="payment-icon">💳</div>
+                    <div class="payment-info">
+                        <div class="payment-name">クレジットカード</div>
+                        <div class="payment-description">Visa, Mastercard, JCB, American Express</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+
+                <!-- PayPay -->
+                <div class="payment-method" onclick="selectPaymentMethod('paypay')">
+                    <div class="payment-icon" style="background: #ff6b6b; color: white; font-weight: bold;">
+                        PayPay
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name">PayPay</div>
+                        <div class="payment-description">PayPayアプリで簡単決済</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+
+                <!-- Alipay -->
+                <div class="payment-method" onclick="selectPaymentMethod('alipay')">
+                    <div class="payment-icon" style="background: #1678FF; color: white; font-weight: bold; font-size: 1.2rem;">
+                        Alipay
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name">Alipay (支付宝)</div>
+                        <div class="payment-description">アリペイで支払う</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+
+                <!-- WeChat Pay -->
+                <div class="payment-method" onclick="selectPaymentMethod('wechat')">
+                    <div class="payment-icon" style="background: #09B83E; color: white; font-weight: bold; font-size: 1.2rem;">
+                        WeChat
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name">WeChat Pay (微信支付)</div>
+                        <div class="payment-description">ウィーチャットペイで支払う</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+
+                <!-- コンビニ決済 -->
+                <div class="payment-method" onclick="selectPaymentMethod('convenience')">
+                    <div class="payment-icon">🏪</div>
+                    <div class="payment-info">
+                        <div class="payment-name">コンビニ決済</div>
+                        <div class="payment-description">セブン、ローソン、ファミマで支払い</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+
+                <!-- 銀行振込 -->
+                <div class="payment-method" onclick="selectPaymentMethod('banktransfer')">
+                    <div class="payment-icon">🏦</div>
+                    <div class="payment-info">
+                        <div class="payment-name">銀行振込</div>
+                        <div class="payment-description">振込手数料はお客様負担となります</div>
+                    </div>
+                    <div class="radio-indicator"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- クレジットカードフォーム -->
+        <div id="creditCardForm" class="credit-card-form">
+            <div class="form-group">
+                <label for="cardNumber">カード番号</label>
+                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+            </div>
+            <div class="form-group">
+                <label for="cardName">カード名義人</label>
+                <input type="text" id="cardName" placeholder="TARO YAMADA">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="expiry">有効期限</label>
+                    <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="form-group">
+                    <label for="cvv">セキュリティコード</label>
+                    <input type="text" id="cvv" placeholder="123" maxlength="4">
+                </div>
+            </div>
+        </div>
+
+        <div class="security-note">
+            <p>🔒 すべての決済情報は暗号化されて安全に処理されます</p>
+        </div>
+
+        <button class="btn-pay" id="payButton" disabled onclick="processPayment()">
+            支払い方法を選択してください
+        </button>
+
+        <div class="back-link">
+            <a href="payment-plan.html">← プラン選択に戻る</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedMethod = '';
+        let planData = {};
+
+        // URLパラメータから情報を取得
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userType = urlParams.get('type');
+            const planType = urlParams.get('plan');
+            const amount = urlParams.get('amount');
+
+            planData = {
+                userType: userType,
+                planType: planType,
+                amount: parseInt(amount)
+            };
+
+            // プラン名の表示
+            const planNames = {
+                'standard': 'スタンダードプラン',
+                'premium': 'プレミアムプラン',
+                'professional': 'プロフェッショナルプラン'
+            };
+            document.getElementById('planName').textContent = planNames[planType] || planType;
+            document.getElementById('totalAmount').textContent = `¥${amount.toLocaleString()}/月`;
+
+            // カード番号の自動フォーマット
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // 有効期限の自動フォーマット
+            const expiryInput = document.getElementById('expiry');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+        };
+
+        function selectPaymentMethod(method) {
+            selectedMethod = method;
+            
+            // すべての選択を解除
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 選択した方法をハイライト
+            event.currentTarget.classList.add('selected');
+            
+            // クレジットカードフォームの表示/非表示
+            const creditCardForm = document.getElementById('creditCardForm');
+            if (method === 'creditcard') {
+                creditCardForm.classList.add('active');
+            } else {
+                creditCardForm.classList.remove('active');
+            }
+            
+            // ボタンを有効化
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = false;
+            payButton.textContent = getPayButtonText(method);
+        }
+
+        function getPayButtonText(method) {
+            const texts = {
+                'creditcard': '無料トライアルを開始',
+                'paypay': 'PayPayで支払う',
+                'alipay': 'Alipayで支払う',
+                'wechat': 'WeChat Payで支払う',
+                'convenience': 'コンビニ決済を選択',
+                'banktransfer': '銀行振込情報を確認'
+            };
+            return texts[method] || '支払いを確定';
+        }
+
+        function processPayment() {
+            if (!selectedMethod) {
+                alert('支払い方法を選択してください');
+                return;
+            }
+
+            // クレジットカードの場合はバリデーション
+            if (selectedMethod === 'creditcard') {
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardName = document.getElementById('cardName').value;
+                const expiry = document.getElementById('expiry').value;
+                const cvv = document.getElementById('cvv').value;
+
+                if (!cardNumber || !cardName || !expiry || !cvv) {
+                    alert('すべてのカード情報を入力してください');
+                    return;
+                }
+
+                // カード番号の簡易バリデーション
+                if (cardNumber.replace(/\s/g, '').length < 13) {
+                    alert('正しいカード番号を入力してください');
+                    return;
+                }
+            }
+
+            // 支払い情報を保存
+            const paymentData = {
+                method: selectedMethod,
+                plan: planData,
+                timestamp: new Date().toISOString(),
+                status: 'trial' // 無料トライアル中
+            };
+
+            localStorage.setItem('paymentInfo', JSON.stringify(paymentData));
+
+            // 各支払い方法に応じた処理
+            switch(selectedMethod) {
+                case 'creditcard':
+                    // クレジットカード処理
+                    showPaymentProcessing('クレジットカード情報を処理中...');
+                    break;
+                case 'paypay':
+                    // PayPay処理（実際はPayPay APIにリダイレクト）
+                    window.location.href = 'payment-paypay.html?' + new URLSearchParams(planData);
+                    return;
+                case 'alipay':
+                    // Alipay処理（実際はAlipay APIにリダイレクト）
+                    window.location.href = 'payment-alipay.html?' + new URLSearchParams(planData);
+                    return;
+                case 'wechat':
+                    // WeChat Pay処理（実際はWeChat Pay APIにリダイレクト）
+                    window.location.href = 'payment-wechat.html?' + new URLSearchParams(planData);
+                    return;
+                case 'convenience':
+                    window.location.href = 'payment-convenience.html?' + new URLSearchParams(planData);
+                    return;
+                case 'banktransfer':
+                    window.location.href = 'payment-bank.html?' + new URLSearchParams(planData);
+                    return;
+            }
+        }
+
+        function showPaymentProcessing(message) {
+            const payButton = document.getElementById('payButton');
+            payButton.textContent = message;
+            payButton.disabled = true;
+
+            // 2秒後に完了画面へ
+            setTimeout(() => {
+                window.location.href = 'payment-success.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+```
+
+## 11. payment-paypay.html (PayPay決済)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPay決済 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .paypay-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .paypay-logo {
+            width: 150px;
+            height: 50px;
+            background: #ff6b6b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .amount-display {
+            background: #fff3f3;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .amount-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-value {
+            font-size: 3rem;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instructions h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .btn-open-app {
+            width: 100%;
+            padding: 1.2rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn-open-app:hover {
+            background: #ee5a6f;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .status-checking {
+            color: #666;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        @keyframes blink {
+            0%, 20% { opacity: 0; }
+            40% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .loading-dots span {
+            animation: blink 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="paypay-container">
+        <div class="paypay-logo">PayPay</div>
+        <h2>PayPayでお支払い</h2>
+
+        <div class="amount-display">
+            <div class="amount-label">お支払い金額</div>
+            <div class="amount-value" id="paymentAmount">¥29,800</div>
+        </div>
+
+        <div class="qr-code">
+            📱
+        </div>
+
+        <div class="instructions">
+            <h3>お支払い手順</h3>
+            <ol>
+                <li>PayPayアプリを開く</li>
+                <li>「スキャン」をタップ</li>
+                <li>上記のQRコードを読み取る</li>
+                <li>金額を確認して支払いを完了</li>
+            </ol>
+        </div>
+
+        <button class="btn-open-app" onclick="openPayPayApp()">
+            PayPayアプリを開く
+        </button>
+
+        <div class="status-checking">
+            支払い状況を確認中<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+
+        <button class="btn-cancel" onclick="cancelPayment()">
+            キャンセル
+        </button>
+    </div>
+
+    <script>
+        // URLパラメータから金額を取得
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const amount = urlParams.get('amount');
+            if (amount) {
+                document.getElementById('paymentAmount').textContent = 
+                    `¥${parseInt(amount).toLocaleString()}`;
+            }
+
+            // 支払い完了の自動チェック（デモ用に10秒後に完了）
+            setTimeout(() => {
+                // 実際のシステムでは、サーバーから支払い状態をポーリング
+                if (confirm('PayPayでの支払いが完了しました。登録を続けますか？')) {
+                    completePayment();
+                }
+            }, 10000);
+        };
+
+        function openPayPayApp() {
+            // 実際のシステムでは、PayPay Deep LinkまたはUniversal Linkを使用
+            // paypay://payment?code=xxxxx
+            alert('PayPayアプリを開きます（実装時はDeep Linkを使用）');
+            
+            // デモ用：5秒後に支払い完了
+            setTimeout(() => {
+                completePayment();
+            }, 5000);
+        }
+
+        function completePayment() {
+            // 支払い完了情報を保存
+            const paymentData = {
+                method: 'paypay',
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paymentCompleted', JSON.stringify(paymentData));
+            
+            // 成功ページへリダイレクト
+            window.location.href = 'payment-success.html';
+        }
+
+        function cancelPayment() {
+            if (confirm('支払いをキャンセルしますか？')) {
+                window.location.href = 'payment-method.html?' + window.location.search.substring(1);
+            }
+        }
+    </script>
+</body>
+</html>
+```
+
+## 12. payment-alipay.html (Alipay決済)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alipay決済 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1678FF 0%, #0D5FD9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .alipay-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .alipay-logo {
+            width: 150px;
+            height: 50px;
+            background: #1678FF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .amount-display {
+            background: #e6f2ff;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .amount-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-value {
+            font-size: 3rem;
+            color: #1678FF;
+            font-weight: bold;
+        }
+
+        .currency-note {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .qr-code-large {
+            width: 280px;
+            height: 280px;
+            background: white;
+            border: 4px solid #1678FF;
+            border-radius: 15px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            position: relative;
+        }
+
+        .qr-code-large::after {
+            content: 'Scan QR Code';
+            position: absolute;
+            bottom: 1rem;
+            font-size: 0.9rem;
+            color: #1678FF;
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instructions h3 {
+            color: #1678FF;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: #1678FF;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1.2rem;
+            background: #1678FF;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #0D5FD9;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #1678FF;
+            color: #1678FF;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #666;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #1678FF;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .language-switch {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #1678FF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="alipay-container">
+        <div class="alipay-logo">Alipay 支付宝</div>
+        
+        <div class="language-switch">
+            <button class="lang-btn active" onclick="switchLanguage('ja')">日本語</button>
+            <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
+            <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+        </div>
+
+        <h2 id="title">Alipayでお支払い</h2>
+        <p class="subtitle" id="subtitle">支付宝扫码支付</p>
+
+        <div class="amount-display">
+            <div class="amount-label" id="amountLabel">お支払い金額</div>
+            <div class="amount-value" id="paymentAmount">¥29,800</div>
+            <div class="currency-note" id="currencyNote">
+                ※ 為替レートに応じて人民元で請求されます
+            </div>
+        </div>
+
+        <div class="qr-code-large">
+            📲
+        </div>
+
+        <div class="instructions">
+            <h3 id="instructionTitle">支付步骤 / Payment Steps</h3>
+            <div class="instruction-step">
+                <div class="step-number">1</div>
+                <div class="step-text" id="step1">
+                    支付宝アプリを開く / 打开支付宝应用
+                </div>
+            </div>
+            <div class="instruction-step">
+                <div class="step-number">2</div>
+                <div class="step-text" id="step2">
+                    「スキャン」をタップ / 点击"扫一扫"
+                </div>
+            </div>
+            <div class="instruction-step">
+                <div class="step-number">3</div>
+                <div class="step-text" id="step3">
+                    QRコードをスキャン / 扫描二维码
+                </div>
+            </div>
+            <div class="instruction-step">
+                <div class="step-number">4</div>
+                <div class="step-text" id="step4">
+                    金額を確認して支払い / 确认金额并支付
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator"></div>
+            <span id="statusText">支付状态确认中...</span>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-primary" onclick="openAlipayApp()" id="openAppBtn">
+                打开支付宝 / Open Alipay App
+            </button>
+            <button class="btn-secondary" onclick="cancelPayment()" id="cancelBtn">
+                取消 / Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            ja: {
+                title: 'Alipayでお支払い',
+                subtitle: '支付宝扫码支付',
+                amountLabel: 'お支払い金額',
+                currencyNote: '※ 為替レートに応じて人民元で請求されます',
+                instructionTitle: '支付步骤',
+                step1: '支付宝アプリを開く',
+                step2: '「スキャン」をタップ',
+                step3: 'QRコードをスキャン',
+                step4: '金額を確認して支払い',
+                statusText: '支付状態確認中...',
+                openAppBtn: '支付宝を開く',
+                cancelBtn: 'キャンセル'
+            },
+            zh: {
+                title: '使用支付宝支付',
+                subtitle: 'Alipay Payment',
+                amountLabel: '支付金额',
+                currencyNote: '※ 将按照当前汇率以人民币结算',
+                instructionTitle: '支付步骤',
+                step1: '打开支付宝应用',
+                step2: '点击"扫一扫"',
+                step3: '扫描二维码',
+                step4: '确认金额并支付',
+                statusText: '正在确认支付状态...',
+                openAppBtn: '打开支付宝',
+                cancelBtn: '取消'
+            },
+            en: {
+                title: 'Pay with Alipay',
+                subtitle: 'Scan QR Code to Pay',
+                amountLabel: 'Payment Amount',
+                currencyNote: '※ Will be charged in CNY based on exchange rate',
+                instructionTitle: 'Payment Steps',
+                step1: 'Open Alipay App',
+                step2: 'Tap "Scan"',
+                step3: 'Scan the QR Code',
+                step4: 'Confirm amount and pay',
+                statusText: 'Checking payment status...',
+                openAppBtn: 'Open Alipay App',
+                cancelBtn: 'Cancel'
+            }
+        };
+
+        let currentLang = 'ja';
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const amount = urlParams.get('amount');
+            if (amount) {
+                document.getElementById('paymentAmount').textContent = 
+                    `¥${parseInt(amount).toLocaleString()}`;
+            }
+
+            // デモ用：15秒後に支払い完了確認
+            setTimeout(() => {
+                if (confirm('Alipayでの支払いが完了しました。登録を続けますか？\n支付已完成，是否继续注册？')) {
+                    completePayment();
+                }
+            }, 15000);
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // テキストを更新
+            const trans = translations[lang];
+            document.getElementById('title').textContent = trans.title;
+            document.getElementById('subtitle').textContent = trans.subtitle;
+            document.getElementById('amountLabel').textContent = trans.amountLabel;
+            document.getElementById('currencyNote').textContent = trans.currencyNote;
+            document.getElementById('instructionTitle').textContent = trans.instructionTitle;
+            document.getElementById('step1').textContent = trans.step1;
+            document.getElementById('step2').textContent = trans.step2;
+            document.getElementById('step3').textContent = trans.step3;
+            document.getElementById('step4').textContent = trans.step4;
+            document.getElementById('statusText').textContent = trans.statusText;
+            document.getElementById('openAppBtn').textContent = trans.openAppBtn;
+            document.getElementById('cancelBtn').textContent = trans.cancelBtn;
+        }
+
+        function openAlipayApp() {
+            // 実際のシステムでは、Alipay SDKまたはDeep Linkを使用
+            // alipays://platformapi/startapp?...
+            alert('Opening Alipay App...\n打开支付宝应用...');
+            
+            // デモ用：3秒後に支払い完了
+            setTimeout(() => {
+                completePayment();
+            }, 3000);
+        }
+
+        function completePayment() {
+            const paymentData = {
+                method: 'alipay',
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paymentCompleted', JSON.stringify(paymentData));
+            window.location.href = 'payment-success.html';
+        }
+
+        function cancelPayment() {
+            if (confirm('支払いをキャンセルしますか？\n是否取消支付？')) {
+                window.location.href = 'payment-method.html?' + window.location.search.substring(1);
+            }
+        }
+    </script>
+</body>
+</html>
+```
+
+## 13. payment-wechat.html (WeChat Pay決済)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeChat Pay決済 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #09B83E 0%, #078031 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .wechat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .wechat-logo {
+            width: 150px;
+            height: 50px;
+            background: #09B83E;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .amount-display {
+            background: #e8f5e9;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .amount-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-value {
+            font-size: 3rem;
+            color: #09B83E;
+            font-weight: bold;
+        }
+
+        .currency-note {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .qr-code-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 2rem auto;
+        }
+
+        .qr-code-wechat {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 4px solid #09B83E;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            position: relative;
+        }
+
+        .wechat-icon-overlay {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #09B83E;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instructions h3 {
+            color: #09B83E;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .instruction-item:hover {
+            transform: translateX(5px);
+        }
+
+        .item-number {
+            width: 28px;
+            height: 28px;
+            background: #09B83E;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .language-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .lang-tab {
+            padding: 0.5rem 1.2rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .lang-tab.active {
+            background: #09B83E;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-wechat {
+            width: 100%;
+            padding: 1.2rem;
+            background: #09B83E;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-wechat:hover {
+            background: #078031;
+        }
+
+        .btn-cancel-wechat {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel-wechat:hover {
+            border-color: #09B83E;
+            color: #09B83E;
+        }
+
+        .status-indicator-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #e8f5e9;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #09B83E;
+            border-radius: 50%;
+            animation: pulse-animation 1.5s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.5;
+            }
+        }
+
+        .status-text {
+            color: #09B83E;
+            font-weight: 500;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="wechat-container">
+        <div class="wechat-logo">WeChat Pay</div>
+        
+        <div class="language-tabs">
+            <button class="lang-tab active" onclick="switchLang('ja')">日本語</button>
+            <button class="lang-tab" onclick="switchLang('zh')">中文</button>
+            <button class="lang-tab" onclick="switchLang('en')">English</button>
+        </div>
+
+        <h2 id="mainTitle">WeChat Payでお支払い</h2>
+        <p class="subtitle" id="mainSubtitle">微信支付 / WeChat Payment</p>
+
+        <div class="amount-display">
+            <div class="amount-label" id="amountLabelText">支付金额 / Payment Amount</div>
+            <div class="amount-value" id="paymentAmountValue">¥29,800</div>
+            <div class="currency-note" id="currencyNoteText">
+                ※ 将按照当前汇率以人民币结算
+            </div>
+        </div>
+
+        <div class="qr-code-container">
+            <div class="qr-code-wechat">
+                <div class="wechat-icon-overlay">💬</div>
+                📱
+            </div>
+        </div>
+
+        <div class="status-indicator-bar">
+            <div class="pulse-dot"></div>
+            <span class="status-text" id="statusIndicatorText">等待扫码支付...</span>
+        </div>
+
+        <div class="instructions">
+            <h3 id="instructionsTitle">💡 支付步骤</h3>
+            <div class="instruction-item">
+                <div class="item-number">1</div>
+                <div class="item-content">
+                    <div class="item-title" id="step1Title">打开微信</div>
+                    <div class="item-description" id="step1Desc">启动微信应用程序</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">2</div>
+                <div class="item-content">
+                    <div class="item-title" id="step2Title">扫一扫</div>
+                    <div class="item-description" id="step2Desc">点击右上角"+"选择"扫一扫"</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">3</div>
+                <div class="item-content">
+                    <div class="item-title" id="step3Title">扫描二维码</div>
+                    <div class="item-description" id="step3Desc">将摄像头对准上方二维码</div>
+                </div>
+            </div>
+            <div class="instruction-item">
+                <div class="item-number">4</div>
+                <div class="item-content">
+                    <div class="item-title" id="step4Title">确认支付</div>
+                    <div class="item-description" id="step4Desc">核对金额后输入密码完成支付</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-wechat" onclick="openWeChatApp()" id="openWeChatBtn">
+                <span>💬</span>
+                <span id="openBtnText">打开微信 / Open WeChat</span>
+            </button>
+            <button class="btn-cancel-wechat" onclick="cancelWeChatPayment()" id="cancelWeChatBtn">
+                <span id="cancelBtnText">取消 / Cancel</span>
+            </button>
+        </div>
+
+        <div class="security-badge">
+            🔒 <span id="securityText">安全加密支付</span>
+        </div>
+    </div>
+
+    <script>
+        const wechatTranslations = {
+            ja: {
+                mainTitle: 'WeChat Payでお支払い',
+                mainSubtitle: '微信支付でお支払い',
+                amountLabelText: '支払金額',
+                currencyNoteText: '※ 為替レートに応じて人民元で請求されます',
+                statusIndicatorText: '支付状態確認中...',
+                instructionsTitle: '💡 支付手順',
+                step1Title: 'WeChatを開く',
+                step1Desc: 'WeChatアプリを起動',
+                step2Title: 'スキャン機能',
+                step2Desc: '右上の「+」から「スキャン」を選択',
+                step3Title: 'QRコードをスキャン',
+                step3Desc: 'カメラで上のQRコードを読み取り',
+                step4Title: '支払い確認',
+                step4Desc: '金額を確認しパスワードを入力',
+                openBtnText: 'WeChatを開く',
+                cancelBtnText: 'キャンセル',
+                securityText: '安全な暗号化決済'
+            },
+            zh: {
+                mainTitle: '使用微信支付',
+                mainSubtitle: 'WeChat Pay',
+                amountLabelText: '支付金额',
+                currencyNoteText: '※ 将按照当前汇率以人民币结算',
+                statusIndicatorText: '等待扫码支付...',
+                instructionsTitle: '💡 支付步骤',
+                step1Title: '打开微信',
+                step1Desc: '启动微信应用程序',
+                step2Title: '扫一扫',
+                step2Desc: '点击右上角"+"选择"扫一扫"',
+                step3Title: '扫描二维码',
+                step3Desc: '将摄

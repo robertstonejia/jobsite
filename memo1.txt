@@ -1,0 +1,2173 @@
+# 追加ページ作成 - 完全版
+
+## 5. login.html (ログイン)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            padding: 3rem;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .user-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .user-type-btn.active {
+            border-color: #667eea;
+            background: #f0f3ff;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .user-type-btn:hover {
+            border-color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 2rem 0;
+            color: #999;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .register-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .btn-register {
+            padding: 0.8rem;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: block;
+        }
+
+        .btn-register:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🚀</div>
+        <h2>TechJob ログイン</h2>
+
+        <div class="user-type-selector">
+            <button class="user-type-btn active" onclick="selectUserType('company')">
+                🏢 企業
+            </button>
+            <button class="user-type-btn" onclick="selectUserType('engineer')">
+                👨‍💻 技術者
+            </button>
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            メールアドレスまたはパスワードが正しくありません
+        </div>
+
+        <form id="loginForm">
+            <input type="hidden" id="userType" value="company">
+            
+            <div class="form-group">
+                <label for="email">メールアドレス</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">パスワード</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="forgot-password">
+                <a href="#">パスワードをお忘れですか？</a>
+            </div>
+
+            <button type="submit" class="btn-login">ログイン</button>
+        </form>
+
+        <div class="divider">または</div>
+
+        <div class="register-links">
+            <a href="company-register.html" class="btn-register">🏢 企業として新規登録</a>
+            <a href="engineer-register.html" class="btn-register">👨‍💻 技術者として新規登録</a>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">← トップページに戻る</a>
+        </div>
+    </div>
+
+    <script>
+        let currentUserType = 'company';
+
+        function selectUserType(type) {
+            currentUserType = type;
+            document.getElementById('userType').value = type;
+            
+            document.querySelectorAll('.user-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+
+            let users = [];
+            let redirectPage = '';
+
+            if (userType === 'company') {
+                users = JSON.parse(localStorage.getItem('companies') || '[]');
+                redirectPage = 'company-dashboard.html';
+            } else {
+                users = JSON.parse(localStorage.getItem('engineers') || '[]');
+                redirectPage = 'engineer-profile.html';
+            }
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // ログイン成功
+                sessionStorage.setItem('loggedInUser', JSON.stringify({
+                    email: user.email,
+                    type: userType
+                }));
+                window.location.href = redirectPage + '?email=' + email;
+            } else {
+                // ログイン失敗
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## 6. engineer-profile.html (技術者プロフィール)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技術者プロフィール - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .profile-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-title {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit-profile {
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-edit-profile:hover {
+            background: #5568d3;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .skill-badge {
+            background: #e8eaf6;
+            color: #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .skill-badge.expert {
+            background: #667eea;
+            color: white;
+        }
+
+        .job-recommendations {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .job-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .job-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-name {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .job-details {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            color: #666;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .btn-apply {
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-apply:hover {
+            background: #5568d3;
+        }
+
+        .application-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-reviewing {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-accepted {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">👨‍💻 TechJob</div>
+            <div class="nav-menu">
+                <a href="job-search.html">求人検索</a>
+                <a href="engineer-profile.html">マイページ</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="index.html" class="btn-logout">ログアウト</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-info">
+                <h1 class="profile-name" id="engineerName">山田 太郎</h1>
+                <div class="profile-title" id="jobType">フロントエンドエンジニア</div>
+                <div class="profile-meta">
+                    <div class="profile-meta-item">
+                        📍 <span id="location">東京都</span>
+                    </div>
+                    <div class="profile-meta-item">
+                        💼 <span id="experience">実務経験 3-5年</span>
+                    </div>
+                    <div class="profile-meta-item">
+                        💰 <span id="salary">希望年収 500-600万円</span>
+                    </div>
+                </div>
+                <button class="btn-edit-profile" onclick="editProfile()">プロフィール編集</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">概要</button>
+            <button class="tab" onclick="switchTab('skills')">スキル</button>
+            <button class="tab" onclick="switchTab('recommendations')">おすすめ求人</button>
+            <button class="tab" onclick="switchTab('applications')">応募履歴</button>
+        </div>
+
+        <!-- 概要タブ -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div>応募中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div>面接予定</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">45</div>
+                    <div>スカウト</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">89%</div>
+                    <div>プロフィール充実度</div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">📝 自己PR</h2>
+                <p id="selfPR">
+                    5年間のWeb開発経験があり、特にReactを使ったフロントエンド開発を得意としています。
+                    ユーザー体験を重視した開発を心がけており、アクセシビリティやパフォーマンス最適化にも
+                    注力しています。チーム開発においては、コードレビューや技術共有を積極的に行い、
+                    チーム全体のスキル向上に貢献してきました。
+                </p>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">🔗 ポートフォリオ</h2>
+                <p>
+                    <a href="#" style="color: #667eea;">https://github.com/yamada-taro</a><br>
+                    <a href="#" style="color: #667eea;">https://portfolio.example.com</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- スキルタブ -->
+        <div id="skills" class="tab-content">
+            <div class="section-card">
+                <h2 class="section-title">💻 プログラミング言語</h2>
+                <div class="skills-grid" id="languageSkills">
+                    <span class="skill-badge expert">JavaScript</span>
+                    <span class="skill-badge expert">TypeScript</span>
+                    <span class="skill-badge">Python</span>
+                    <span class="skill-badge">HTML/CSS</span>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">🛠️ フレームワーク・ライブラリ</h2>
+                <div class="skills-grid" id="frameworkSkills">
+                    <span class="skill-badge expert">React</span>
+                    <span class="skill-badge expert">Next.js</span>
+                    <span class="skill-badge">Vue.js</span>
+                    <span class="skill-badge">Node.js</span>
+                    <span class="skill-badge">Express</span>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">🗄️ データベース</h2>
+                <div class="skills-grid" id="databaseSkills">
+                    <span class="skill-badge">MySQL</span>
+                    <span class="skill-badge">PostgreSQL</span>
+                    <span class="skill-badge">MongoDB</span>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2 class="section-title">⚙️ その他のスキル</h2>
+                <div class="skills-grid" id="otherSkills">
+                    <span class="skill-badge">Git</span>
+                    <span class="skill-badge">Docker</span>
+                    <span class="skill-badge">AWS</span>
+                    <span class="skill-badge">CI/CD</span>
+                    <span class="skill-badge">Figma</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- おすすめ求人タブ -->
+        <div id="recommendations" class="tab-content">
+            <div class="job-recommendations">
+                <div class="job-card">
+                    <div class="job-header">
+                        <div>
+                            <h3>フロントエンドエンジニア（React）</h3>
+                            <div class="company-name">株式会社テックイノベーション</div>
+                        </div>
+                        <div class="company-logo">🏢</div>
+                    </div>
+                    <div class="job-details">
+                        <span>📍 東京都渋谷区</span>
+                        <span>💰 500-700万円</span>
+                        <span>🏠 リモート可</span>
+                        <span>⏰ フルタイム</span>
+                    </div>
+                    <div class="skills-grid" style="margin-bottom: 1rem;">
+                        <span class="skill-badge">React</span>
+                        <span class="skill-badge">TypeScript</span>
+                        <span class="skill-badge">Next.js</span>
+                    </div>
+                    <p style="color: #666; margin-bottom: 1rem;">
+                        自社サービスのフロントエンド開発をお任せします。最新技術を積極的に導入し、
+                        ユーザー体験の向上を目指しています。
+                    </p>
+                    <button class="btn-apply" onclick="applyJob(1)">応募する</button>
+                </div>
+
+                <div class="job-card">
+                    <div class="job-header">
+                        <div>
+                            <h3>フルスタックエンジニア</h3>
+                            <div class="company-name">グローバルウェブ株式会社</div>
+                        </div>
+                        <div class="company-logo">🌐</div>
+                    </div>
+                    <div class="job-details">
+                        <span>📍 東京都港区</span>
+                        <span>💰 600-800万円</span>
+                        <span>🏠 ハイブリッド</span>
+                        <span>⏰ フルタイム</span>
+                    </div>
+                    <div class="skills-grid" style="margin-bottom: 1rem;">
+                        <span class="skill-badge">React</span>
+                        <span class="skill-badge">Node.js</span>
+                        <span class="skill-badge">AWS</span>
+                    </div>
+                    <p style="color: #666; margin-bottom: 1rem;">
+                        フロントエンドからバックエンドまで幅広く開発に携わっていただけるポジションです。
+                    </p>
+                    <button class="btn-apply" onclick="applyJob(2)">応募する</button>
+                </div>
+
+                <div class="job-card">
+                    <div class="job-header">
+                        <div>
+                            <h3>UIエンジニア</h3>
+                            <div class="company-name">デザインテック株式会社</div>
+                        </div>
+                        <div class="company-logo">🎨</div>
+                    </div>
+                    <div class="job-details">
+                        <span>📍 東京都新宿区</span>
+                        <span>💰 550-700万円</span>
+                        <span>🏠 リモート可</span>
+                        <span>⏰ フルタイム</span>
+                    </div>
+                    <div class="skills-grid" style="margin-bottom: 1rem;">
+                        <span class="skill-badge">React</span>
+                        <span class="skill-badge">CSS</span>
+                        <span class="skill-badge">Figma</span>
+                    </div>
+                    <p style="color: #666; margin-bottom: 1rem;">
+                        デザイナーと密に連携し、美しく使いやすいUIの実装をお願いします。
+                    </p>
+                    <button class="btn-apply" onclick="applyJob(3)">応募する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 応募履歴タブ -->
+        <div id="applications" class="tab-content">
+            <div class="application-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 0.5rem;">フロントエンドエンジニア</h3>
+                        <div style="color: #667eea; font-weight: 500;">株式会社ウェブソリューションズ</div>
+                    </div>
+                    <span class="status-badge status-reviewing">書類選考中</span>
+                </div>
+                <div style="color: #666; font-size: 0.9rem;">
+                    応募日: 2024/01/20
+                </div>
+            </div>
+
+            <div class="application-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 0.5rem;">Reactエンジニア</h3>
+                        <div style="color: #667eea; font-weight: 500;">テックスタートアップ株式会社</div>
+                    </div>
+                    <span class="status-badge status-accepted">面接調整中</span>
+                </div>
+                <div style="color: #666; font-size: 0.9rem;">
+                    応募日: 2024/01/18<br>
+                    次回面接: 2024/01/25 14:00
+                </div>
+            </div>
+
+            <div class="application-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 0.5rem;">フルスタックエンジニア</h3>
+                        <div style="color: #667eea; font-weight: 500;">株式会社クラウドテック</div>
+                    </div>
+                    <span class="status-badge status-pending">応募済み</span>
+                </div>
+                <div style="color: #666; font-size: 0.9rem;">
+                    応募日: 2024/01/15
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータから技術者情報を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+
+        if (email) {
+            const engineers = JSON.parse(localStorage.getItem('engineers') || '[]');
+            const engineer = engineers.find(e => e.email === email);
+            
+            if (engineer) {
+                document.getElementById('engineerName').textContent = 
+                    `${engineer.lastName} ${engineer.firstName}`;
+                
+                const jobTypeMap = {
+                    'frontend': 'フロントエンドエンジニア',
+                    'backend': 'バックエンドエンジニア',
+                    'fullstack': 'フルスタックエンジニア',
+                    'mobile': 'モバイルアプリ開発エンジニア',
+                    'infrastructure': 'インフラエンジニア',
+                    'data': 'データサイエンティスト',
+                    'ai': 'AI/機械学習エンジニア',
+                    'pm': 'プロジェクトマネージャー'
+                };
+                document.getElementById('jobType').textContent = 
+                    jobTypeMap[engineer.desiredJobType] || engineer.desiredJobType;
+                
+                document.getElementById('location').textContent = 
+                    engineer.desiredLocation || engineer.address || '東京都';
+                
+                const experienceMap = {
+                    '0-1': '1年未満',
+                    '1-3': '1-3年',
+                    '3-5': '3-5年',
+                    '5-10': '5-10年',
+                    '10+': '10年以上'
+                };
+                document.getElementById('experience').textContent = 
+                    '実務経験 ' + (experienceMap[engineer.experience] || engineer.experience);
+                
+                const salaryMap = {
+                    '300-400': '300-400万円',
+                    '400-500': '400-500万円',
+                    '500-600': '500-600万円',
+                    '600-700': '600-700万円',
+                    '700-800': '700-800万円',
+                    '800-1000': '800-1000万円',
+                    '1000+': '1000万円以上'
+                };
+                document.getElementById('salary').textContent = 
+                    '希望年収 ' + (salaryMap[engineer.desiredSalary] || engineer.desiredSalary);
+                
+                if (engineer.selfPR) {
+                    document.getElementById('selfPR').textContent = engineer.selfPR;
+                }
+
+                // スキルを表示
+                if (engineer.languages && engineer.languages.length > 0) {
+                    const languageSkills = document.getElementById('languageSkills');
+                    languageSkills.innerHTML = engineer.languages.map(lang => 
+                        `<span class="skill-badge">${lang}</span>`
+                    ).join('');
+                }
+
+                if (engineer.frameworks && engineer.frameworks.length > 0) {
+                    const frameworkSkills = document.getElementById('frameworkSkills');
+                    frameworkSkills.innerHTML = engineer.frameworks.map(fw => 
+                        `<span class="skill-badge">${fw}</span>`
+                    ).join('');
+                }
+
+                if (engineer.databases && engineer.databases.length > 0) {
+                    const databaseSkills = document.getElementById('databaseSkills');
+                    databaseSkills.innerHTML = engineer.databases.map(db => 
+                        `<span class="skill-badge">${db}</span>`
+                    ).join('');
+                }
+
+                if (engineer.otherSkills && engineer.otherSkills.length > 0) {
+                    const otherSkills = document.getElementById('otherSkills');
+                    otherSkills.innerHTML = engineer.otherSkills.map(skill => 
+                        `<span class="skill-badge">${skill}</span>`
+                    ).join('');
+                }
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function editProfile() {
+            alert('プロフィール編集機能（別途実装可能）');
+        }
+
+        function applyJob(jobId) {
+            if (confirm('この求人に応募しますか？')) {
+                alert('応募が完了しました！企業からの連絡をお待ちください。');
+            }
+        }
+    </script>
+</body>
+</html>
+```
+
+## 7. job-search.html (求人検索)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求人検索 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-search {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+        }
+
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .filter-group select {
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .filter-checkbox {
+            margin-bottom: 0.8rem;
+        }
+
+        .filter-checkbox label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .results-header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .job-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .job-info {
+            flex: 1;
+        }
+
+        .job-title {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-name {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            color: #666;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .job-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .job-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .job-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .job-tag {
+            background: #e8eaf6;
+            color: #667eea;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .job-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .posted-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .btn-apply {
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-apply:hover {
+            background: #5568d3;
+        }
+
+        .btn-bookmark {
+            padding: 0.8rem;
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .btn-bookmark:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .no-results {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            color: #666;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+
+            .filter-section {
+                grid-template-columns: 1fr;
+            }
+
+            .job-card-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .job-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🔍 TechJob - 求人検索</div>
+            <div class="nav-menu">
+                <a href="index.html">ホーム</a>
+                <a href="engineer-profile.html">マイページ</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="login.html">ログイン</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="search-container">
+        <div class="search-header">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchKeyword" 
+                       placeholder="キーワード、会社名、職種名で検索...">
+                <button class="btn-search" onclick="searchJobs()">🔍 検索</button>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="locationFilter">勤務地</label>
+                    <select id="locationFilter" onchange="searchJobs()">
+                        <option value="">すべて</option>
+                        <option value="tokyo">東京都</option>
+                        <option value="osaka">大阪府</option>
+                        <option value="nagoya">愛知県</option>
+                        <option value="fukuoka">福岡県</option>
+                        <option value="remote">フルリモート</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="salaryFilter">年収</label>
+                    <select id="salaryFilter" onchange="searchJobs()">
+                        <option value="">指定なし</option>
+                        <option value="300">300万円以上</option>
+                        <option value="400">400万円以上</option>
+                        <option value="500">500万円以上</option>
+                        <option value="600">600万円以上</option>
+                        <option value="700">700万円以上</option>
+                        <option value="800">800万円以上</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="experienceFilter">経験年数</label>
+                    <select id="experienceFilter" onchange="searchJobs()">
+                        <option value="">指定なし</option>
+                        <option value="0">未経験可</option>
+                        <option value="1">1年以上</option>
+                        <option value="3">3年以上</option>
+                        <option value="5">5年以上</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="employmentFilter">雇用形態</label>
+                    <select id="employmentFilter" onchange="searchJobs()">
+                        <option value="">すべて</option>
+                        <option value="fulltime">正社員</option>
+                        <option value="contract">契約社員</option>
+                        <option value="freelance">フリーランス</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>スキルで絞り込み</h3>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="JavaScript" onchange="searchJobs()">
+                        JavaScript
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="Python" onchange="searchJobs()">
+                        Python
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="Java" onchange="searchJobs()">
+                        Java
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="React" onchange="searchJobs()">
+                        React
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="Vue.js" onchange="searchJobs()">
+                        Vue.js
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="Node.js" onchange="searchJobs()">
+                        Node.js
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="AWS" onchange="searchJobs()">
+                        AWS
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="Docker" onchange="searchJobs()">
+                        Docker
+                    </label>
+                </div>
+
+                <h3 style="margin-top: 2rem;">勤務形態</h3>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="remote" onchange="searchJobs()">
+                        フルリモート可
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="hybrid" onchange="searchJobs()">
+                        ハイブリッド
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <label>
+                        <input type="checkbox" value="flextime" onchange="searchJobs()">
+                        フレックスタイム
+                    </label>
+                </div>
+            </aside>
+
+            <div class="results-section">
+                <div class="results-header">
+                    <div class="results-count" id="resultsCount">125件の求人が見つかりました</div>
+                    <select class="sort-select">
+                        <option value="newest">新着順</option>
+                        <option value="salary-high">年収が高い順</option>
+                        <option value="salary-low">年収が低い順</option>
+                        <option value="popular">人気順</option>
+                    </select>
+                </div>
+
+                <div id="jobsList">
+                    <!-- 求人カード1 -->
+                    <div class="job-card" onclick="viewJobDetail(1)">
+                        <div class="job-card-header">
+                            <div class="job-info">
+                                <h2 class="job-title">フロントエンドエンジニア（React）</h2>
+                                <div class="company-name">株式会社テックイノベーション</div>
+                            </div>
+                            <div class="company-logo">🏢</div>
+                        </div>
+
+                        <div class="job-meta">
+                            <div class="job-meta-item">📍 東京都渋谷区</div>
+                            <div class="job-meta-item">💰 500-700万円</div>
+                            <div class="job-meta-item">🏠 リモート可</div>
+                            <div class="job-meta-item">⏰ 正社員</div>
+                        </div>
+
+                        <p class="job-description">
+                            自社サービスのフロントエンド開発をお任せします。
+                            Reactを使用した最新のWebアプリケーション開発に携わっていただけます。
+                            ユーザー体験を重視した開発環境で、あなたのスキルを存分に発揮してください。
+                        </p>
+
+                        <div class="job-tags">
+                            <span class="job-tag">React</span>
+                            <span class="job-tag">TypeScript</span>
+                            <span class="job-tag">Next.js</span>
+                            <span class="job-tag">Git</span>
+                            <span class="job-tag">リモートワーク可</span>
+                        </div>
+
+                        <div class="job-footer">
+                            <div class="posted-date">📅 2日前に投稿</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-bookmark" onclick="event.stopPropagation(); bookmarkJob(1)">
+                                    🔖
+                                </button>
+                                <button class="btn-apply" onclick="event.stopPropagation(); applyJob(1)">
+                                    応募する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 求人カード2 -->
+                    <div class="job-card" onclick="viewJobDetail(2)">
+                        <div class="job-card-header">
+                            <div class="job-info">
+                                <h2 class="job-title">バックエンドエンジニア（Python/Django）</h2>
+                                <div class="company-name">グローバルウェブ株式会社</div>
+                            </div>
+                            <div class="company-logo">🌐</div>
+                        </div>
+
+                        <div class="job-meta">
+                            <div class="job-meta-item">📍 東京都港区</div>
+                            <div class="job-meta-item">💰 600-900万円</div>
+                            <div class="job-meta-item">🏠 ハイブリッド</div>
+                            <div class="job-meta-item">⏰ 正社員</div>
+                        </div>
+
+                        <p class="job-description">
+                            大規模Webサービスのバックエンド開発を担当していただきます。
+                            PythonとDjangoを使用したAPI開発、データベース設計、
+                            インフラ構築まで幅広い業務に携わっていただけます。
+                        </p>
+
+                        <div class="job-tags">
+                            <span class="job-tag">Python</span>
+                            <span class="job-tag">Django</span>
+                            <span class="job-tag">PostgreSQL</span>
+                            <span class="job-tag">AWS</span>
+                            <span class="job-tag">Docker</span>
+                        </div>
+
+                        <div class="job-footer">
+                            <div class="posted-date">📅 1週間前に投稿</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-bookmark" onclick="event.stopPropagation(); bookmarkJob(2)">
+                                    🔖
+                                </button>
+                                <button class="btn-apply" onclick="event.stopPropagation(); applyJob(2)">
+                                    応募する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 求人カード3 -->
+                    <div class="job-card" onclick="viewJobDetail(3)">
+                        <div class="job-card-header">
+                            <div class="job-info">
+                                <h2 class="job-title">フルスタックエンジニア</h2>
+                                <div class="company-name">スタートアップベンチャー株式会社</div>
+                            </div>
+                            <div class="company-logo">🚀</div>
+                        </div>
+
+                        <div class="job-meta">
+                            <div class="job-meta-item">📍 フルリモート</div>
+                            <div class="job-meta-item">💰 550-800万円</div>
+                            <div class="job-meta-item">🏠 完全リモート</div>
+                            <div class="job-meta-item">⏰ 正社員</div>
+                        </div>
+
+                        <p class="job-description">
+                            急成長中のスタートアップで、フロントエンドからバックエンドまで
+                            幅広く開発をお任せします。新規サービスの立ち上げから参画でき、
+                            技術選定にも関わっていただける魅力的なポジションです。
+                        </p>
+
+                        <div class="job-tags">
+                            <span class="job-tag">React</span>
+                            <span class="job-tag">Node.js</span>
+                            <span class="job-tag">MongoDB</span>
+                            <span class="job-tag">AWS</span>
+                            <span class="job-tag">完全リモート</span>
+                        </div>
+
+                        <div class="job-footer">
+                            <div class="posted-date">📅 3日前に投稿</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-bookmark" onclick="event.stopPropagation(); bookmarkJob(3)">
+                                    🔖
+                                </button>
+                                <button class="btn-apply" onclick="event.stopPropagation(); applyJob(3)">
+                                    応募する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 求人カード4 -->
+                    <div class="job-card" onclick="viewJobDetail(4)">
+                        <div class="job-card-header">
+                            <div class="job-info">
+                                <h2 class="job-title">モバイルアプリエンジニア（iOS/Android）</h2>
+                                <div class="company-name">モバイルテック株式会社</div>
+                            </div>
+                            <div class="company-logo">📱</div>
+                        </div>
+
+                        <div class="job-meta">
+                            <div class="job-meta-item">📍 大阪府大阪市</div>
+                            <div class="job-meta-item">💰 500-700万円</div>
+                            <div class="job-meta-item">🏠 ハイブリッド</div>
+                            <div class="job-meta-item">⏰ 正社員</div>
+                        </div>
+
+                        <p class="job-description">
+                            iOSおよびAndroidアプリの開発をお任せします。
+                            React NativeまたはFlutterを使用したクロスプラットフォーム開発の経験者歓迎。
+                            100万DL以上の人気アプリの開発に携われます。
+                        </p>
+
+                        <div class="job-tags">
+                            <span class="job-tag">React Native</span>
+                            <span class="job-tag">Swift</span>
+                            <span class="job-tag">Kotlin</span>
+                            <span class="job-tag">Firebase</span>
+                        </div>
+
+                        <div class="job-footer">
+                            <div class="posted-date">📅 5日前に投稿</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-bookmark" onclick="event.stopPropagation(); bookmarkJob(4)">
+                                    🔖
+                                </button>
+                                <button class="btn-apply" onclick="event.stopPropagation(); applyJob(4)">
+                                    応募する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 求人カード5 -->
+                    <div class="job-card" onclick="viewJobDetail(5)">
+                        <div class="job-card-header">
+                            <div class="job-info">
+                                <h2 class="job-title">データエンジニア</h2>
+                                <div class="company-name">ビッグデータ株式会社</div>
+                            </div>
+                            <div class="company-logo">📊</div>
+                        </div>
+
+                        <div class="job-meta">
+                            <div class="job-meta-item">📍 東京都千代田区</div>
+                            <div class="job-meta-item">💰 700-1000万円</div>
+                            <div class="job-meta-item">🏠 リモート可</div>
+                            <div class="job-meta-item">⏰ 正社員</div>
+                        </div>
+
+                        <p class="job-description">
+                            大規模データ基盤の構築・運用をお任せします。
+                            データパイプラインの設計からBI環境の整備まで、
+                            データ活用を推進する重要なポジションです。
+                        </p>
+
+                        <div class="job-tags">
+                            <span class="job-tag">Python</span>
+                            <span class="job-tag">SQL</span>
+                            <span class="job-tag">AWS</span>
+                            <span class="job-tag">BigQuery</span>
+                            <span class="job-tag">Airflow</span>
+                        </div>
+
+                        <div class="job-footer">
+                            <div class="posted-date">📅 1日前に投稿</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-bookmark" onclick="event.stopPropagation(); bookmarkJob(5)">
+                                    🔖
+                                </button>
+                                <button class="btn-apply" onclick="event.stopPropagation(); applyJob(5)">
+                                    応募する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchJobs() {
+            const keyword = document.getElementById('searchKeyword').value;
+            console.log('検索キーワード:', keyword);
+            // 実際のシステムでは、ここでAPIを呼び出してフィルタリングされた結果を取得
+            alert('検索機能を実行しました（実装時はAPIと連携）');
+        }
+
+        function viewJobDetail(jobId) {
+            window.location.href = `job-detail.html?id=${jobId}`;
+        }
+
+        function applyJob(jobId) {
+            if (confirm('この求人に応募しますか？')) {
+                alert(`求人ID ${jobId} に応募しました！`);
+                // 実際のシステムでは応募処理を実行
+            }
+        }
+
+        function bookmarkJob(jobId) {
+            alert(`求人ID ${jobId} をブックマークしました！`);
+            // 実際のシステムではブックマーク処理を実行
+        }
+
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // URLパラメータから検索条件を取得して適用
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyword = urlParams.get('keyword');
+            if (keyword) {
+                document.getElementById('searchKeyword').value = keyword;
+                searchJobs();
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+## 8. job-detail.html (求人詳細)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求人詳細 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .detail-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .main-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .job-header {
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 2rem;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .company-logo-large {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .company-name-large {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .job-title-large {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .job-meta-large {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #666;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-content {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .requirements-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements-list li {
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .requirements-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0.8rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .skill-badge-large {
+            background: #e8eaf6;
+            color: #667eea;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .benefit-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+        }
+
+        .benefit-text h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-text p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .apply-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .salary-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .salary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-apply-large {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .btn-apply-large:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-bookmark-large {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-bookmark-large:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .info-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: opacity 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 1024px) {
+            .detail-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 2rem;
+            }
+
+            .job-title-large {
+                font-size: 1.5rem;
+            }
+
+            .company-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo" onclick="location.href='index.html'">💼 TechJob</div>
+            <div class="nav-menu">
+                <a href="job-search.html">求人検索</a>
+                <a href="engineer-profile.html">マイページ</a>
+                <a href="messages.html">メッセージ</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="detail-container">
+        <div class="main-content">
+            <a href="job-search.html" class="back-link">
+                ← 検索結果に戻る
+            </a>
+
+            <div class="job-header">
+                <div class="company-info">
+                    <div class="company-logo-large">🏢</div>
+                    <div>
+                        <div class="company-name-large">株式会社テックイノベーション</div>
+                        <div style="color: #999; font-size: 0.9rem;">IT・通信 | 従業員数: 101-500名</div>
+                    </div>
+                </div>
+
+                <h1 class="job-title-large">フロントエンドエンジニア（React）</h1>
+
+                <div class="job-meta-large">
+                    <div class="meta-item">📍 東京都渋谷区</div>
+                    <div class="meta-item">💰 500-700万円</div>
+                    <div class="meta-item">🏠 リモート可</div>
+                    <div class="meta-item">⏰ 正社員</div>
+                    <div class="meta-item">📅 2日前に投稿</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📋 仕事内容</h2>

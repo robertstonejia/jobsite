@@ -1,0 +1,284 @@
+### 2. company-register.html (企業会員登録)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業会員登録 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 0.3rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .register-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">🏢 TechJob</div>
+        <h2>企業会員登録</h2>
+        
+        <div id="successMessage" class="success-message">
+            登録が完了しました！ログインページに移動します...
+        </div>
+
+        <form id="companyRegisterForm">
+            <div class="form-group">
+                <label for="companyName">会社名<span class="required">*</span></label>
+                <input type="text" id="companyName" name="companyName" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="representativeName">代表者名<span class="required">*</span></label>
+                    <input type="text" id="representativeName" name="representativeName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="industry">業種<span class="required">*</span></label>
+                    <select id="industry" name="industry" required>
+                        <option value="">選択してください</option>
+                        <option value="it">IT・通信</option>
+                        <option value="web">Web制作・開発</option>
+                        <option value="game">ゲーム開発</option>
+                        <option value="consulting">コンサルティング</option>
+                        <option value="finance">金融</option>
+                        <option value="manufacture">製造業</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="employeeCount">従業員数<span class="required">*</span></label>
+                    <select id="employeeCount" name="employeeCount" required>
+                        <option value="">選択してください</option>
+                        <option value="1-10">1-10名</option>
+                        <option value="11-50">11-50名</option>
+                        <option value="51-100">51-100名</option>
+                        <option value="101-500">101-500名</option>
+                        <option value="501+">501名以上</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="foundedYear">設立年</label>
+                    <input type="number" id="foundedYear" name="foundedYear" min="1900" max="2024">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">所在地<span class="required">*</span></label>
+                <input type="text" id="address" name="address" required placeholder="例: 東京都渋谷区...">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">電話番号<span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="03-1234-5678">
+                </div>
+
+                <div class="form-group">
+                    <label for="website">企業ウェブサイト</label>
+                    <input type="url" id="website" name="website" placeholder="https://example.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">メールアドレス<span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">パスワード<span class="required">*</span></label>
+                    <input type="password" id="password" name="password" required minlength="8">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">パスワード確認<span class="required">*</span></label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">会社概要</label>
+                <textarea id="description" name="description" placeholder="会社の特徴や事業内容を入力してください"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">登録する</button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← トップページに戻る</a> | 
+            <a href="login.html">既にアカウントをお持ちの方</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('companyRegisterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('パスワードが一致しません');
+                return;
+            }
+
+            // フォームデータを収集
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                representativeName: document.getElementById('representativeName').value,
+                industry: document.getElementById('industry').value,
+                employeeCount: document.getElementById('employeeCount').value,
+                foundedYear: document.getElementById('foundedYear').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                website: document.getElementById('website').value,
+                email: document.getElementById('email').value,
+                password: password,
+                description: document.getElementById('description').value,
+                registeredDate: new Date().toISOString()
+            };
+
+            // LocalStorageに保存（実際のシステムではサーバーに送信）
+            let companies = JSON.parse(localStorage.getItem('companies') || '[]');
+            companies.push(formData);
+            localStorage.setItem('companies', JSON.stringify(companies));
+
+            // 成功メッセージを表示
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // 3秒後にログインページへリダイレクト
+            setTimeout(function() {
+                window.location.href = 'company-dashboard.html?email=' + formData.email;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

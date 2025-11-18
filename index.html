@@ -1,0 +1,283 @@
+### 1. index.html (トップページ)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechJob - IT技術者求人プラットフォーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* ヒーローセクション */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* 機能紹介セクション */
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #667eea;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        /* 統計セクション */
+        .stats {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            color: #667eea;
+        }
+
+        /* フッター */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🚀 TechJob</div>
+            <ul class="nav-links">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="company-register.html">企業登録</a></li>
+                <li><a href="engineer-register.html">技術者登録</a></li>
+                <li><a href="login.html">ログイン</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>IT技術者と企業をつなぐ</h1>
+        <p>最適なマッチングで、理想のキャリアと人材を</p>
+        <div class="cta-buttons">
+            <a href="engineer-register.html" class="btn btn-primary">技術者として登録</a>
+            <a href="company-register.html" class="btn btn-secondary">企業として登録</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>選ばれる理由</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🏢</div>
+                <h3>企業向け機能</h3>
+                <p>簡単登録で企業ページを作成。求人情報の管理から応募者とのマッチングまで、すべてをワンストップで。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👨‍💻</div>
+                <h3>技術者向け機能</h3>
+                <p>スキルセットを登録して、最適な求人情報を受け取ろう。プロフィールで自分をアピール。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>精密なマッチング</h3>
+                <p>AIを活用した高精度なマッチングで、企業と技術者の最適な組み合わせを実現。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>充実の管理機能</h3>
+                <p>応募状況の確認、メッセージのやり取り、面接日程の調整など、採用活動を効率化。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>安心のセキュリティ</h3>
+                <p>個人情報は厳重に管理。安心して利用できる環境を提供します。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>充実のサポート</h3>
+                <p>登録から採用まで、専任スタッフがしっかりサポート。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <h2>TechJobの実績</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>1,250+</h3>
+                <p>登録企業数</p>
+            </div>
+            <div class="stat-item">
+                <h3>8,500+</h3>
+                <p>登録技術者数</p>
+            </div>
+            <div class="stat-item">
+                <h3>3,200+</h3>
+                <p>マッチング成功数</p>
+            </div>
+            <div class="stat-item">
+                <h3>95%</h3>
+                <p>満足度</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 TechJob. All rights reserved.</p>
+    </footer>
+</body>
+</html>

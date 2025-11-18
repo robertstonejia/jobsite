@@ -1,0 +1,532 @@
+# 支払い機能追加 - PayPay、Alipay、WeChat Pay対応
+
+## 9. payment-plan.html (料金プラン選択)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>料金プラン - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .user-type-selector {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .user-type-tab {
+            padding: 1rem 3rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .user-type-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .plan-card.recommended {
+            border: 3px solid #667eea;
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .plan-name {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            margin-bottom: 2rem;
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .price-period {
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .plan-description {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.8rem 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .plan-features li.disabled {
+            color: #ccc;
+        }
+
+        .plan-features li.disabled::before {
+            content: '×';
+            color: #ccc;
+        }
+
+        .btn-select-plan {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-select-plan:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-select-plan.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 4rem;
+        }
+
+        .comparison-section h2 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-table th {
+            background: #f8f9fa;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .comparison-table td {
+            color: #555;
+        }
+
+        .check-icon {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .cross-icon {
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-type-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">💳 TechJob - 料金プラン</div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>最適なプランを選択してください</h1>
+            <p>14日間の無料トライアル付き。いつでもキャンセル可能です。</p>
+        </div>
+
+        <div class="user-type-selector">
+            <button class="user-type-tab active" onclick="switchUserType('company')">
+                🏢 企業プラン
+            </button>
+            <button class="user-type-tab" onclick="switchUserType('engineer')">
+                👨‍💻 技術者プラン
+            </button>
+        </div>
+
+        <!-- 企業プラン -->
+        <div id="companyPlans" class="plans-grid">
+            <div class="plan-card">
+                <div class="plan-name">フリー</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥0</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    小規模企業や試験的に利用したい企業向け
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 1件まで</li>
+                    <li>応募者閲覧 月10名まで</li>
+                    <li>基本サポート</li>
+                    <li class="disabled">スカウト機能</li>
+                    <li class="disabled">詳細分析レポート</li>
+                    <li class="disabled">優先サポート</li>
+                </ul>
+                <button class="btn-select-plan secondary" onclick="selectPlan('company', 'free', 0)">
+                    無料で始める
+                </button>
+            </div>
+
+            <div class="plan-card recommended">
+                <div class="recommended-badge">おすすめ</div>
+                <div class="plan-name">スタンダード</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥29,800</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    継続的に採用活動を行う企業に最適
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 5件まで</li>
+                    <li>応募者閲覧 無制限</li>
+                    <li>スカウト機能（月50通）</li>
+                    <li>基本分析レポート</li>
+                    <li>メールサポート</li>
+                    <li class="disabled">専任コンサルタント</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('company', 'standard', 29800)">
+                    14日間無料で試す
+                </button>
+            </div>
+
+            <div class="plan-card">
+                <div class="plan-name">プレミアム</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥59,800</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    大規模採用を行う企業向けの完全パッケージ
+                </div>
+                <ul class="plan-features">
+                    <li>求人掲載 無制限</li>
+                    <li>応募者閲覧 無制限</li>
+                    <li>スカウト機能（無制限）</li>
+                    <li>詳細分析レポート</li>
+                    <li>優先サポート（24時間以内対応）</li>
+                    <li>専任コンサルタント</li>
+                    <li>企業ページカスタマイズ</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('company', 'premium', 59800)">
+                    14日間無料で試す
+                </button>
+            </div>
+        </div>
+
+        <!-- 技術者プラン -->
+        <div id="engineerPlans" class="plans-grid" style="display: none;">
+            <div class="plan-card">
+                <div class="plan-name">フリー</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥0</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    求人検索と基本機能を無料で利用
+                </div>
+                <ul class="plan-features">
+                    <li>求人検索・応募 無制限</li>
+                    <li>プロフィール作成</li>
+                    <li>企業からのスカウト受信</li>
+                    <li class="disabled">プロフィール優先表示</li>
+                    <li class="disabled">詳細応募状況分析</li>
+                    <li class="disabled">キャリア相談</li>
+                </ul>
+                <button class="btn-select-plan secondary" onclick="selectPlan('engineer', 'free', 0)">
+                    無料で始める
+                </button>
+            </div>
+
+            <div class="plan-card recommended">
+                <div class="recommended-badge">おすすめ</div>
+                <div class="plan-name">プレミアム</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥980</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    本気で転職活動をする技術者向け
+                </div>
+                <ul class="plan-features">
+                    <li>すべてのフリー機能</li>
+                    <li>プロフィール優先表示</li>
+                    <li>非公開求人へのアクセス</li>
+                    <li>詳細応募状況分析</li>
+                    <li>月1回のキャリア相談</li>
+                    <li>履歴書・職務経歴書添削</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('engineer', 'premium', 980)">
+                    14日間無料で試す
+                </button>
+            </div>
+
+            <div class="plan-card">
+                <div class="plan-name">プロフェッショナル</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥2,980</span>
+                    <span class="price-period">/月</span>
+                </div>
+                <div class="plan-description">
+                    最高のキャリア支援を受けたい方へ
+                </div>
+                <ul class="plan-features">
+                    <li>すべてのプレミアム機能</li>
+                    <li>専任キャリアアドバイザー</li>
+                    <li>企業への直接推薦</li>
+                    <li>面接対策（無制限）</li>
+                    <li>年収交渉サポート</li>
+                    <li>VIP専用イベント招待</li>
+                </ul>
+                <button class="btn-select-plan" onclick="selectPlan('engineer', 'professional', 2980)">
+                    14日間無料で試す
+                </button>
+            </div>
+        </div>
+
+        <!-- 比較表 -->
+        <div class="comparison-section">
+            <h2>詳細機能比較</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>機能</th>
+                        <th>フリー</th>
+                        <th>スタンダード</th>
+                        <th>プレミアム</th>
+                    </tr>
+                </thead>
+                <tbody id="comparisonBody">
+                    <tr>
+                        <td>求人掲載数</td>
+                        <td>1件</td>
+                        <td>5件</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>応募者閲覧</td>
+                        <td>月10名</td>
+                        <td>無制限</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>スカウト機能</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td>月50通</td>
+                        <td>無制限</td>
+                    </tr>
+                    <tr>
+                        <td>分析レポート</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="check-icon">✓</span> 基本</td>
+                        <td><span class="check-icon">✓</span> 詳細</td>
+                    </tr>
+                    <tr>
+                        <td>サポート</td>
+                        <td>基本</td>
+                        <td>メール</td>
+                        <td>優先（24h）</td>
+                    </tr>
+                    <tr>
+                        <td>専任コンサルタント</td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="cross-icon">×</span></td>
+                        <td><span class="check-icon">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentUserType = 'company';
+
+        function switchUserType(type) {
+            currentUserType = type;
+            
+            // タブの切り替え
+            document.querySelectorAll('.user-type-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // プランの表示切り替え
+            if (type === 'company') {
+                document.getElementById('companyPlans').style.display = 'grid';
+                document.getElementById('engineerPlans').style.display = 'none';
+            } else {
+                document.getElementById('companyPlans').style.display = 'none';
+                document.getElementById('engineerPlans').style.display = 'grid';
+            }
+        }
+
+        function selectPlan(userType, planType, amount) {
+            // プラン情報を保存
+            const planData = {
+                userType: userType,
+                planType: planType,
+                amount: amount,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('selectedPlan', JSON.stringify(planData));
+
+            if (amount === 0) {
+                // 無料プランの場合は直接登録ページへ
+                if (userType === 'company') {
+                    window.location.href = 'company-register.html';
+                } else {
+                    window.location.href = 'engineer-register.html';
+                }
+            } else {
+                // 有料プランの場合は支払いページへ
+                window.location.href = `payment-method.html?type=${userType}&plan=${planType}&amount=${amount}`;
+            }
+        }
+    </script>
+</body>
+</html>

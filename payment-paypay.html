@@ -1,0 +1,261 @@
+## 11. payment-paypay.html (PayPay決済)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPay決済 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .paypay-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .paypay-logo {
+            width: 150px;
+            height: 50px;
+            background: #ff6b6b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .amount-display {
+            background: #fff3f3;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .amount-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-value {
+            font-size: 3rem;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+
+        .instructions h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .btn-open-app {
+            width: 100%;
+            padding: 1.2rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn-open-app:hover {
+            background: #ee5a6f;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .status-checking {
+            color: #666;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        @keyframes blink {
+            0%, 20% { opacity: 0; }
+            40% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .loading-dots span {
+            animation: blink 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="paypay-container">
+        <div class="paypay-logo">PayPay</div>
+        <h2>PayPayでお支払い</h2>
+
+        <div class="amount-display">
+            <div class="amount-label">お支払い金額</div>
+            <div class="amount-value" id="paymentAmount">¥29,800</div>
+        </div>
+
+        <div class="qr-code">
+            📱
+        </div>
+
+        <div class="instructions">
+            <h3>お支払い手順</h3>
+            <ol>
+                <li>PayPayアプリを開く</li>
+                <li>「スキャン」をタップ</li>
+                <li>上記のQRコードを読み取る</li>
+                <li>金額を確認して支払いを完了</li>
+            </ol>
+        </div>
+
+        <button class="btn-open-app" onclick="openPayPayApp()">
+            PayPayアプリを開く
+        </button>
+
+        <div class="status-checking">
+            支払い状況を確認中<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+
+        <button class="btn-cancel" onclick="cancelPayment()">
+            キャンセル
+        </button>
+    </div>
+
+    <script>
+        // URLパラメータから金額を取得
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const amount = urlParams.get('amount');
+            if (amount) {
+                document.getElementById('paymentAmount').textContent = 
+                    `¥${parseInt(amount).toLocaleString()}`;
+            }
+
+            // 支払い完了の自動チェック（デモ用に10秒後に完了）
+            setTimeout(() => {
+                // 実際のシステムでは、サーバーから支払い状態をポーリング
+                if (confirm('PayPayでの支払いが完了しました。登録を続けますか？')) {
+                    completePayment();
+                }
+            }, 10000);
+        };
+
+        function openPayPayApp() {
+            // 実際のシステムでは、PayPay Deep LinkまたはUniversal Linkを使用
+            // paypay://payment?code=xxxxx
+            alert('PayPayアプリを開きます（実装時はDeep Linkを使用）');
+            
+            // デモ用：5秒後に支払い完了
+            setTimeout(() => {
+                completePayment();
+            }, 5000);
+        }
+
+        function completePayment() {
+            // 支払い完了情報を保存
+            const paymentData = {
+                method: 'paypay',
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paymentCompleted', JSON.stringify(paymentData));
+            
+            // 成功ページへリダイレクト
+            window.location.href = 'payment-success.html';
+        }
+
+        function cancelPayment() {
+            if (confirm('支払いをキャンセルしますか？')) {
+                window.location.href = 'payment-method.html?' + window.location.search.substring(1);
+            }
+        }
+    </script>
+</body>
+</html>

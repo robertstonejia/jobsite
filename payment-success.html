@@ -1,0 +1,379 @@
+## 14. payment-success.html (支払い完了)
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お支払い完了 - TechJob</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 2rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .payment-details {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .payment-details h3 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #999;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .trial-notice {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .trial-notice h4 {
+            color: #2e7d32;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trial-notice p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .next-steps {
+            background: #fff3cd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .next-steps h4 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .next-steps ol {
+            padding-left: 1.5rem;
+            color: #856404;
+        }
+
+        .next-steps li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .support-info {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .support-info h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .support-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .success-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1>お支払いが完了しました！</h1>
+        <p class="success-message">
+            ご登録ありがとうございます。<br>
+            14日間の無料トライアルを開始しました。
+        </p>
+
+        <div class="payment-details">
+            <h3>お支払い詳細</h3>
+            <div class="detail-row">
+                <span class="detail-label">決済方法</span>
+                <span class="detail-value" id="paymentMethod">WeChat Pay</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">プラン</span>
+                <span class="detail-value" id="planName">スタンダードプラン</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">金額</span>
+                <span class="detail-value" id="amount">¥29,800/月</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">決済日時</span>
+                <span class="detail-value" id="paymentDate">2024/01/20 14:30</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">取引ID</span>
+                <span class="detail-value" id="transactionId">TXN-2024012014301234</span>
+            </div>
+        </div>
+
+        <div class="trial-notice">
+            <h4>🎉 無料トライアル期間について</h4>
+            <p>
+                <strong>トライアル期間：</strong> 14日間（2024/02/03まで）<br>
+                <strong>期間中：</strong> すべての機能を無料でご利用いただけます<br>
+                <strong>課金開始：</strong> トライアル期間終了後、自動的に有料プランに移行します<br>
+                <strong>キャンセル：</strong> いつでも無料でキャンセル可能です
+            </p>
+        </div>
+
+        <div class="next-steps">
+            <h4>📋 次のステップ</h4>
+            <ol>
+                <li>アカウント登録を完了させてください</li>
+                <li>プロフィール情報を入力してください</li>
+                <li>求人の掲載または検索を開始できます</li>
+                <li>サービスの全機能をお試しください</li>
+            </ol>
+        </div>
+
+        <div class="btn-container">
+            <a href="company-register.html" class="btn-primary" id="continueBtn">
+                登録を続ける
+            </a>
+            <a href="index.html" class="btn-secondary">
+                トップページへ戻る
+            </a>
+        </div>
+
+        <div class="support-info">
+            <h4>サポートが必要ですか？</h4>
+            <p>
+                ご不明な点がございましたら、お気軽にお問い合わせください。<br>
+                メール: <a href="mailto:support@techjob.com" class="contact-link">support@techjob.com</a><br>
+                電話: <span class="contact-link">03-1234-5678</span> (平日 9:00-18:00)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // LocalStorageから支払い情報を取得
+            const paymentCompleted = JSON.parse(localStorage.getItem('paymentCompleted') || '{}');
+            const selectedPlan = JSON.parse(localStorage.getItem('selectedPlan') || '{}');
+
+            // 支払い方法を表示
+            const methodNames = {
+                'creditcard': 'クレジットカード',
+                'paypay': 'PayPay',
+                'alipay': 'Alipay (支付宝)',
+                'wechat': 'WeChat Pay (微信支付)',
+                'convenience': 'コンビニ決済',
+                'banktransfer': '銀行振込'
+            };
+            
+            if (paymentCompleted.method) {
+                document.getElementById('paymentMethod').textContent = 
+                    methodNames[paymentCompleted.method] || paymentCompleted.method;
+            }
+
+            // プラン名を表示
+            const planNames = {
+                'standard': 'スタンダードプラン',
+                'premium': 'プレミアムプラン',
+                'professional': 'プロフェッショナルプラン'
+            };
+
+            if (selectedPlan.planType) {
+                document.getElementById('planName').textContent = 
+                    planNames[selectedPlan.planType] || selectedPlan.planType;
+            }
+
+            // 金額を表示
+            if (selectedPlan.amount) {
+                document.getElementById('amount').textContent = 
+                    `¥${selectedPlan.amount.toLocaleString()}/月`;
+            }
+
+            // 決済日時を表示
+            if (paymentCompleted.timestamp) {
+                const date = new Date(paymentCompleted.timestamp);
+                document.getElementById('paymentDate').textContent = 
+                    date.toLocaleString('ja-JP');
+            }
+
+            // ランダムな取引IDを生成（実際のシステムでは、サーバーから取得）
+            const transactionId = 'TXN-' + Date.now() + Math.floor(Math.random() * 10000);
+            document.getElementById('transactionId').textContent = transactionId;
+
+            // 登録続行ボタンのリンクを設定
+            const continueBtn = document.getElementById('continueBtn');
+            if (selectedPlan.userType === 'engineer') {
+                continueBtn.href = 'engineer-register.html';
+            } else {
+                continueBtn.href = 'company-register.html';
+            }
+
+            // 確認メールの送信（実際のシステムで実装）
+            sendConfirmationEmail();
+        };
+
+        function sendConfirmationEmail() {
+            // 実際のシステムでは、サーバーに確認メール送信リクエストを送る
+            console.log('確認メールを送信しました');
+        }
+    </script>
+</body>
+</html>
