@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { sendEmail, createScoutEmail } from '@/lib/email'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // POST - スカウトメールを送信 (企業のみ)
 const sendScoutSchema = z.object({
   engineerId: z.string().optional(),

@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // POST - IT案件情報を投稿 (IT企業のみ、1日5件まで)
 const createProjectSchema = z.object({
   title: z.string().min(1),

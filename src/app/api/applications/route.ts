@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { sendEmail, createApplicationNotificationEmail } from '@/lib/email'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // POST - Create a new application (engineer only)
 const createApplicationSchema = z.object({
   jobId: z.string(),

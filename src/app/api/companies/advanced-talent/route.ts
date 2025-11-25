@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // GET - 高度人材加点制度対応企業の一覧を取得
 export async function GET(req: Request) {
   try {

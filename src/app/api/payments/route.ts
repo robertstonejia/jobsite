@@ -9,6 +9,9 @@ import {
   createPayPayPayment,
 } from '@/lib/payment-providers'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 const createPaymentSchema = z.object({
   plan: z.enum(['FREE', 'BASIC', 'PREMIUM', 'ENTERPRISE']),
   paymentMethod: z.enum(['credit', 'wechat', 'alipay', 'paypay']),
