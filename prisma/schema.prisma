@@ -1,0 +1,435 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ENGINEER
+  COMPANY
+  ADMIN
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  INTERVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          UserRole
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company       Company?
+  engineer      Engineer?
+  emailVerifications EmailVerification[]
+
+  @@map("users")
+}
+
+model Company {
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  name            String
+  description     String?
+  industry        String?
+  website         String?
+  logoUrl         String?
+  address         String?
+  phoneNumber     String?
+  employeeCount   Int?
+  foundedYear     Int?
+
+  subscriptionPlan    SubscriptionPlan @default(FREE)
+  subscriptionExpiry  DateTime?
+
+  // 無料トライアル機能
+  trialStartDate      DateTime?        // トライアル開始日
+  trialEndDate        DateTime?        // トライアル終了日（開始日から30日後）
+  isTrialActive       Boolean          @default(false) // トライアルが有効かどうか
+  hasUsedTrial        Boolean          @default(false) // トライアルを使用したことがあるか
+
+  // 新機能: 高度人材加点制度対応企業かどうか
+  supportsAdvancedTalentPoints Boolean @default(false)
+
+  // 新機能: メール通知設定
+  emailNotificationEnabled Boolean @default(true)
+
+  // 企業カテゴリー (IT企業かどうか)
+  isITCompany     Boolean             @default(true)
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs            Job[]
+  payments        Payment[]
+  sentMessages    Message[]           @relation("CompanySentMessages")
+  projectPosts    ProjectPost[]
+  scoutEmails     ScoutEmail[]
+
+  @@map("companies")
+}
+
+model Engineer {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  firstName       String
+  lastName        String
+  displayName     String?
+  birthDate       DateTime?
+  phoneNumber     String?
+  address         String?
+  nearestStation  String?
+  profileImage    String?
+  bio             String?
+
+  // 職務情報
+  yearsOfExperience Int?
+  currentPosition   String?
+  desiredPosition   String?
+  desiredSalaryMin  Int?
+  desiredSalaryMax  Int?
+  availableFrom     DateTime?
+
+  // SNS・ポートフォリオ
+  githubUrl       String?
+  linkedinUrl     String?
+  portfolioUrl    String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills          EngineerSkill[]
+  experiences     Experience[]
+  educations      Education[]
+  applications    Application[]
+  receivedMessages Message[]     @relation("EngineerReceivedMessages")
+  receivedScoutEmails ScoutEmail[]
+  projectApplications ProjectApplication[]
+
+  @@map("engineers")
+}
+
+model Skill {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  category    String          // e.g., "プログラミング言語", "フレームワーク", "データベース"
+
+  engineers   EngineerSkill[]
+  jobs        JobSkill[]
+
+  @@map("skills")
+}
+
+model EngineerSkill {
+  id          String    @id @default(cuid())
+  engineerId  String
+  skillId     String
+  level       Int       @default(1) // 1-5のレベル
+  yearsUsed   Int?
+
+  engineer    Engineer  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([engineerId, skillId])
+  @@map("engineer_skills")
+}
+
+model Experience {
+  id              String    @id @default(cuid())
+  engineerId      String
+  companyName     String
+  position        String
+  description     String?
+  startDate       DateTime
+  endDate         DateTime?
+  isCurrent       Boolean   @default(false)
+
+  engineer        Engineer  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@map("experiences")
+}
+
+model Education {
+  id              String    @id @default(cuid())
+  engineerId      String
+  schoolName      String
+  degree          String?
+  fieldOfStudy    String?
+  startDate       DateTime
+  endDate         DateTime?
+  isCurrent       Boolean   @default(false)
+
+  engineer        Engineer  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@map("educations")
+}
+
+model Job {
+  id              String      @id @default(cuid())
+  companyId       String
+  title           String
+  description     String
+  requirements    String?
+  benefits        String?
+
+  jobType         JobType     @default(FULL_TIME)
+  location        String?
+  remoteOk        Boolean     @default(false)
+
+  salaryMin       Int?
+  salaryMax       Int?
+
+  isActive        Boolean     @default(true)
+  viewCount       Int         @default(0)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  expiresAt       DateTime?
+
+  company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  skills          JobSkill[]
+  applications    Application[]
+
+  @@map("jobs")
+}
+
+model JobSkill {
+  id          String    @id @default(cuid())
+  jobId       String
+  skillId     String
+  required    Boolean   @default(true)
+  level       Int       @default(1)
+
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, skillId])
+  @@map("job_skills")
+}
+
+model Application {
+  id              String              @id @default(cuid())
+  jobId           String
+  engineerId      String
+  status          ApplicationStatus   @default(PENDING)
+  coverLetter     String?
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  job             Job                 @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  engineer        Engineer            @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+  messages        Message[]
+
+  @@unique([jobId, engineerId])
+  @@map("applications")
+}
+
+model Payment {
+  id              String              @id @default(cuid())
+  companyId       String
+  amount          Int
+  currency        String              @default("JPY")
+  paymentMethod   String              // "stripe", "paypay", "wechat", "alipay"
+  transactionId   String?
+  plan            SubscriptionPlan
+  status          String              @default("pending") // "pending", "pending_approval", "completed", "failed"
+
+  createdAt       DateTime            @default(now())
+
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  approvals       PaymentApproval[]
+
+  @@map("payments")
+}
+
+// 支払い承認（管理者メール承認用）
+model PaymentApproval {
+  id              String              @id @default(cuid())
+  paymentId       String
+  token           String              @unique
+  status          String              @default("pending") // "pending", "approved", "rejected"
+  expiresAt       DateTime
+  approvedAt      DateTime?
+  approvedBy      String?             // 承認者のメールアドレス
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  payment         Payment             @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([paymentId])
+  @@map("payment_approvals")
+}
+
+// メッセージング機能
+model Message {
+  id              String              @id @default(cuid())
+  applicationId   String
+  companyId       String
+  engineerId      String
+  senderType      String              // "COMPANY" or "ENGINEER"
+  content         String
+  isRead          Boolean             @default(false)
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  application     Application         @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  company         Company             @relation("CompanySentMessages", fields: [companyId], references: [id], onDelete: Cascade)
+  engineer        Engineer            @relation("EngineerReceivedMessages", fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("messages")
+}
+
+// スカウトメール
+model ScoutEmail {
+  id              String              @id @default(cuid())
+  companyId       String
+  engineerId      String
+  jobId           String?
+  subject         String
+  content         String
+  matchScore      Int?                // マッチングスコア (0-100)
+  isRead          Boolean             @default(false)
+  isReplied       Boolean             @default(false)
+
+  createdAt       DateTime            @default(now())
+
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  engineer        Engineer            @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@index([engineerId])
+  @@index([companyId])
+  @@map("scout_emails")
+}
+
+// IT案件情報投稿
+model ProjectPost {
+  id              String              @id @default(cuid())
+  companyId       String
+  title           String
+  description     String              // 職務内容
+  requirements    String?             // 必須スキル
+  preferredSkills String?             // 尚可スキル
+
+  // 案件詳細情報
+  monthlyRate     Int?                // 月額単価（円）
+  workingHours    String?             // 稼働時間（例: 160-180時間/月）
+  contractType    String?             // 契約形態（例: 業務委託、準委任、請負）
+  interviewCount  Int?                // 商談回数
+  nearestStation  String?             // 最寄駅
+  paymentTerms    String?             // 支払サイト（例: 月末締め翌月末払い）
+
+  // 技術カテゴリー（タブ用）
+  category        String?             // Java, C#, PHP, Ruby, AWS, Linux等
+
+  duration        String?             // プロジェクト期間
+  location        String?
+  remoteOk        Boolean             @default(false)
+  foreignNationalityOk Boolean         @default(false)  // 外国籍可
+  isActive        Boolean             @default(true)
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  projectApplications ProjectApplication[]
+
+  @@index([companyId])
+  @@index([createdAt])
+  @@index([category])
+  @@map("project_posts")
+}
+
+// IT案件への応募
+model ProjectApplication {
+  id              String              @id @default(cuid())
+  projectId       String
+  engineerId      String
+  status          ApplicationStatus   @default(PENDING)
+  coverLetter     String?
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  project         ProjectPost         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  engineer        Engineer            @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, engineerId])
+  @@index([projectId])
+  @@index([engineerId])
+  @@map("project_applications")
+}
+
+// メール認証
+model EmailVerification {
+  id              String              @id @default(cuid())
+  userId          String
+  email           String?
+  phoneNumber     String?
+  verificationCode String
+  verificationType String             @default("email") // "email" or "phone"
+  expiresAt       DateTime
+  verified        Boolean             @default(false)
+
+  createdAt       DateTime            @default(now())
+
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([verificationCode])
+  @@map("email_verifications")
+}
+
+// お問い合わせ
+model ContactInquiry {
+  id              String              @id @default(cuid())
+  name            String
+  email           String
+  company         String?
+  phoneNumber     String?
+  subject         String
+  message         String
+  status          String              @default("pending") // "pending", "replied", "resolved"
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_inquiries")
+}
