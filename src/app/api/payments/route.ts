@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     })
 
     let qrCodeData: string | null = null
-    let paymentUrl: string | null = null
+    let paymentUrl: string | null |　undefined
 
     // 決済プロバイダーの認証情報をチェック
     const hasWeChatCredentials = process.env.WECHAT_APP_ID && process.env.WECHAT_MCH_ID && process.env.WECHAT_API_KEY
