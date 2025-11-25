@@ -35,6 +35,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
+    const company = user.company
+
     // Handle bulk sending
     const engineerIds = validatedData.engineerIds || (validatedData.engineerId ? [validatedData.engineerId] : [])
 
@@ -43,7 +45,7 @@ export async function POST(req: Request) {
     }
 
     const messageContent = validatedData.message || validatedData.content || ''
-    const subject = validatedData.subject || `${user.company.name}からスカウトメッセージ`
+    const subject = validatedData.subject || `${company.name}からスカウトメッセージ`
 
     if (!messageContent) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
@@ -67,7 +69,7 @@ export async function POST(req: Request) {
           // Create scout email record
           const scoutEmail = await prisma.scoutEmail.create({
             data: {
-              companyId: user.company.id,
+              companyId: company.id,
               engineerId: engineerId,
               jobId: validatedData.jobId,
               subject: subject,
@@ -94,7 +96,7 @@ export async function POST(req: Request) {
 
             const emailData = createScoutEmail({
               engineerName,
-              companyName: user.company.name,
+              companyName: company.name,
               jobTitle,
               jobUrl,
               message: messageContent,
