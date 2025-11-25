@@ -82,6 +82,8 @@ export default function Header() {
   const handleMessageClick = async (e: React.MouseEvent) => {
     e.preventDefault()
 
+    if (!session) return
+
     const role = (session.user as any).role
 
     // 企業の場合は常にダッシュボードの応募者管理タブを開く

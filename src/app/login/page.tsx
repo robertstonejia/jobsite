@@ -121,7 +121,7 @@ export default function LoginPage() {
           return
         }
 
-        const userRole = session?.user?.role
+        const userRole = session?.user?.role as string | undefined
 
         console.log('User role:', userRole)
 
