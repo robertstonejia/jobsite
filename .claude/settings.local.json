@@ -52,7 +52,12 @@
       "Bash(cmd /c \"timeout /t 3 /nobreak\")",
       "Bash(cmd /c \"timeout /t 2 /nobreak\")",
       "Bash(git add:*)",
-      "Bash(cmd /c \"del nul\")"
+      "Bash(cmd /c \"del nul\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: TechJob platform with payment system\n\n- Complete Next.js application with TypeScript\n- Prisma ORM with PostgreSQL database\n- NextAuth authentication for company and engineer roles\n- Payment system with multiple providers (PayPay, WeChat Pay, Alipay)\n- Email verification and notification system\n- Job posting and application management\n- IT project posting and application\n- Scout/recruitment feature with auto-matching\n- Advanced talent point system support\n- Subscription management with trial period\n- Payment approval workflow with email notifications\n- Responsive UI with Tailwind CSS\n\nFixed issues:\n- Database schema synchronization\n- Port number configuration (NEXT_PUBLIC_URL)\n- Payment processing error handling\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(gh auth:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
