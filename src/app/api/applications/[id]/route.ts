@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // GET - Get a single application by ID
 export async function GET(
   req: Request,

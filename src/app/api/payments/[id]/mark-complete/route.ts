@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 /**
  * 支払い完了リクエストを送信
  * 管理者メールに確認メールを送信し、承認後に支払いが完了する

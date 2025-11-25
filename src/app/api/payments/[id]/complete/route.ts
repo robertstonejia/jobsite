@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 /**
  * このエンドポイントは無効化されています
  * 支払いは決済プロバイダーのWebhookによってのみ完了できます
