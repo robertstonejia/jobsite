@@ -166,9 +166,9 @@ function getExpectedAmount(paymentMethod: string, dbAmount: number): number {
   switch (paymentMethod) {
     case 'wechat':
     case 'alipay':
-      return 368 // 368元
+      return 168 // 168元
     case 'paypay':
-      return 8000 // 8,000円
+      return 3680 // 3,680円
     case 'credit':
       return dbAmount
     default:

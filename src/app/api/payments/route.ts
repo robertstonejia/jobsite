@@ -50,11 +50,11 @@ export async function POST(req: Request) {
     switch (validatedData.paymentMethod) {
       case 'wechat':
       case 'alipay':
-        amount = 368 // 368元
+        amount = 168 // 168元
         currency = 'CNY'
         break
       case 'paypay':
-        amount = 8000 // 8,000円
+        amount = 3680 // 3,680円
         currency = 'JPY'
         break
       default:

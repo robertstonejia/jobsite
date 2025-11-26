@@ -83,10 +83,10 @@ export async function POST(
     switch (payment.paymentMethod) {
       case 'wechat':
       case 'alipay':
-        paymentAmount = '368元 (CNY)'
+        paymentAmount = '168元 (CNY)'
         break
       case 'paypay':
-        paymentAmount = '8,000円 (JPY)'
+        paymentAmount = '3,680円 (JPY)'
         break
       default:
         paymentAmount = `${payment.amount.toLocaleString()}円 (JPY)`

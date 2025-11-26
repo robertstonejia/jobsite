@@ -148,9 +148,9 @@ export default function QRCodePaymentPage() {
     switch (method) {
       case 'wechat':
       case 'alipay':
-        return { amount: 368, currency: '元 (CNY)', displayText: '368元' }
+        return { amount: 168, currency: '元 (CNY)', displayText: '168元' }
       case 'paypay':
-        return { amount: 8000, currency: '円 (JPY)', displayText: '8,000円' }
+        return { amount: 3680, currency: '円 (JPY)', displayText: '3,680円' }
       default:
         return { amount: payment.amount, currency: '円 (JPY)', displayText: `¥${payment.amount.toLocaleString()}` }
     }
@@ -267,21 +267,21 @@ export default function QRCodePaymentPage() {
                   <li>1. {getPaymentMethodName(payment.paymentMethod)}アプリを開く</li>
                   <li>2. スキャン機能を選択</li>
                   <li>3. 上のQRコードをスキャン</li>
-                  <li>4. 支払い金額（<span className="font-bold text-red-700">368元</span>）を確認</li>
+                  <li>4. 支払い金額（<span className="font-bold text-red-700">168元</span>）を確認</li>
                   <li>5. 中国元(CNY)での支払いを完了</li>
                   <li>6. 支払い完了後、自動的に確認されます</li>
-                  <li className="text-red-700 font-semibold">※ 金額は<span className="underline">368元（人民元）</span>です。</li>
+                  <li className="text-red-700 font-semibold">※ 金額は<span className="underline">168元（人民元）</span>です。</li>
                 </ol>
               ) : payment.paymentMethod === 'paypay' ? (
                 <ol className="text-sm text-yellow-800 space-y-1 ml-4">
                   <li>1. PayPayアプリを開く</li>
                   <li>2. 「送る」を選択</li>
                   <li>3. PayPay ID「<span className="font-bold">{getPayPayId()}</span>」を入力</li>
-                  <li>4. 支払い金額（<span className="font-bold text-red-700">8,000円</span>）を入力</li>
+                  <li>4. 支払い金額（<span className="font-bold text-red-700">3,680円</span>）を入力</li>
                   <li>5. 送金を完了</li>
                   <li>6. 支払い完了後、自動的に確認されます</li>
                   <li className="text-red-700 font-semibold">※ PayPay ID: {getPayPayId()}</li>
-                  <li className="text-red-700 font-semibold">※ 金額: 8,000円</li>
+                  <li className="text-red-700 font-semibold">※ 金額: 3,680円</li>
                 </ol>
               ) : (
                 <ol className="text-sm text-yellow-800 space-y-1 ml-4">
