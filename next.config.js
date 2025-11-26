@@ -8,9 +8,15 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
-  // Force new build - cache bust
+  // Force new build - cache bust v2
   generateBuildId: async () => {
-    return `build-${Date.now()}`
+    // Using environment variable for even stronger cache busting
+    return process.env.VERCEL_GIT_COMMIT_SHA || `build-${Date.now()}`
+  },
+  // Disable webpack cache completely for this build
+  webpack: (config, { isServer }) => {
+    config.cache = false
+    return config
   },
 }
 
