@@ -88,7 +88,7 @@ export default function CompanySubscriptionPage() {
     }
   }
 
-  const MONTHLY_FEE = 8000
+  const MONTHLY_FEE = 3680
 
   // Check if subscription is active
   const now = new Date()
