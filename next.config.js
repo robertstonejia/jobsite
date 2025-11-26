@@ -8,16 +8,20 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
-  // Force new build - cache bust v2
+  // Force new build - cache bust v3 - timestamp based
   generateBuildId: async () => {
-    // Using environment variable for even stronger cache busting
-    return process.env.VERCEL_GIT_COMMIT_SHA || `build-${Date.now()}`
+    return `v3-${Date.now()}`
   },
-  // Disable webpack cache completely for this build
+  // Completely disable caching
   webpack: (config, { isServer }) => {
     config.cache = false
+    // Disable module concatenation which can cache
+    config.optimization = config.optimization || {}
+    config.optimization.concatenateModules = false
     return config
   },
+  // Disable SWC minification cache
+  swcMinify: false,
 }
 
 module.exports = nextConfig
