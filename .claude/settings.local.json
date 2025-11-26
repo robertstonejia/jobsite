@@ -69,7 +69,14 @@
       "Bash(cmd /c \"dir /S /B src\\app\\api\\*.ts 2>nul | findstr route.ts\")",
       "Bash(openssl rand:*)",
       "Bash(npx vercel:*)",
-      "Bash(cmd /c \"del src\\lib\\logger.ts\")"
+      "Bash(cmd /c \"del src\\lib\\logger.ts\")",
+      "Bash(cmd /c \"if exist vercel.json (type vercel.json) else (echo No vercel.json found)\")",
+      "Bash(cmd /c \"dir /S /B src\\app\\api\\auth 2>nul\")",
+      "Bash(cmd /c \"del check-db.ts\")",
+      "Bash(gh api:*)",
+      "Bash(cmd /c \"if exist .env (type .env | findstr NEXT_PUBLIC_URL) else (echo .env not found)\")",
+      "Bash(del check-new-user.ts)",
+      "Bash(cmd /c \"del check-new-user.ts\")"
     ],
     "deny": [],
     "ask": []
