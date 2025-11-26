@@ -76,7 +76,9 @@
       "Bash(gh api:*)",
       "Bash(cmd /c \"if exist .env (type .env | findstr NEXT_PUBLIC_URL) else (echo .env not found)\")",
       "Bash(del check-new-user.ts)",
-      "Bash(cmd /c \"del check-new-user.ts\")"
+      "Bash(cmd /c \"del check-new-user.ts\")",
+      "Bash(cmd /c \"del check-db.ts check-new-user.ts\")",
+      "Bash(cmd /c \"del test-auth.ts 2>nul\")"
     ],
     "deny": [],
     "ask": []
