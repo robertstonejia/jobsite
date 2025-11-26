@@ -1,14 +1,5 @@
-import fs from 'fs'
-import path from 'path'
-
-const LOG_DIR = path.join(process.cwd(), 'logs')
-const LOG_FILE = path.join(LOG_DIR, 'auth.log')
-
-// Create logs directory if it doesn't exist
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true })
-}
-
+// Simple logger that works in Vercel serverless environment
+// Note: File system operations are not available in Vercel functions
 export function log(message: string, data?: any) {
   const timestamp = new Date().toISOString()
 
@@ -22,15 +13,8 @@ export function log(message: string, data?: any) {
     }
   }
 
-  const logMessage = `[${timestamp}] ${message}${dataString}\n`
+  const logMessage = `[${timestamp}] ${message}${dataString}`
 
-  // Log to console
+  // Log to console (will appear in Vercel function logs)
   console.log(logMessage)
-
-  // Log to file
-  try {
-    fs.appendFileSync(LOG_FILE, logMessage)
-  } catch (error) {
-    console.error('Failed to write to log file:', error)
-  }
 }
