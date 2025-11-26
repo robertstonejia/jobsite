@@ -18,41 +18,58 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log('❌ Missing credentials')
+            return null
+          }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        })
+          console.log('🔍 Attempting login for:', credentials.email)
 
-        if (!user) {
-          return null
-        }
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email,
+            },
+          })
 
-        const isPasswordValid = await compare(credentials.password, user.passwordHash)
+          if (!user) {
+            console.log('❌ User not found:', credentials.email)
+            return null
+          }
 
-        if (!isPasswordValid) {
-          return null
-        }
+          console.log('✅ User found, checking password...')
 
-        // 企業ユーザーまたは応募者ユーザーの場合、メール検証をチェック
-        if (!user.emailVerified) {
-          // nullを返す代わりに、特殊なオブジェクトを返してフロントエンドで判別
+          const isPasswordValid = await compare(credentials.password, user.passwordHash)
+
+          if (!isPasswordValid) {
+            console.log('❌ Invalid password for:', credentials.email)
+            return null
+          }
+
+          console.log('✅ Password valid, checking email verification...')
+
+          // 企業ユーザーまたは応募者ユーザーの場合、メール検証をチェック
+          if (!user.emailVerified) {
+            console.log('⚠️ Email not verified for:', credentials.email)
+            // nullを返す代わりに、特殊なオブジェクトを返してフロントエンドで判別
+            return {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+              emailVerified: false,
+            } as any
+          }
+
+          console.log('✅ Login successful for:', credentials.email, 'Role:', user.role)
+
           return {
             id: user.id,
             email: user.email,
             role: user.role,
-            emailVerified: false,
-          } as any
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          role: user.role,
+          }
+        } catch (error) {
+          console.error('❌ Auth error:', error)
+          return null
         }
       },
     }),
