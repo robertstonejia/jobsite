@@ -4,6 +4,10 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
+  // Disable static optimization for pages using useSearchParams
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 }
 
 module.exports = nextConfig

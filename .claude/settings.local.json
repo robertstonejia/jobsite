@@ -59,7 +59,14 @@
       "Bash(git push:*)",
       "Bash(git commit:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(cmd /c \"timeout /t 30 /nobreak\")",
+      "Bash(cmd /c \"dir /S /B src\\app\\api 2>nul | findstr /C:\"[\" /C:\"]\"\")",
+      "Bash(cmd /c \"timeout /t 60 /nobreak\")",
+      "Bash(git log:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cmd /c \"timeout /t 10 /nobreak\")",
+      "Bash(cmd /c \"dir /S /B src\\app\\api\\*.ts 2>nul | findstr route.ts\")"
     ],
     "deny": [],
     "ask": []
