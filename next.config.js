@@ -8,6 +8,10 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  // Force new build - cache bust
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
 }
 
 module.exports = nextConfig
