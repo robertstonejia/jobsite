@@ -9,7 +9,9 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
+    error: '/login', // Redirect errors back to login page
   },
+  debug: true, // Enable debug mode to see detailed errors
   providers: [
     CredentialsProvider({
       name: 'credentials',
