@@ -68,7 +68,8 @@
       "Bash(cmd /c \"timeout /t 10 /nobreak\")",
       "Bash(cmd /c \"dir /S /B src\\app\\api\\*.ts 2>nul | findstr route.ts\")",
       "Bash(openssl rand:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(cmd /c \"del src\\lib\\logger.ts\")"
     ],
     "deny": [],
     "ask": []
