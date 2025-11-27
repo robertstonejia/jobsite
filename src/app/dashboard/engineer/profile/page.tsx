@@ -16,6 +16,19 @@ interface Experience {
   isCurrent: boolean
 }
 
+interface Skill {
+  id: string
+  name: string
+  category: string
+}
+
+interface EngineerSkill {
+  id: string
+  level: number
+  yearsUsed: number | null
+  skill: Skill
+}
+
 interface EngineerProfile {
   firstName: string
   lastName: string
@@ -35,6 +48,7 @@ interface EngineerProfile {
   linkedinUrl: string | null
   portfolioUrl: string | null
   experiences?: Experience[]
+  skills?: EngineerSkill[]
 }
 
 export default function EngineerProfilePage() {
@@ -42,8 +56,11 @@ export default function EngineerProfilePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingSkills, setSavingSkills] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [allSkills, setAllSkills] = useState<Skill[]>([])
+  const [selectedSkills, setSelectedSkills] = useState<Map<string, { level: number; yearsUsed: number }>>(new Map())
 
   const [formData, setFormData] = useState<EngineerProfile>({
     firstName: '',
@@ -64,6 +81,7 @@ export default function EngineerProfilePage() {
     linkedinUrl: null,
     portfolioUrl: null,
     experiences: [],
+    skills: [],
   })
 
   useEffect(() => {
@@ -71,6 +89,7 @@ export default function EngineerProfilePage() {
       router.push('/login')
     } else if (status === 'authenticated') {
       fetchProfile()
+      fetchSkills()
     }
   }, [status, router])
 
@@ -84,7 +103,20 @@ export default function EngineerProfilePage() {
           birthDate: data.birthDate ? data.birthDate.split('T')[0] : null,
           availableFrom: data.availableFrom ? data.availableFrom.split('T')[0] : null,
           experiences: data.experiences || [],
+          skills: data.skills || [],
         })
+
+        // Initialize selected skills
+        if (data.skills) {
+          const skillMap = new Map()
+          data.skills.forEach((es: EngineerSkill) => {
+            skillMap.set(es.skill.id, {
+              level: es.level,
+              yearsUsed: es.yearsUsed || 0,
+            })
+          })
+          setSelectedSkills(skillMap)
+        }
       } else {
         setError('プロフィールの取得に失敗しました')
       }
@@ -93,6 +125,18 @@ export default function EngineerProfilePage() {
       setError('プロフィールの取得中にエラーが発生しました')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchSkills = async () => {
+    try {
+      const response = await fetch('/api/skills')
+      if (response.ok) {
+        const data = await response.json()
+        setAllSkills(data)
+      }
+    } catch (error) {
+      console.error('Error fetching skills:', error)
     }
   }
 
@@ -151,6 +195,68 @@ export default function EngineerProfilePage() {
       setError('プロフィールの更新中にエラーが発生しました: ' + (error as Error).message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  // Skills management handlers
+  const handleSkillToggle = (skillId: string) => {
+    const newMap = new Map(selectedSkills)
+    if (newMap.has(skillId)) {
+      newMap.delete(skillId)
+    } else {
+      newMap.set(skillId, { level: 3, yearsUsed: 1 })
+    }
+    setSelectedSkills(newMap)
+  }
+
+  const handleLevelChange = (skillId: string, level: number) => {
+    const newMap = new Map(selectedSkills)
+    const current = newMap.get(skillId)
+    if (current) {
+      newMap.set(skillId, { ...current, level })
+      setSelectedSkills(newMap)
+    }
+  }
+
+  const handleYearsChange = (skillId: string, years: number) => {
+    const newMap = new Map(selectedSkills)
+    const current = newMap.get(skillId)
+    if (current) {
+      newMap.set(skillId, { ...current, yearsUsed: years })
+      setSelectedSkills(newMap)
+    }
+  }
+
+  const handleSaveSkills = async () => {
+    setSavingSkills(true)
+    try {
+      const skillsData = Array.from(selectedSkills.entries()).map(([skillId, data]) => ({
+        skillId,
+        level: data.level,
+        yearsUsed: data.yearsUsed,
+      }))
+
+      const response = await fetch('/api/engineer/skills', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ skills: skillsData }),
+      })
+
+      if (response.ok) {
+        setSuccess(true)
+        setTimeout(() => setSuccess(false), 3000)
+        await fetchProfile()
+      } else {
+        const data = await response.json()
+        setError(data.error || 'スキル情報の更新に失敗しました')
+      }
+    } catch (error) {
+      console.error('Error updating skills:', error)
+      setError('スキル情報の更新中にエラーが発生しました')
+    } finally {
+      setSavingSkills(false)
     }
   }
 
@@ -514,6 +620,110 @@ export default function EngineerProfilePage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* スキル管理 */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">スキル管理</h2>
+                <button
+                  type="button"
+                  onClick={handleSaveSkills}
+                  disabled={savingSkills}
+                  className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm"
+                >
+                  {savingSkills ? 'スキル保存中...' : 'スキルを保存'}
+                </button>
+              </div>
+
+              {selectedSkills.size > 0 && (
+                <div className="space-y-3 mb-6">
+                  <h3 className="font-semibold text-gray-900">選択中のスキル: {selectedSkills.size}件</h3>
+                  {Array.from(selectedSkills.entries()).map(([skillId, data]) => {
+                    const skill = allSkills.find(s => s.id === skillId)
+                    if (!skill) return null
+                    return (
+                      <div key={skillId} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex-1">
+                          <span className="font-semibold text-gray-900">{skill.name}</span>
+                          <span className="text-sm text-gray-500 ml-2">({skill.category})</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-gray-600">レベル:</label>
+                          <select
+                            value={data.level}
+                            onChange={(e) => handleLevelChange(skillId, parseInt(e.target.value))}
+                            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                          >
+                            <option value={1}>1 - 初級</option>
+                            <option value={2}>2 - 中級下</option>
+                            <option value={3}>3 - 中級</option>
+                            <option value={4}>4 - 上級</option>
+                            <option value={5}>5 - エキスパート</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-gray-600">経験:</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={data.yearsUsed}
+                            onChange={(e) => handleYearsChange(skillId, parseInt(e.target.value) || 0)}
+                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                          />
+                          <span className="text-sm text-gray-600">年</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleSkillToggle(skillId)}
+                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {allSkills.length > 0 && (
+                <div className="space-y-6">
+                  <h3 className="font-semibold text-gray-900">スキルを追加</h3>
+                  {Object.entries(allSkills.reduce((acc, skill) => {
+                    if (!acc[skill.category]) {
+                      acc[skill.category] = []
+                    }
+                    acc[skill.category].push(skill)
+                    return acc
+                  }, {} as Record<string, Skill[]>)).map(([category, skills]) => (
+                    <div key={category} className="border-t pt-4">
+                      <h4 className="text-md font-semibold text-gray-800 mb-3">{category}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {skills.map((skill) => (
+                          <button
+                            key={skill.id}
+                            type="button"
+                            onClick={() => handleSkillToggle(skill.id)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                              selectedSkills.has(skill.id)
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {skill.name}
+                            {selectedSkills.has(skill.id) && ' ✓'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {allSkills.length === 0 && (
+                <p className="text-gray-500 text-center py-4">スキルデータを読み込み中...</p>
+              )}
             </div>
 
             <div className="flex gap-4">

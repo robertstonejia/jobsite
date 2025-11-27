@@ -227,12 +227,11 @@ export default function ScoutPage() {
                 {engineers.map((engineer) => (
                   <div
                     key={engineer.id}
-                    className={`border rounded-lg p-6 cursor-pointer transition ${
+                    className={`border rounded-lg p-6 transition ${
                       selectedEngineers.has(engineer.id)
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
-                    onClick={() => toggleEngineer(engineer.id)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -242,7 +241,6 @@ export default function ScoutPage() {
                             checked={selectedEngineers.has(engineer.id)}
                             onChange={() => toggleEngineer(engineer.id)}
                             className="w-5 h-5 text-primary-500"
-                            onClick={(e) => e.stopPropagation()}
                           />
                           <h3 className="text-lg font-bold text-gray-900">
                             {engineer.lastName} {engineer.firstName}
@@ -283,6 +281,15 @@ export default function ScoutPage() {
                           </div>
                         )}
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          router.push(`/scout/${engineer.id}`)
+                        }}
+                        className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                      >
+                        詳細を見る
+                      </button>
                     </div>
                   </div>
                 ))}

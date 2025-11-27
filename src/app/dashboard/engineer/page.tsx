@@ -132,7 +132,7 @@ export default function EngineerDashboard() {
           {/* クイックアクション */}
           <div className="bg-white rounded-lg shadow p-6 mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">クイックアクション</h2>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <Link
                 href="/jobs"
                 className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition"
@@ -151,16 +151,6 @@ export default function EngineerDashboard() {
                 <div>
                   <p className="font-semibold text-gray-900">プロフィール編集</p>
                   <p className="text-sm text-gray-600">情報を更新する</p>
-                </div>
-              </Link>
-              <Link
-                href="/dashboard/engineer/skills"
-                className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition"
-              >
-                <span className="text-3xl">⚡</span>
-                <div>
-                  <p className="font-semibold text-gray-900">スキル管理</p>
-                  <p className="text-sm text-gray-600">スキルを追加・編集</p>
                 </div>
               </Link>
             </div>
