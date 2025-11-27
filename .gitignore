@@ -45,3 +45,7 @@ logs/
 
 # Windows reserved filenames
 nul
+
+# API keys and secrets
+apikey.txt
+*.key
