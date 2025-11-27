@@ -68,6 +68,7 @@ const createJobSchema = z.object({
   jobType: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE']),
   location: z.string().optional(),
   remoteOk: z.boolean().default(false),
+  foreignNationalityOk: z.boolean().default(false),
   salaryMin: z.number().optional(),
   salaryMax: z.number().optional(),
   skillIds: z.array(z.string()).optional(),
@@ -117,6 +118,15 @@ export async function POST(req: Request) {
     }
 
     // Create job
+    console.log('Creating job with data:', {
+      companyId: user.company.id,
+      title: validatedData.title,
+      jobType: validatedData.jobType,
+      remoteOk: validatedData.remoteOk,
+      salaryMin: validatedData.salaryMin,
+      salaryMax: validatedData.salaryMax,
+    })
+
     const job = await prisma.job.create({
       data: {
         companyId: user.company.id,
@@ -127,6 +137,7 @@ export async function POST(req: Request) {
         jobType: validatedData.jobType,
         location: validatedData.location,
         remoteOk: validatedData.remoteOk,
+        foreignNationalityOk: validatedData.foreignNationalityOk,
         salaryMin: validatedData.salaryMin,
         salaryMax: validatedData.salaryMax,
         skills: validatedData.skillIds
@@ -147,6 +158,8 @@ export async function POST(req: Request) {
         },
       },
     })
+
+    console.log('Job created successfully:', job.id)
 
     return NextResponse.json(job, { status: 201 })
   } catch (error) {

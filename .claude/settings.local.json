@@ -19,7 +19,9 @@
       "Bash(npx tsx:*)",
       "Bash(npm test:*)",
       "Bash(npm run:*)",
-      "Bash(cmd /c \"if not exist src\\app\\api\\engineer\\scout-emails mkdir src\\app\\api\\engineer\\scout-emails\")"
+      "Bash(cmd /c \"if not exist src\\app\\api\\engineer\\scout-emails mkdir src\\app\\api\\engineer\\scout-emails\")",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npx prisma db push:*)"
     ],
     "deny": [],
     "ask": []

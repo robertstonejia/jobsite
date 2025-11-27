@@ -238,7 +238,7 @@ export default function EngineerRegisterPage() {
 
                   <div>
                     <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                      電話番号 {formData.verificationType === 'phone' && <span className="text-red-500">*</span>}
+                      電話番号
                     </label>
                     <input
                       id="phoneNumber"
@@ -251,7 +251,8 @@ export default function EngineerRegisterPage() {
                     />
                   </div>
 
-                  {/* 検証方法の選択 */}
+                  {/* 検証方法の選択 - 電話検証は現在無効 */}
+                  {/*
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <label className="block text-sm font-medium text-gray-700 mb-3">
                       アカウント確認方法を選択してください <span className="text-red-500">*</span>
@@ -292,6 +293,7 @@ export default function EngineerRegisterPage() {
                       </label>
                     </div>
                   </div>
+                  */}
 
                   <div>
                     <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">

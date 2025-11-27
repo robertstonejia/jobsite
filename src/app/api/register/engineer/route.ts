@@ -116,6 +116,8 @@ export async function POST(req: Request) {
     const userName = `${validatedData.lastName} ${validatedData.firstName}`
 
     // メールまたは電話番号での検証
+    // 電話番号検証は現在無効化されています
+    /*
     if (validatedData.verificationType === 'phone' && validatedData.phoneNumber) {
       // 電話番号検証
       await prisma.emailVerification.create({
@@ -150,6 +152,9 @@ export async function POST(req: Request) {
         })
       }
     } else {
+    */
+    // 常にメール検証を使用
+    {
       // メール検証
       await prisma.emailVerification.create({
         data: {
