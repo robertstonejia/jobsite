@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     // Add skill filter
     if (skill) {
-      where.skills = {
+      where.engineerSkills = {
         some: {
           skill: {
             name: {
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
       }
     }
 
-    const engineers = await prisma.engineerProfile.findMany({
+    const engineers = await prisma.engineer.findMany({
       where,
       select: {
         id: true,
@@ -51,13 +51,14 @@ export async function GET(req: Request) {
         lastName: true,
         currentPosition: true,
         yearsOfExperience: true,
-        desiredSalary: true,
+        desiredSalaryMin: true,
+        desiredSalaryMax: true,
         user: {
           select: {
             email: true,
           },
         },
-        skills: {
+        engineerSkills: {
           select: {
             level: true,
             skill: {
