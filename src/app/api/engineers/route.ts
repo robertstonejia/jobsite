@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     // Add skill filter
     if (skill) {
-      where.engineerSkills = {
+      where.skills = {
         some: {
           skill: {
             name: {
@@ -58,7 +58,7 @@ export async function GET(req: Request) {
             email: true,
           },
         },
-        engineerSkills: {
+        skills: {
           select: {
             level: true,
             skill: {
