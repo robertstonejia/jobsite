@@ -90,12 +90,15 @@ export default function LoginPage() {
 
       if (result?.error) {
         console.error('SignIn error:', result.error)
-        if (result.error === 'EMAIL_NOT_VERIFIED') {
+        if (result.error === 'EMAIL_NOT_VERIFIED' || result.error.includes('EMAIL_NOT_VERIFIED')) {
           setEmailNotVerified(true)
           setError('メールアドレスが確認されていません。登録時に送信された確認メールをご確認ください。')
-        } else {
+        } else if (result.error === 'CredentialsSignin') {
           setEmailNotVerified(false)
           setError('メールアドレスまたはパスワードが正しくありません')
+        } else {
+          setEmailNotVerified(false)
+          setError('ログインに失敗しました。もう一度お試しください。')
         }
         setLoading(false)
         return
@@ -113,7 +116,7 @@ export default function LoginPage() {
         console.log('Session data:', session)
 
         // Check if email is verified
-        if (session?.user && (session.user as any).emailVerified === false) {
+        if (session?.user && session.user.emailVerified === false) {
           console.log('Email not verified')
           setEmailNotVerified(true)
           setError('メールアドレスが確認されていません。登録時に送信された確認メールをご確認ください。')
@@ -121,7 +124,7 @@ export default function LoginPage() {
           return
         }
 
-        const userRole = session?.user?.role as string | undefined
+        const userRole = session?.user?.role
 
         console.log('User role:', userRole)
 

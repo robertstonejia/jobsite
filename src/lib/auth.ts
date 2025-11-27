@@ -53,13 +53,8 @@ export const authOptions: NextAuthOptions = {
           // 企業ユーザーまたは応募者ユーザーの場合、メール検証をチェック
           if (!user.emailVerified) {
             console.log('⚠️ Email not verified for:', credentials.email)
-            // nullを返す代わりに、特殊なオブジェクトを返してフロントエンドで判別
-            return {
-              id: user.id,
-              email: user.email,
-              role: user.role,
-              emailVerified: false,
-            } as any
+            // メール未確認の場合はエラーを投げる
+            throw new Error('EMAIL_NOT_VERIFIED')
           }
 
           console.log('✅ Login successful for:', credentials.email, 'Role:', user.role)
