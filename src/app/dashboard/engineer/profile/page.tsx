@@ -62,6 +62,16 @@ export default function EngineerProfilePage() {
   const [success, setSuccess] = useState(false)
   const [allSkills, setAllSkills] = useState<Skill[]>([])
   const [selectedSkills, setSelectedSkills] = useState<Map<string, { level: number; yearsUsed: number }>>(new Map())
+  const [showExpForm, setShowExpForm] = useState(false)
+  const [editingExpId, setEditingExpId] = useState<string | null>(null)
+  const [expFormData, setExpFormData] = useState({
+    companyName: '',
+    position: '',
+    description: '',
+    startDate: '',
+    endDate: '',
+    isCurrent: false,
+  })
 
   const [formData, setFormData] = useState<EngineerProfile>({
     firstName: '',
@@ -260,6 +270,94 @@ export default function EngineerProfilePage() {
     } finally {
       setSavingSkills(false)
     }
+  }
+
+  // Experience management handlers
+  const handleExpChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    setExpFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }))
+  }
+
+  const handleExpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const url = editingExpId
+        ? `/api/engineer/experiences/${editingExpId}`
+        : '/api/engineer/experiences'
+
+      const response = await fetch(url, {
+        method: editingExpId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(expFormData),
+      })
+
+      if (response.ok) {
+        await fetchProfile()
+        resetExpForm()
+        setSuccess(true)
+        setTimeout(() => setSuccess(false), 3000)
+      } else {
+        const data = await response.json()
+        setError(data.error || '職歴の保存に失敗しました')
+      }
+    } catch (error) {
+      console.error('Error saving experience:', error)
+      setError('職歴の保存中にエラーが発生しました')
+    }
+  }
+
+  const handleExpEdit = (exp: Experience) => {
+    setExpFormData({
+      companyName: exp.companyName,
+      position: exp.position,
+      description: exp.description || '',
+      startDate: exp.startDate.split('T')[0],
+      endDate: exp.endDate ? exp.endDate.split('T')[0] : '',
+      isCurrent: exp.isCurrent,
+    })
+    setEditingExpId(exp.id)
+    setShowExpForm(true)
+  }
+
+  const handleExpDelete = async (id: string) => {
+    if (!confirm('この職歴を削除してもよろしいですか？')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/engineer/experiences/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await fetchProfile()
+        setSuccess(true)
+        setTimeout(() => setSuccess(false), 3000)
+      } else {
+        setError('職歴の削除に失敗しました')
+      }
+    } catch (error) {
+      console.error('Error deleting experience:', error)
+      setError('職歴の削除中にエラーが発生しました')
+    }
+  }
+
+  const resetExpForm = () => {
+    setExpFormData({
+      companyName: '',
+      position: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      isCurrent: false,
+    })
+    setEditingExpId(null)
+    setShowExpForm(false)
   }
 
   if (loading || status === 'loading') {
@@ -560,14 +658,120 @@ export default function EngineerProfilePage() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900">職歴</h2>
-                <button
-                  type="button"
-                  onClick={() => router.push('/dashboard/engineer/experiences')}
-                  className="text-primary-500 hover:text-primary-600 text-sm font-medium"
-                >
-                  詳細管理ページへ →
-                </button>
+                {!showExpForm && (
+                  <button
+                    type="button"
+                    onClick={() => setShowExpForm(true)}
+                    className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition text-sm font-medium"
+                  >
+                    + 職歴を追加
+                  </button>
+                )}
               </div>
+
+              {showExpForm && (
+                <div className="mb-6 border border-gray-300 rounded-lg p-4 bg-gray-50">
+                  <h3 className="text-lg font-semibold mb-4">{editingExpId ? '職歴を編集' : '職歴を追加'}</h3>
+                  <form onSubmit={handleExpSubmit} className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          会社名 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="companyName"
+                          type="text"
+                          required
+                          value={expFormData.companyName}
+                          onChange={handleExpChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          役職 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="position"
+                          type="text"
+                          required
+                          value={expFormData.position}
+                          onChange={handleExpChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">職務内容</label>
+                      <textarea
+                        name="description"
+                        value={expFormData.description}
+                        onChange={handleExpChange}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          開始日 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="startDate"
+                          type="date"
+                          required
+                          value={expFormData.startDate}
+                          onChange={handleExpChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">終了日</label>
+                        <input
+                          name="endDate"
+                          type="date"
+                          value={expFormData.endDate}
+                          onChange={handleExpChange}
+                          disabled={expFormData.isCurrent}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none disabled:bg-gray-100"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="isCurrent"
+                          checked={expFormData.isCurrent}
+                          onChange={handleExpChange}
+                          className="w-4 h-4 text-primary-500 rounded"
+                        />
+                        <span className="text-sm text-gray-700">現在この会社に在籍中</span>
+                      </label>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={resetExpForm}
+                        className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm"
+                      >
+                        キャンセル
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 bg-primary-500 text-white py-2 rounded-lg hover:bg-primary-600 transition text-sm"
+                      >
+                        保存
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {formData.experiences && formData.experiences.length > 0 ? (
                   formData.experiences.map((exp) => (
@@ -584,8 +788,24 @@ export default function EngineerProfilePage() {
                         {exp.endDate ? new Date(exp.endDate).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' }) : '現在'}
                       </p>
                       {exp.description && (
-                        <p className="text-gray-600 mt-2 text-sm">{exp.description}</p>
+                        <p className="text-gray-600 mt-2 text-sm whitespace-pre-wrap">{exp.description}</p>
                       )}
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          type="button"
+                          onClick={() => handleExpEdit(exp)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm"
+                        >
+                          編集
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleExpDelete(exp.id)}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm"
+                        >
+                          削除
+                        </button>
+                      </div>
                     </div>
                   ))
                 ) : (

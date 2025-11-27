@@ -16,7 +16,10 @@
       "Bash(find . -name \"route.ts\" -type f -exec sh -c 'if ! grep -q \"\"export const dynamic\"\" \"\"$1\"\"; then echo \"\"$1\"\"; fi' _ {} ;)",
       "Bash(npx prisma migrate dev:*)",
       "Bash(git log:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(cmd /c \"if not exist src\\app\\api\\engineer\\scout-emails mkdir src\\app\\api\\engineer\\scout-emails\")"
     ],
     "deny": [],
     "ask": []

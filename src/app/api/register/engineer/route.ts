@@ -3,6 +3,7 @@ import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { sendEmail, createVerificationEmail, createPhoneVerificationEmail } from '@/lib/email'
+import { sendSMS, createVerificationSMS } from '@/lib/sms'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ const registerSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   birthDate: z.string().optional(), // ISO日付文字列
+  gender: z.string().optional(),
   phoneNumber: z.string().optional(),
   address: z.string().optional(),
   nearestStation: z.string().optional(),
@@ -19,9 +21,11 @@ const registerSchema = z.object({
   yearsOfExperience: z.number().optional(),
   currentPosition: z.string().optional(),
   desiredPosition: z.string().optional(),
+  desiredSalary: z.number().optional(),
   desiredSalaryMin: z.number().optional(),
   desiredSalaryMax: z.number().optional(),
-  availableFrom: z.string().optional(), // 転職希望時期（ISO日付文字列）
+  availableFrom: z.string().optional(), // 転職希望時期（文字列）
+  isITEngineer: z.boolean().optional(),
   githubUrl: z.string().optional(),
   linkedinUrl: z.string().optional(),
   portfolioUrl: z.string().optional(),
@@ -75,9 +79,9 @@ export async function POST(req: Request) {
             yearsOfExperience: validatedData.yearsOfExperience,
             currentPosition: validatedData.currentPosition,
             desiredPosition: validatedData.desiredPosition,
-            desiredSalaryMin: validatedData.desiredSalaryMin,
-            desiredSalaryMax: validatedData.desiredSalaryMax,
-            availableFrom: validatedData.availableFrom ? new Date(validatedData.availableFrom) : null,
+            desiredSalaryMin: validatedData.desiredSalary,
+            desiredSalaryMax: validatedData.desiredSalary,
+            availableFrom: validatedData.availableFrom,
             githubUrl: validatedData.githubUrl,
             linkedinUrl: validatedData.linkedinUrl,
             portfolioUrl: validatedData.portfolioUrl,
@@ -124,17 +128,27 @@ export async function POST(req: Request) {
         },
       })
 
-      // 電話番号検証用のメールを送信（実際のSMS送信は別途実装が必要）
-      const emailData = createPhoneVerificationEmail({
-        userName,
-        verificationCode,
-        phoneNumber: validatedData.phoneNumber,
+      // SMSで検証コードを送信
+      const smsMessage = createVerificationSMS(verificationCode)
+      const smsSent = await sendSMS({
+        to: validatedData.phoneNumber,
+        message: smsMessage,
       })
 
-      await sendEmail({
-        ...emailData,
-        to: validatedData.email, // メールアドレスにも送信
-      })
+      if (!smsSent) {
+        // SMSの送信に失敗した場合はメールにフォールバック
+        console.warn('SMS送信に失敗しました。メールで検証コードを送信します。')
+        const emailData = createPhoneVerificationEmail({
+          userName,
+          verificationCode,
+          phoneNumber: validatedData.phoneNumber,
+        })
+
+        await sendEmail({
+          ...emailData,
+          to: validatedData.email,
+        })
+      }
     } else {
       // メール検証
       await prisma.emailVerification.create({

@@ -30,7 +30,8 @@ export default function ScoutPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [engineers, setEngineers] = useState<Engineer[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
   const [searchSkill, setSearchSkill] = useState('')
   const [minExperience, setMinExperience] = useState('')
   const [selectedEngineers, setSelectedEngineers] = useState<Set<string>>(new Set())
@@ -46,7 +47,7 @@ export default function ScoutPage() {
         router.push('/')
         return
       }
-      fetchEngineers()
+      // 初期表示時はエンジニア一覧を取得しない
     }
   }, [status, session, router])
 
@@ -71,6 +72,7 @@ export default function ScoutPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    setHasSearched(true)
     fetchEngineers()
   }
 
@@ -128,7 +130,7 @@ export default function ScoutPage() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading') {
     return (
       <>
         <Header />
@@ -215,10 +217,18 @@ export default function ScoutPage() {
           {/* Results */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">
-              応募者一覧 ({engineers.length}名)
+              応募者一覧 {hasSearched && `(${engineers.length}名)`}
             </h2>
 
-            {engineers.length === 0 ? (
+            {!hasSearched ? (
+              <div className="text-center py-12 text-gray-500">
+                検索条件を入力して「検索」ボタンを押してください
+              </div>
+            ) : loading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+              </div>
+            ) : engineers.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 応募者が見つかりませんでした
               </div>

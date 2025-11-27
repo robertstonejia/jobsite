@@ -28,10 +28,24 @@ interface Application {
   }
 }
 
+interface ScoutEmail {
+  id: string
+  subject: string
+  content: string
+  isRead: boolean
+  createdAt: string
+  company: {
+    id: string
+    name: string
+    logoUrl: string | null
+  }
+}
+
 export default function EngineerDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [applications, setApplications] = useState<Application[]>([])
+  const [scoutEmails, setScoutEmails] = useState<ScoutEmail[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -39,6 +53,7 @@ export default function EngineerDashboard() {
       router.push('/login')
     } else if (status === 'authenticated') {
       fetchApplications()
+      fetchScoutEmails()
     }
   }, [status, router])
 
@@ -53,6 +68,18 @@ export default function EngineerDashboard() {
       console.error('Error fetching applications:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchScoutEmails = async () => {
+    try {
+      const response = await fetch('/api/engineer/scout-emails')
+      if (response.ok) {
+        const data = await response.json()
+        setScoutEmails(data)
+      }
+    } catch (error) {
+      console.error('Error fetching scout emails:', error)
     }
   }
 
@@ -155,6 +182,67 @@ export default function EngineerDashboard() {
               </Link>
             </div>
           </div>
+
+          {/* スカウトメール通知 */}
+          {scoutEmails.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6 mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">スカウトメール</h2>
+              <div className="space-y-4">
+                {scoutEmails.map((email) => (
+                  <div
+                    key={email.id}
+                    className={`border rounded-lg p-4 ${
+                      !email.isRead ? 'bg-blue-50 border-blue-200' : 'border-gray-200'
+                    } hover:shadow-md transition`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {email.company.logoUrl ? (
+                          <img
+                            src={email.company.logoUrl}
+                            alt={email.company.name}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <span className="text-xl">🏢</span>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              {!email.isRead && (
+                                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
+                                  NEW
+                                </span>
+                              )}
+                              <h3 className="text-lg font-bold text-gray-900">{email.subject}</h3>
+                            </div>
+                            <p className="text-sm text-gray-600">{email.company.name}</p>
+                          </div>
+                        </div>
+
+                        <p className="text-gray-700 mb-3 line-clamp-2">{email.content}</p>
+
+                        <div className="flex items-center justify-between pt-3 border-t">
+                          <p className="text-sm text-gray-600">
+                            受信日: {new Date(email.createdAt).toLocaleDateString('ja-JP')}
+                          </p>
+                          <Link
+                            href={`/dashboard/engineer/scout-emails/${email.id}`}
+                            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-sm"
+                          >
+                            詳細を見る
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* 応募一覧 */}
           <div className="bg-white rounded-lg shadow p-6">

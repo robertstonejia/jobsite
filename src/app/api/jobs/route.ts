@@ -94,14 +94,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
-    // Check subscription status
+    // Check subscription status or trial status
     const now = new Date()
     const hasActiveSubscription =
       user.company.subscriptionPlan !== 'FREE' &&
       user.company.subscriptionExpiry &&
       new Date(user.company.subscriptionExpiry) > now
 
-    if (!hasActiveSubscription) {
+    const hasActiveTrial =
+      user.company.isTrialActive &&
+      user.company.trialEndDate &&
+      new Date(user.company.trialEndDate) > now
+
+    if (!hasActiveSubscription && !hasActiveTrial) {
       return NextResponse.json(
         {
           error: '求人を投稿するには有料プランへの登録が必要です。',

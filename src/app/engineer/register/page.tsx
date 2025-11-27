@@ -18,11 +18,15 @@ export default function EngineerRegisterPage() {
     firstName: '',
     lastName: '',
     phoneNumber: '',
+    birthDate: '',
     address: '',
     nearestStation: '',
     bio: '',
     yearsOfExperience: '',
     currentPosition: '',
+    desiredSalary: '',
+    availableFrom: '',
+    isITEngineer: true,
     githubUrl: '',
     linkedinUrl: '',
     portfolioUrl: '',
@@ -30,9 +34,10 @@ export default function EngineerRegisterPage() {
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     })
   }
 
@@ -71,11 +76,15 @@ export default function EngineerRegisterPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           phoneNumber: formData.phoneNumber || undefined,
+          birthDate: formData.birthDate || undefined,
           address: formData.address || undefined,
           nearestStation: formData.nearestStation || undefined,
           bio: formData.bio || undefined,
           yearsOfExperience: formData.yearsOfExperience ? parseInt(formData.yearsOfExperience) : undefined,
           currentPosition: formData.currentPosition || undefined,
+          desiredSalary: formData.desiredSalary ? parseInt(formData.desiredSalary) : undefined,
+          availableFrom: formData.availableFrom || undefined,
+          isITEngineer: formData.isITEngineer,
           githubUrl: formData.githubUrl || undefined,
           linkedinUrl: formData.linkedinUrl || undefined,
           portfolioUrl: formData.portfolioUrl || undefined,
@@ -214,6 +223,20 @@ export default function EngineerRegisterPage() {
                   </div>
 
                   <div>
+                    <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-2">
+                      生年月日
+                    </label>
+                    <input
+                      id="birthDate"
+                      name="birthDate"
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    />
+                  </div>
+
+                  <div>
                     <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
                       電話番号 {formData.verificationType === 'phone' && <span className="text-red-500">*</span>}
                     </label>
@@ -322,6 +345,20 @@ export default function EngineerRegisterPage() {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">職務情報</h2>
 
                 <div className="space-y-4">
+                  <div className="flex items-center">
+                    <input
+                      id="isITEngineer"
+                      name="isITEngineer"
+                      type="checkbox"
+                      checked={formData.isITEngineer}
+                      onChange={handleChange}
+                      className="w-5 h-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"
+                    />
+                    <label htmlFor="isITEngineer" className="ml-2 text-sm font-medium text-gray-700">
+                      IT技術者である
+                    </label>
+                  </div>
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="currentPosition" className="block text-sm font-medium text-gray-700 mb-2">
@@ -359,60 +396,99 @@ export default function EngineerRegisterPage() {
                       </select>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* SNS・ポートフォリオ */}
-              <div className="pb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">SNS・ポートフォリオ</h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="desiredSalary" className="block text-sm font-medium text-gray-700 mb-2">
+                        希望年収
+                      </label>
+                      <input
+                        id="desiredSalary"
+                        name="desiredSalary"
+                        type="number"
+                        value={formData.desiredSalary}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        placeholder="例: 6000000"
+                      />
+                    </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                      GitHub URL
-                    </label>
-                    <input
-                      id="githubUrl"
-                      name="githubUrl"
-                      type="url"
-                      value={formData.githubUrl}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      placeholder="https://github.com/username"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                      LinkedIn URL
-                    </label>
-                    <input
-                      id="linkedinUrl"
-                      name="linkedinUrl"
-                      type="url"
-                      value={formData.linkedinUrl}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      placeholder="https://linkedin.com/in/username"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="portfolioUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                      ポートフォリオサイト URL
-                    </label>
-                    <input
-                      id="portfolioUrl"
-                      name="portfolioUrl"
-                      type="url"
-                      value={formData.portfolioUrl}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      placeholder="https://yourportfolio.com"
-                    />
+                    <div>
+                      <label htmlFor="availableFrom" className="block text-sm font-medium text-gray-700 mb-2">
+                        転職希望時期
+                      </label>
+                      <select
+                        id="availableFrom"
+                        name="availableFrom"
+                        value={formData.availableFrom}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                      >
+                        <option value="">選択してください</option>
+                        <option value="すぐにでも">すぐにでも</option>
+                        <option value="一か月以内">一か月以内</option>
+                        <option value="三か月以内">三か月以内</option>
+                        <option value="半年以内">半年以内</option>
+                        <option value="一年以内">一年以内</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* SNS・ポートフォリオ (IT技術者のみ) */}
+              {formData.isITEngineer && (
+                <div className="pb-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">SNS・ポートフォリオ</h2>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                        GitHub URL
+                      </label>
+                      <input
+                        id="githubUrl"
+                        name="githubUrl"
+                        type="url"
+                        value={formData.githubUrl}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        placeholder="https://github.com/username"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                        LinkedIn URL
+                      </label>
+                      <input
+                        id="linkedinUrl"
+                        name="linkedinUrl"
+                        type="url"
+                        value={formData.linkedinUrl}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        placeholder="https://linkedin.com/in/username"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="portfolioUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                        ポートフォリオサイト URL
+                      </label>
+                      <input
+                        id="portfolioUrl"
+                        name="portfolioUrl"
+                        type="url"
+                        value={formData.portfolioUrl}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        placeholder="https://yourportfolio.com"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"
