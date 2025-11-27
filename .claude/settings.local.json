@@ -12,7 +12,8 @@
       "Bash(do echo \"=== $file ===\")",
       "Bash(head:*)",
       "Bash(done)",
-      "Bash(for file in \"src/app/api/auth/send-verification/route.ts\" \"src/app/api/auth/verify-email/route.ts\" \"src/app/api/register/engineer/route.ts\" \"src/app/api/register/company/route.ts\")"
+      "Bash(for file in \"src/app/api/auth/send-verification/route.ts\" \"src/app/api/auth/verify-email/route.ts\" \"src/app/api/register/engineer/route.ts\" \"src/app/api/register/company/route.ts\")",
+      "Bash(find . -name \"route.ts\" -type f -exec sh -c 'if ! grep -q \"\"export const dynamic\"\" \"\"$1\"\"; then echo \"\"$1\"\"; fi' _ {} ;)"
     ],
     "deny": [],
     "ask": []

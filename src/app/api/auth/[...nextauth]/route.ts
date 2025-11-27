@@ -2,6 +2,8 @@ import NextAuth from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { NextRequest } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 console.log('🚀 NextAuth route handler loading...')
 
 let handler: any

@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { sendEmail, createVerificationEmail } from '@/lib/email'
 
+export const dynamic = 'force-dynamic'
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),

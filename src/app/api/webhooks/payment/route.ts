@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * 決済プロバイダーからのWebhookを受け取るエンドポイント
  * WeChat Pay, Alipay, PayPayなどの決済完了通知を処理
