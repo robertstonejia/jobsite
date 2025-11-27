@@ -104,6 +104,9 @@ export async function GET(
 
     console.log(`[Payment] Payment approved: ${approval.paymentId} by ${process.env.ADMIN_EMAIL}`)
 
+    // 支払い方法に応じた実際の金額と通貨を取得
+    const paymentDetails = getPaymentDetails(approval.payment.paymentMethod, approval.payment.amount)
+
     return new NextResponse(
       generateHTML(
         '承認完了',
@@ -113,7 +116,8 @@ export async function GET(
             <h3 style="margin-top: 0;">支払い情報</h3>
             <p><strong>会社名:</strong> ${approval.payment.company.name}</p>
             <p><strong>プラン:</strong> ${approval.payment.plan}</p>
-            <p><strong>金額:</strong> ¥${approval.payment.amount.toLocaleString()}</p>
+            <p><strong>支払い方法:</strong> ${paymentDetails.methodName}</p>
+            <p><strong>金額:</strong> ${paymentDetails.displayAmount}</p>
             <p><strong>承認日時:</strong> ${new Date().toLocaleString('ja-JP')}</p>
           </div>
           <p>会社のサブスクリプションが有効化されました。</p>
@@ -134,6 +138,55 @@ export async function GET(
         headers: { 'Content-Type': 'text/html; charset=utf-8' }
       }
     )
+  }
+}
+
+/**
+ * 支払い方法に応じた実際の金額情報を取得
+ */
+function getPaymentDetails(paymentMethod: string, dbAmount: number): {
+  methodName: string
+  displayAmount: string
+  actualAmount: number
+  currency: string
+} {
+  switch (paymentMethod.toLowerCase()) {
+    case 'wechat':
+      return {
+        methodName: 'WeChat Pay',
+        displayAmount: '¥168（人民元）',
+        actualAmount: 168,
+        currency: 'CNY'
+      }
+    case 'alipay':
+      return {
+        methodName: 'Alipay',
+        displayAmount: '¥168（人民元）',
+        actualAmount: 168,
+        currency: 'CNY'
+      }
+    case 'paypay':
+      return {
+        methodName: 'PayPay',
+        displayAmount: '¥3,680',
+        actualAmount: 3680,
+        currency: 'JPY'
+      }
+    case 'credit':
+    case 'stripe':
+      return {
+        methodName: 'クレジットカード',
+        displayAmount: `¥${dbAmount.toLocaleString()}`,
+        actualAmount: dbAmount,
+        currency: 'JPY'
+      }
+    default:
+      return {
+        methodName: paymentMethod,
+        displayAmount: `¥${dbAmount.toLocaleString()}`,
+        actualAmount: dbAmount,
+        currency: 'JPY'
+      }
   }
 }
 

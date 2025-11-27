@@ -6,6 +6,16 @@ import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
+interface Experience {
+  id: string
+  companyName: string
+  position: string
+  description: string | null
+  startDate: string
+  endDate: string | null
+  isCurrent: boolean
+}
+
 interface EngineerProfile {
   firstName: string
   lastName: string
@@ -20,9 +30,11 @@ interface EngineerProfile {
   desiredPosition: string | null
   desiredSalaryMin: number | null
   desiredSalaryMax: number | null
+  availableFrom: string | null
   githubUrl: string | null
   linkedinUrl: string | null
   portfolioUrl: string | null
+  experiences?: Experience[]
 }
 
 export default function EngineerProfilePage() {
@@ -47,9 +59,11 @@ export default function EngineerProfilePage() {
     desiredPosition: null,
     desiredSalaryMin: null,
     desiredSalaryMax: null,
+    availableFrom: null,
     githubUrl: null,
     linkedinUrl: null,
     portfolioUrl: null,
+    experiences: [],
   })
 
   useEffect(() => {
@@ -68,6 +82,8 @@ export default function EngineerProfilePage() {
         setFormData({
           ...data,
           birthDate: data.birthDate ? data.birthDate.split('T')[0] : null,
+          availableFrom: data.availableFrom ? data.availableFrom.split('T')[0] : null,
+          experiences: data.experiences || [],
         })
       } else {
         setError('プロフィールの取得に失敗しました')
@@ -393,6 +409,59 @@ export default function EngineerProfilePage() {
                     </div>
                   </div>
                 </div>
+
+                <div>
+                  <label htmlFor="availableFrom" className="block text-sm font-medium text-gray-700 mb-2">
+                    転職希望時期
+                  </label>
+                  <input
+                    id="availableFrom"
+                    name="availableFrom"
+                    type="date"
+                    value={formData.availableFrom || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">いつ頃から新しい職場で働けるかをお知らせください</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 職歴 */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">職歴</h2>
+              <div className="space-y-4">
+                {formData.experiences && formData.experiences.length > 0 ? (
+                  formData.experiences.map((exp) => (
+                    <div key={exp.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-lg">{exp.position}</h3>
+                        {exp.isCurrent && (
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">在職中</span>
+                        )}
+                      </div>
+                      <p className="text-gray-700 font-medium">{exp.companyName}</p>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {new Date(exp.startDate).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })} 〜
+                        {exp.endDate ? new Date(exp.endDate).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' }) : '現在'}
+                      </p>
+                      {exp.description && (
+                        <p className="text-gray-600 mt-2 text-sm">{exp.description}</p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    職歴が登録されていません
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard/engineer/experiences')}
+                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary-500 hover:text-primary-500 transition"
+                >
+                  + 職歴を管理
+                </button>
               </div>
             </div>
 
