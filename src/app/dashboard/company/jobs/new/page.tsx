@@ -6,19 +6,11 @@ import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
-interface Skill {
-  id: string
-  name: string
-  category: string
-}
-
 export default function NewJobPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -28,6 +20,7 @@ export default function NewJobPage() {
     jobType: 'FULL_TIME',
     location: '',
     remoteOk: false,
+    foreignNationalityOk: false,
     salaryMin: '',
     salaryMax: '',
   })
@@ -35,22 +28,8 @@ export default function NewJobPage() {
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
-    } else if (status === 'authenticated') {
-      fetchSkills()
     }
   }, [status, router])
-
-  const fetchSkills = async () => {
-    try {
-      const response = await fetch('/api/skills')
-      if (response.ok) {
-        const data = await response.json()
-        setSkills(data)
-      }
-    } catch (error) {
-      console.error('Error fetching skills:', error)
-    }
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -58,12 +37,6 @@ export default function NewJobPage() {
       ...formData,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     })
-  }
-
-  const handleSkillToggle = (skillId: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
-    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,7 +54,6 @@ export default function NewJobPage() {
           ...formData,
           salaryMin: formData.salaryMin ? parseInt(formData.salaryMin) : undefined,
           salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) : undefined,
-          skillIds: selectedSkills,
         }),
       })
 
@@ -282,7 +254,7 @@ export default function NewJobPage() {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -293,35 +265,18 @@ export default function NewJobPage() {
                       />
                       <span className="text-sm font-medium text-gray-700">リモートワーク可</span>
                     </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="foreignNationalityOk"
+                        checked={formData.foreignNationalityOk}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">外国籍可</span>
+                    </label>
                   </div>
                 </div>
-              </div>
-
-              {/* 必要スキル */}
-              <div className="pb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">必要スキル</h2>
-                <p className="text-sm text-gray-600 mb-4">該当するスキルを選択してください</p>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {skills.map((skill) => (
-                    <button
-                      key={skill.id}
-                      type="button"
-                      onClick={() => handleSkillToggle(skill.id)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                        selectedSkills.includes(skill.id)
-                          ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {skill.name}
-                    </button>
-                  ))}
-                </div>
-
-                {skills.length === 0 && (
-                  <p className="text-gray-500 text-center py-4">スキルがまだ登録されていません</p>
-                )}
               </div>
 
               <div className="flex gap-4">

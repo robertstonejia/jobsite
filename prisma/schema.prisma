@@ -206,6 +206,7 @@ model Job {
   jobType         JobType     @default(FULL_TIME)
   location        String?
   remoteOk        Boolean     @default(false)
+  foreignNationalityOk Boolean @default(false)
 
   salaryMin       Int?
   salaryMax       Int?
