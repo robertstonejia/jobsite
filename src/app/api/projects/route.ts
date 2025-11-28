@@ -178,12 +178,12 @@ export async function GET(req: Request) {
         search
           ? {
               OR: [
-                { title: { contains: search, mode: 'insensitive' } },
-                { description: { contains: search, mode: 'insensitive' } },
+                { title: { contains: search, mode: 'insensitive' as const } },
+                { description: { contains: search, mode: 'insensitive' as const } },
               ],
             }
           : {},
-        location ? { location: { contains: location, mode: 'insensitive' } } : {},
+        location ? { location: { contains: location, mode: 'insensitive' as const } } : {},
         remoteOk ? { remoteOk: true } : {},
       ],
     }
