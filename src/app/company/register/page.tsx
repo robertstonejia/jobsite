@@ -375,6 +375,20 @@ export default function CompanyRegisterPage() {
                 </div>
               </div>
 
+              {/* 利用契約確認 */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-gray-700">
+                  登録することで、当サービスの
+                  <Link href="/terms" target="_blank" className="text-primary-500 hover:underline font-semibold">
+                    利用契約
+                  </Link>
+                  に同意したものとみなされます。
+                </p>
+                <p className="text-xs text-gray-600 mt-2">
+                  ※ 登録前に必ず利用契約をご確認ください
+                </p>
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function EditProjectPage() {
   const params = useParams()
@@ -14,6 +15,9 @@ export default function EditProjectPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -82,24 +86,41 @@ export default function EditProjectPage() {
     setError('')
 
     try {
+      // Exclude numeric fields from formData spread
+      const { monthlyRate, interviewCount, ...restFormData } = formData
+
+      const payload: any = {
+        ...restFormData,
+      }
+
+      // Only include numeric fields if they have values
+      if (monthlyRate) {
+        payload.monthlyRate = parseInt(monthlyRate)
+      }
+      if (interviewCount) {
+        payload.interviewCount = parseInt(interviewCount)
+      }
+
       const response = await fetch(`/api/projects/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          monthlyRate: formData.monthlyRate ? parseInt(formData.monthlyRate) : null,
-          interviewCount: formData.interviewCount ? parseInt(formData.interviewCount) : null,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
-        alert('IT案件を更新しました')
-        router.push('/dashboard/company')
+        setShowSuccessDialog(true)
       } else {
         const data = await response.json()
-        setError(data.error || '更新に失敗しました')
+        // Handle zod validation errors
+        if (Array.isArray(data.error)) {
+          setError(data.error.map((e: any) => e.message).join(', '))
+        } else if (typeof data.error === 'object') {
+          setError(JSON.stringify(data.error))
+        } else {
+          setError(data.error || '更新に失敗しました')
+        }
       }
     } catch (error) {
       console.error('Error updating project:', error)
@@ -109,23 +130,31 @@ export default function EditProjectPage() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!confirm('この案件を削除してもよろしいですか?')) {
-      return
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteConfirmDialog(true)
+  }
 
+  const handleDeleteConfirm = async () => {
+    setShowDeleteConfirmDialog(false)
     setDeleting(true)
+
     try {
       const response = await fetch(`/api/projects/${params.id}`, {
         method: 'DELETE',
       })
 
       if (response.ok) {
-        alert('IT案件を削除しました')
-        router.push('/dashboard/company')
+        setShowDeleteDialog(true)
       } else {
         const data = await response.json()
-        setError(data.error || '削除に失敗しました')
+        // Handle zod validation errors
+        if (Array.isArray(data.error)) {
+          setError(data.error.map((e: any) => e.message).join(', '))
+        } else if (typeof data.error === 'object') {
+          setError(JSON.stringify(data.error))
+        } else {
+          setError(data.error || '削除に失敗しました')
+        }
       }
     } catch (error) {
       console.error('Error deleting project:', error)
@@ -405,7 +434,7 @@ export default function EditProjectPage() {
               </button>
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 disabled={deleting}
                 className="px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
               >
@@ -416,6 +445,48 @@ export default function EditProjectPage() {
         </div>
       </div>
       <Footer />
+
+      {/* Success Dialog */}
+      <ConfirmDialog
+        isOpen={showSuccessDialog}
+        title="更新完了"
+        message="IT案件を更新しました。"
+        confirmText="OK"
+        cancelText=""
+        onConfirm={() => {
+          setShowSuccessDialog(false)
+          router.push('/dashboard/company')
+        }}
+        onCancel={() => {}}
+        type="success"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirmDialog}
+        title="削除の確認"
+        message="この案件を削除してもよろしいですか？"
+        confirmText="削除する"
+        cancelText="キャンセル"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirmDialog(false)}
+        type="warning"
+      />
+
+      {/* Delete Success Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="削除完了"
+        message="IT案件を削除しました。"
+        confirmText="OK"
+        cancelText=""
+        onConfirm={() => {
+          setShowDeleteDialog(false)
+          router.push('/dashboard/company')
+        }}
+        onCancel={() => {}}
+        type="success"
+      />
     </>
   )
 }

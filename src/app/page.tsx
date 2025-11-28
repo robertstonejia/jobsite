@@ -64,8 +64,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-12 sm:py-16 md:py-24 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">応募者と企業をつなぐ</h1>
-          <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8">最適なマッチングで、理想のキャリアと人材を</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">
+            求人検索・IT案件をご利用になるには<br className="hidden sm:block" />
+            新規会員登録が必要です
+          </h1>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link
               href="/engineer/register"
@@ -122,23 +124,14 @@ export default function Home() {
         <section className="bg-blue-50 py-8 sm:py-12 md:py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-500 mb-4">
-              求人検索・IT案件をご利用になるには
+              すでにアカウントを持ってます。
             </h2>
-            <p className="text-base sm:text-lg text-gray-600 mb-6">
-              会員登録（無料）またはログインが必要です
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <div className="flex justify-center">
               <Link
                 href="/login"
                 className="inline-block bg-primary-500 text-white font-bold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform text-sm sm:text-base"
               >
                 ログイン
-              </Link>
-              <Link
-                href="/engineer/register"
-                className="inline-block bg-white text-primary-500 border-2 border-primary-500 font-bold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform text-sm sm:text-base"
-              >
-                無料会員登録
               </Link>
             </div>
           </div>

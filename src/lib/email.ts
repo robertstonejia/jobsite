@@ -51,7 +51,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
     // 送信元の表示名を設定（実名を隠す）
     const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_USER
-    const fromName = process.env.EMAIL_FROM_NAME || 'TechJob'
+    const fromName = process.env.EMAIL_FROM_NAME || 'seekjob'
     const from = `"${fromName}" <${fromAddress}>`
 
     await transporter.sendMail({
@@ -193,13 +193,13 @@ export function createVerificationEmail(data: {
   verificationCode: string
   verificationUrl: string
 }): EmailOptions {
-  const subject = '【TechJob】メールアドレスの確認'
+  const subject = '【seekjob】メールアドレスの確認'
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">メールアドレスの確認</h2>
       <p>${data.companyName}様</p>
-      <p>TechJobにご登録いただきありがとうございます。</p>
+      <p>seekjobにご登録いただきありがとうございます。</p>
       <p>以下の6桁の検証コードを入力して、メールアドレスの確認を完了してください:</p>
 
       <div style="background-color: #f5f5f5; padding: 30px; text-align: center; border-radius: 5px; margin: 20px 0;">
@@ -224,7 +224,7 @@ export function createVerificationEmail(data: {
       <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
       <p style="color: #666; font-size: 12px;">
         このメールは自動送信されています。<br>
-        TechJob運営チーム
+        seekjob運営チーム
       </p>
     </div>
   `
@@ -234,7 +234,7 @@ export function createVerificationEmail(data: {
 
 ${data.companyName}様
 
-TechJobにご登録いただきありがとうございます。
+seekjobにご登録いただきありがとうございます。
 
 以下の6桁の検証コードを入力して、メールアドレスの確認を完了してください:
 
@@ -248,7 +248,7 @@ ${data.verificationUrl}
 
 ---
 このメールは自動送信されています。
-TechJob運営チーム
+seekjob運営チーム
   `
 
   return { to: '', subject, html, text }
@@ -260,13 +260,13 @@ export function createPhoneVerificationEmail(data: {
   verificationCode: string
   phoneNumber: string
 }): EmailOptions {
-  const subject = '【TechJob】電話番号の確認'
+  const subject = '【seekjob】電話番号の確認'
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">電話番号の確認</h2>
       <p>${data.userName}様</p>
-      <p>TechJobにご登録いただきありがとうございます。</p>
+      <p>seekjobにご登録いただきありがとうございます。</p>
       <p>以下の6桁の検証コードを入力して、電話番号の確認を完了してください:</p>
 
       <div style="background-color: #f5f5f5; padding: 30px; text-align: center; border-radius: 5px; margin: 20px 0;">
@@ -287,7 +287,7 @@ export function createPhoneVerificationEmail(data: {
       <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
       <p style="color: #666; font-size: 12px;">
         このメールは自動送信されています。<br>
-        TechJob運営チーム
+        seekjob運営チーム
       </p>
     </div>
   `
@@ -297,7 +297,7 @@ export function createPhoneVerificationEmail(data: {
 
 ${data.userName}様
 
-TechJobにご登録いただきありがとうございます。
+seekjobにご登録いただきありがとうございます。
 
 以下の6桁の検証コードを入力して、電話番号の確認を完了してください:
 
@@ -310,7 +310,7 @@ ${data.verificationCode}
 
 ---
 このメールは自動送信されています。
-TechJob運営チーム
+seekjob運営チーム
   `
 
   return { to: '', subject, html, text }

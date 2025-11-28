@@ -18,22 +18,71 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: (session.user as any).id },
-      include: {
+      select: {
         engineer: {
-          include: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            displayName: true,
+            birthDate: true,
+            phoneNumber: true,
+            nationality: true,
+            residenceStatus: true,
+            residenceExpiry: true,
+            address: true,
+            nearestStation: true,
+            bio: true,
+            yearsOfExperience: true,
+            currentPosition: true,
+            desiredPosition: true,
+            desiredSalaryMin: true,
+            desiredSalaryMax: true,
+            availableFrom: true,
+            isITEngineer: true,
+            githubUrl: true,
+            linkedinUrl: true,
+            portfolioUrl: true,
             experiences: {
+              select: {
+                id: true,
+                companyName: true,
+                position: true,
+                description: true,
+                startDate: true,
+                endDate: true,
+                isCurrent: true,
+              },
               orderBy: {
                 startDate: 'desc',
               },
             },
             educations: {
+              select: {
+                id: true,
+                schoolName: true,
+                degree: true,
+                fieldOfStudy: true,
+                startDate: true,
+                endDate: true,
+                isCurrent: true,
+              },
               orderBy: {
                 startDate: 'desc',
               },
             },
             skills: {
-              include: {
-                skill: true,
+              select: {
+                id: true,
+                level: true,
+                yearsUsed: true,
+                skill: {
+                  select: {
+                    id: true,
+                    name: true,
+                    category: true,
+                  },
+                },
               },
             },
           },
@@ -62,6 +111,9 @@ const updateProfileSchema = z.object({
   displayName: z.string().nullable().optional(),
   birthDate: z.string().nullable().optional(),
   phoneNumber: z.string().nullable().optional(),
+  nationality: z.string().nullable().optional(),
+  residenceStatus: z.string().nullable().optional(),
+  residenceExpiry: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   nearestStation: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
@@ -108,6 +160,7 @@ export async function PUT(req: Request) {
       linkedinUrl: validatedData.linkedinUrl === '' ? null : validatedData.linkedinUrl,
       portfolioUrl: validatedData.portfolioUrl === '' ? null : validatedData.portfolioUrl,
       birthDate: validatedData.birthDate ? new Date(validatedData.birthDate) : null,
+      residenceExpiry: validatedData.residenceExpiry ? new Date(validatedData.residenceExpiry) : null,
       // availableFrom is now a string, not a DateTime
     }
 

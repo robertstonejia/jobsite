@@ -71,6 +71,9 @@ export async function GET(
       )
     }
 
+    // Check if this is a scout payment based on amount
+    const isScoutPayment = approval.payment.amount === 3000 || approval.payment.amount === 150
+
     // 支払いを承認
     await prisma.$transaction([
       // 承認レコードを更新
@@ -92,10 +95,15 @@ export async function GET(
         }
       }),
 
-      // 会社のサブスクリプションを更新
+      // 会社の情報を更新（スカウトまたはサブスクリプション）
       prisma.company.update({
         where: { id: approval.payment.companyId },
-        data: {
+        data: isScoutPayment ? {
+          // スカウト機能の場合
+          hasScoutAccess: true,
+          scoutAccessExpiry: new Date(new Date().setDate(new Date().getDate() + 30))
+        } : {
+          // サブスクリプションの場合
           subscriptionPlan: approval.payment.plan,
           subscriptionExpiry: new Date(new Date().setMonth(new Date().getMonth() + 1))
         }
@@ -150,26 +158,28 @@ function getPaymentDetails(paymentMethod: string, dbAmount: number): {
   actualAmount: number
   currency: string
 } {
+  const isScoutPayment = dbAmount === 3000 || dbAmount === 150
+
   switch (paymentMethod.toLowerCase()) {
     case 'wechat':
       return {
         methodName: 'WeChat Pay',
-        displayAmount: '¥168（人民元）',
-        actualAmount: 168,
+        displayAmount: isScoutPayment ? '¥150（人民元）' : '¥180（人民元）',
+        actualAmount: isScoutPayment ? 150 : 180,
         currency: 'CNY'
       }
     case 'alipay':
       return {
         methodName: 'Alipay',
-        displayAmount: '¥168（人民元）',
-        actualAmount: 168,
+        displayAmount: isScoutPayment ? '¥150（人民元）' : '¥180（人民元）',
+        actualAmount: isScoutPayment ? 150 : 180,
         currency: 'CNY'
       }
     case 'paypay':
       return {
         methodName: 'PayPay',
-        displayAmount: '¥3,680',
-        actualAmount: 3680,
+        displayAmount: isScoutPayment ? '¥3,000' : '¥3,680',
+        actualAmount: isScoutPayment ? 3000 : 3680,
         currency: 'JPY'
       }
     case 'credit':

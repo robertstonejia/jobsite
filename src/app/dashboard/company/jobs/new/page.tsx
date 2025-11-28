@@ -82,15 +82,21 @@ export default function NewJobPage() {
           title: '求人作成成功',
           message: '求人が正常に作成されました。'
         })
-        setTimeout(() => {
-          router.push('/dashboard/company')
-        }, 2000)
+        // Don't auto-redirect - let user close dialog manually
       } else {
+        let errorMessage = data.error || '求人の作成に失敗しました'
+
+        // Handle zod validation errors
+        if (Array.isArray(errorMessage)) {
+          errorMessage = errorMessage.map((e: any) => e.message).join(', ')
+        } else if (typeof errorMessage === 'object') {
+          errorMessage = JSON.stringify(errorMessage)
+        }
+
+        errorMessage = errorMessage.replace(/http:\/\/localhost:\d+/g, '').trim()
+
         if (data.requiresPayment) {
           // Redirect to subscription page with error message
-          let errorMessage = data.error || '求人を投稿するには有料プランへの登録が必要です。'
-          errorMessage = errorMessage.replace(/http:\/\/localhost:\d+/g, '').trim()
-
           setDialog({
             isOpen: true,
             type: 'error',
@@ -102,8 +108,6 @@ export default function NewJobPage() {
             router.push('/dashboard/company/subscription')
           }, 3000)
         } else {
-          let errorMessage = data.error || '求人の作成に失敗しました'
-          errorMessage = errorMessage.replace(/http:\/\/localhost:\d+/g, '').trim()
           setDialog({
             isOpen: true,
             type: 'error',
@@ -345,7 +349,13 @@ export default function NewJobPage() {
 
       <Dialog
         isOpen={dialog.isOpen}
-        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        onClose={() => {
+          setDialog({ ...dialog, isOpen: false })
+          // 求人作成成功時はダッシュボードに戻る
+          if (dialog.type === 'success' && dialog.title === '求人作成成功') {
+            router.push('/dashboard/company')
+          }
+        }}
         title={dialog.title}
         message={dialog.message}
         type={dialog.type}

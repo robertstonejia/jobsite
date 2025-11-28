@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
+import { useDialog } from '@/hooks/useDialog'
 
 interface Experience {
   id: string
@@ -58,8 +60,9 @@ interface EngineerDetail {
   githubUrl: string | null
   linkedinUrl: string | null
   portfolioUrl: string | null
+  hasContactPermission: boolean
   user: {
-    email: string
+    email: string | null
   }
   skills: EngineerSkill[]
   experiences: Experience[]
@@ -78,6 +81,8 @@ export default function EngineerDetailPage() {
   const [showScoutForm, setShowScoutForm] = useState(false)
   const [scoutMessage, setScoutMessage] = useState('')
   const [sending, setSending] = useState(false)
+
+  const { dialog, showConfirm, showSuccess, showError, showWarning, closeDialog } = useDialog()
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -111,41 +116,43 @@ export default function EngineerDetailPage() {
 
   const handleSendScout = async () => {
     if (!scoutMessage.trim()) {
-      alert('スカウトメッセージを入力してください')
+      showWarning('スカウトメッセージを入力してください')
       return
     }
 
-    if (!confirm('この応募者にスカウトメッセージを送信しますか？')) {
-      return
-    }
+    showConfirm(
+      'この応募者にスカウトメッセージを送信しますか？',
+      async () => {
+        setSending(true)
+        try {
+          const response = await fetch('/api/scout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              engineerIds: [engineerId],
+              message: scoutMessage,
+            }),
+          })
 
-    setSending(true)
-    try {
-      const response = await fetch('/api/scout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          engineerIds: [engineerId],
-          message: scoutMessage,
-        }),
-      })
-
-      if (response.ok) {
-        alert('スカウトメッセージを送信しました')
-        setScoutMessage('')
-        setShowScoutForm(false)
-      } else {
-        const error = await response.json()
-        alert(`エラー: ${error.error || 'スカウトメッセージの送信に失敗しました'}`)
-      }
-    } catch (error) {
-      console.error('Error sending scout:', error)
-      alert('スカウトメッセージの送信に失敗しました')
-    } finally {
-      setSending(false)
-    }
+          if (response.ok) {
+            showSuccess('スカウトメッセージを送信しました')
+            setScoutMessage('')
+            setShowScoutForm(false)
+          } else {
+            const error = await response.json()
+            showError(`エラー: ${error.error || 'スカウトメッセージの送信に失敗しました'}`)
+          }
+        } catch (error) {
+          console.error('Error sending scout:', error)
+          showError('スカウトメッセージの送信に失敗しました')
+        } finally {
+          setSending(false)
+        }
+      },
+      '確認'
+    )
   }
 
   if (loading || status === 'loading') {
@@ -265,16 +272,30 @@ export default function EngineerDetailPage() {
                   </span>
                 </div>
               )}
-              {engineer.phoneNumber && (
-                <div>
-                  <span className="text-sm text-gray-600">電話番号: </span>
-                  <span className="text-gray-900">{engineer.phoneNumber}</span>
+              {engineer.hasContactPermission ? (
+                <>
+                  {engineer.phoneNumber && (
+                    <div>
+                      <span className="text-sm text-gray-600">電話番号: </span>
+                      <span className="text-gray-900">{engineer.phoneNumber}</span>
+                    </div>
+                  )}
+                  {engineer.user.email && (
+                    <div>
+                      <span className="text-sm text-gray-600">メールアドレス: </span>
+                      <span className="text-gray-900">{engineer.user.email}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    <span className="font-semibold">📧 連絡先情報</span>
+                    <br />
+                    応募者返信すると、連絡先情報（メールアドレス・電話番号）を確認できるようになります。
+                  </p>
                 </div>
               )}
-              <div>
-                <span className="text-sm text-gray-600">メールアドレス: </span>
-                <span className="text-gray-900">{engineer.user.email}</span>
-              </div>
               {engineer.address && (
                 <div>
                   <span className="text-sm text-gray-600">住所: </span>
@@ -331,9 +352,7 @@ export default function EngineerDetailPage() {
               {engineer.availableFrom && (
                 <div>
                   <span className="text-sm text-gray-600">転職希望時期: </span>
-                  <span className="text-gray-900">
-                    {new Date(engineer.availableFrom).toLocaleDateString('ja-JP')}
-                  </span>
+                  <span className="text-gray-900">{engineer.availableFrom}</span>
                 </div>
               )}
             </div>
@@ -489,6 +508,17 @@ export default function EngineerDetailPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+        onConfirm={dialog.onConfirm}
+      />
     </>
   )
 }

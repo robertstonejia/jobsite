@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
+import { useDialog } from '@/hooks/useDialog'
 
 interface Engineer {
   id: string
@@ -13,6 +15,8 @@ interface Engineer {
   currentPosition: string | null
   yearsOfExperience: number | null
   desiredSalary: number | null
+  nationality: string | null
+  birthDate: string | null
   user: {
     email: string
   }
@@ -34,10 +38,15 @@ export default function ScoutPage() {
   const [hasSearched, setHasSearched] = useState(false)
   const [searchSkill, setSearchSkill] = useState('')
   const [minExperience, setMinExperience] = useState('')
+  const [nationality, setNationality] = useState('')
+  const [minAge, setMinAge] = useState('')
+  const [maxAge, setMaxAge] = useState('')
   const [selectedEngineers, setSelectedEngineers] = useState<Set<string>>(new Set())
   const [scoutMessage, setScoutMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [company, setCompany] = useState<any>(null)
+
+  const { dialog, showConfirm, showSuccess, showError, showWarning, closeDialog } = useDialog()
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -64,6 +73,16 @@ export default function ScoutPage() {
     }
   }
 
+  const hasActiveSubscription = () => {
+    if (!company) return false
+    const now = new Date()
+    return (
+      company.subscriptionPlan !== 'FREE' &&
+      company.subscriptionExpiry &&
+      new Date(company.subscriptionExpiry) > now
+    )
+  }
+
   const hasScoutAccess = () => {
     if (!company) return false
     const now = new Date()
@@ -80,6 +99,9 @@ export default function ScoutPage() {
       const params = new URLSearchParams()
       if (searchSkill) params.append('skill', searchSkill)
       if (minExperience) params.append('minExperience', minExperience)
+      if (nationality) params.append('nationality', nationality)
+      if (minAge) params.append('minAge', minAge)
+      if (maxAge) params.append('maxAge', maxAge)
 
       const response = await fetch(`/api/engineers?${params}`)
       if (response.ok) {
@@ -96,7 +118,7 @@ export default function ScoutPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // Only search if at least one field is filled
-    if (!searchSkill.trim() && !minExperience.trim()) {
+    if (!searchSkill.trim() && !minExperience.trim() && !nationality.trim() && !minAge.trim() && !maxAge.trim()) {
       setEngineers([])
       setHasSearched(true)
       return
@@ -117,46 +139,48 @@ export default function ScoutPage() {
 
   const handleSendScout = async () => {
     if (selectedEngineers.size === 0) {
-      alert('スカウトする応募者を選択してください')
+      showWarning('スカウトする応募者を選択してください')
       return
     }
 
     if (!scoutMessage.trim()) {
-      alert('スカウトメッセージを入力してください')
+      showWarning('スカウトメッセージを入力してください')
       return
     }
 
-    if (!confirm(`${selectedEngineers.size}名にスカウトメッセージを送信しますか？`)) {
-      return
-    }
+    showConfirm(
+      `${selectedEngineers.size}名にスカウトメッセージを送信しますか？`,
+      async () => {
+        setSending(true)
+        try {
+          const response = await fetch('/api/scout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              engineerIds: Array.from(selectedEngineers),
+              message: scoutMessage,
+            }),
+          })
 
-    setSending(true)
-    try {
-      const response = await fetch('/api/scout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          engineerIds: Array.from(selectedEngineers),
-          message: scoutMessage,
-        }),
-      })
-
-      if (response.ok) {
-        alert('スカウトメッセージを送信しました')
-        setSelectedEngineers(new Set())
-        setScoutMessage('')
-      } else {
-        const error = await response.json()
-        alert(`エラー: ${error.error || 'スカウトメッセージの送信に失敗しました'}`)
-      }
-    } catch (error) {
-      console.error('Error sending scout:', error)
-      alert('スカウトメッセージの送信に失敗しました')
-    } finally {
-      setSending(false)
-    }
+          if (response.ok) {
+            showSuccess('スカウトメッセージを送信しました')
+            setSelectedEngineers(new Set())
+            setScoutMessage('')
+          } else {
+            const error = await response.json()
+            showError(`エラー: ${error.error || 'スカウトメッセージの送信に失敗しました'}`)
+          }
+        } catch (error) {
+          console.error('Error sending scout:', error)
+          showError('スカウトメッセージの送信に失敗しました')
+        } finally {
+          setSending(false)
+        }
+      },
+      '確認'
+    )
   }
 
   if (status === 'loading') {
@@ -181,8 +205,29 @@ export default function ScoutPage() {
             <p className="text-gray-600">優秀な応募者にスカウトメッセージを送信できます</p>
           </div>
 
+          {/* Subscription Required Message */}
+          {!hasActiveSubscription() && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3">🚫</span>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-red-800 mb-2">月額会員プランへの登録が必要です</h3>
+                  <p className="text-red-700 mb-4">
+                    スカウト機能を利用する前に、月額会員プランへの登録が必要です。
+                  </p>
+                  <button
+                    onClick={() => router.push('/dashboard/company/subscription')}
+                    className="bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition font-semibold"
+                  >
+                    月額会員プランに登録する
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Scout Access Required Message */}
-          {!hasScoutAccess() && (
+          {hasActiveSubscription() && !hasScoutAccess() && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">⚠️</span>
@@ -217,7 +262,7 @@ export default function ScoutPage() {
 
           {/* Search Form */}
           <form onSubmit={handleSearch} className="bg-white p-6 rounded-lg shadow-md mb-8" style={{ opacity: hasScoutAccess() ? 1 : 0.5, pointerEvents: hasScoutAccess() ? 'auto' : 'none' }}>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   スキル検索
@@ -240,6 +285,48 @@ export default function ScoutPage() {
                   onChange={(e) => setMinExperience(e.target.value)}
                   placeholder="例: 3"
                   min="0"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  国籍
+                </label>
+                <input
+                  type="text"
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                  placeholder="例: 日本、中国、アメリカ"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  最低年齢
+                </label>
+                <input
+                  type="number"
+                  value={minAge}
+                  onChange={(e) => setMinAge(e.target.value)}
+                  placeholder="例: 25"
+                  min="18"
+                  max="100"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  最高年齢
+                </label>
+                <input
+                  type="number"
+                  value={maxAge}
+                  onChange={(e) => setMaxAge(e.target.value)}
+                  placeholder="例: 40"
+                  min="18"
+                  max="100"
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
@@ -332,6 +419,18 @@ export default function ScoutPage() {
                           </p>
                         )}
 
+                        {engineer.nationality && (
+                          <p className="text-sm text-gray-600 mb-2">
+                            国籍: {engineer.nationality}
+                          </p>
+                        )}
+
+                        {engineer.birthDate && (
+                          <p className="text-sm text-gray-600 mb-2">
+                            年齢: {Math.floor((new Date().getTime() - new Date(engineer.birthDate).getTime()) / (1000 * 60 * 60 * 24 * 365.25))}歳
+                          </p>
+                        )}
+
                         {engineer.desiredSalary && (
                           <p className="text-sm text-gray-600 mb-2">
                             希望年収: ¥{engineer.desiredSalary.toLocaleString()}
@@ -372,6 +471,17 @@ export default function ScoutPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+        onConfirm={dialog.onConfirm}
+      />
     </>
   )
 }

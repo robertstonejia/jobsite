@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Dialog from '@/components/Dialog'
+import { useDialog } from '@/hooks/useDialog'
 
 export default function CompanySubscriptionPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [company, setCompany] = useState<any>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'wechat' | 'alipay' | 'paypay'>('paypay')
+  const { dialog, showConfirm, showSuccess, showError, closeDialog } = useDialog()
 
   useEffect(() => {
     fetchCompanyProfile()
@@ -50,45 +53,73 @@ export default function CompanySubscriptionPage() {
         }
       } else {
         const error = await response.json()
-        alert(`エラー: ${error.error}`)
+        showError(`エラー: ${error.error}`)
       }
     } catch (error) {
       console.error('Error creating payment:', error)
-      alert('支払いの作成に失敗しました')
+      showError('支払いの作成に失敗しました')
     } finally {
       setLoading(false)
     }
   }
 
   const handleCancelSubscription = async () => {
-    if (!confirm('サブスクリプションをキャンセルしますか？キャンセル後は求人投稿とIT案件投稿ができなくなります。')) {
-      return
-    }
+    showConfirm(
+      'サブスクリプションをキャンセルしますか？キャンセル後は求人投稿とIT案件投稿ができなくなります。',
+      async () => {
+        try {
+          setLoading(true)
 
-    try {
-      setLoading(true)
+          const response = await fetch('/api/subscription/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          })
 
-      const response = await fetch('/api/subscription/cancel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-
-      if (response.ok) {
-        alert('サブスクリプションをキャンセルしました。再度利用する場合は、支払いが必要です。')
-        router.push('/dashboard/company')
-      } else {
-        const error = await response.json()
-        alert(`エラー: ${error.error}`)
-      }
-    } catch (error) {
-      console.error('Error canceling subscription:', error)
-      alert('キャンセルに失敗しました')
-    } finally {
-      setLoading(false)
-    }
+          if (response.ok) {
+            showSuccess('サブスクリプションをキャンセルしました。再度利用する場合は、支払いが必要です。')
+            setTimeout(() => {
+              router.push('/dashboard/company')
+            }, 2000)
+          } else {
+            const error = await response.json()
+            showError(`エラー: ${error.error}`)
+          }
+        } catch (error) {
+          console.error('Error canceling subscription:', error)
+          showError('キャンセルに失敗しました')
+        } finally {
+          setLoading(false)
+        }
+      },
+      '確認'
+    )
   }
 
   const MONTHLY_FEE = 3680
+  const MONTHLY_FEE_CNY = 180
+
+  const getAmount = () => {
+    if (selectedPaymentMethod === 'paypay') {
+      return `¥${MONTHLY_FEE.toLocaleString()}`
+    } else {
+      return `${MONTHLY_FEE_CNY}元`
+    }
+  }
+
+  const getAmountNumber = () => {
+    if (selectedPaymentMethod === 'paypay') {
+      return MONTHLY_FEE.toLocaleString()
+    } else {
+      return `${MONTHLY_FEE_CNY}元`
+    }
+  }
+
+  const getPlanName = (plan: string) => {
+    if (plan === 'BASIC') {
+      return '基本プラン'
+    }
+    return plan
+  }
 
   // Check if subscription is active
   const now = new Date()
@@ -119,7 +150,7 @@ export default function CompanySubscriptionPage() {
                 <div>
                   <h3 className="text-lg font-bold text-green-800 mb-2">現在のプラン</h3>
                   <p className="text-green-700 mb-1">
-                    <strong>プラン:</strong> {company.subscriptionPlan}
+                    <strong>プラン:</strong> {getPlanName(company.subscriptionPlan)}
                   </p>
                   <p className="text-green-700">
                     <strong>有効期限:</strong> {new Date(company.subscriptionExpiry).toLocaleDateString('ja-JP')}
@@ -162,7 +193,7 @@ export default function CompanySubscriptionPage() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-primary-500">¥{MONTHLY_FEE.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-primary-500">{getAmount()}</p>
                 <p className="text-sm text-gray-500">/ 月</p>
               </div>
             </div>
@@ -212,7 +243,7 @@ export default function CompanySubscriptionPage() {
               />
               <div className="flex-1">
                 <p className="font-medium">PayPay</p>
-                <p className="text-sm text-gray-500">PayPay ID: robertstonejia</p>
+                <p className="text-sm text-gray-500">¥{MONTHLY_FEE.toLocaleString()} / 月</p>
               </div>
               <div className="text-2xl">💰</div>
             </label>
@@ -228,7 +259,7 @@ export default function CompanySubscriptionPage() {
               />
               <div className="flex-1">
                 <p className="font-medium">WeChat Pay (微信支付)</p>
-                <p className="text-sm text-gray-500">WeChatアプリで支払い</p>
+                <p className="text-sm text-gray-500">{MONTHLY_FEE_CNY}元 / 月</p>
               </div>
               <div className="text-2xl">💬</div>
             </label>
@@ -244,7 +275,7 @@ export default function CompanySubscriptionPage() {
               />
               <div className="flex-1">
                 <p className="font-medium">Alipay (支付宝)</p>
-                <p className="text-sm text-gray-500">Alipayアプリで支払い</p>
+                <p className="text-sm text-gray-500">{MONTHLY_FEE_CNY}元 / 月</p>
               </div>
               <div className="text-2xl">🅰️</div>
             </label>
@@ -256,9 +287,10 @@ export default function CompanySubscriptionPage() {
               <strong>お支払いについて:</strong>
             </p>
             <ul className="text-sm text-blue-800 space-y-1 ml-4">
-              <li>• 初回: 今すぐ{MONTHLY_FEE.toLocaleString()}円をお支払いいただき、即座にプランが有効になります</li>
-              <li>• 翌月以降: 毎月{MONTHLY_FEE.toLocaleString()}円が自動的に請求されます</li>
+              <li>• 初回: 今すぐ{getAmountNumber()}をお支払いいただき、即座にプランが有効になります</li>
+              <li>• 翌月以降: 毎月{getAmountNumber()}が自動的に請求されます</li>
               <li>• 解約: いつでも解約可能です</li>
+              <li className="font-semibold text-red-700">• 注意: 一度購入されたプラン・サービスの料金については、理由の如何を問わず返金はいたしません</li>
             </ul>
           </div>
 
@@ -267,10 +299,21 @@ export default function CompanySubscriptionPage() {
             disabled={loading || hasActiveSubscription}
             className="w-full bg-primary-500 text-white py-4 rounded-lg font-semibold hover:bg-primary-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {loading ? '処理中...' : hasActiveSubscription ? 'すでに登録済みです' : `¥${MONTHLY_FEE.toLocaleString()}/月 で登録する`}
+            {loading ? '処理中...' : hasActiveSubscription ? 'すでに登録済みです' : `${getAmount()}/月 で登録する`}
           </button>
         </div>
       </div>
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+        onConfirm={dialog.onConfirm}
+      />
     </div>
   )
 }

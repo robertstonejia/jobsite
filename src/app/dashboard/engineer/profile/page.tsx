@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
 
 interface Experience {
   id: string
@@ -35,6 +36,9 @@ interface EngineerProfile {
   displayName: string | null
   birthDate: string | null
   phoneNumber: string | null
+  nationality: string | null
+  residenceStatus: string | null
+  residenceExpiry: string | null
   address: string | null
   nearestStation: string | null
   bio: string | null
@@ -58,8 +62,18 @@ export default function EngineerProfilePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [savingSkills, setSavingSkills] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [dialog, setDialog] = useState<{
+    isOpen: boolean
+    type: 'success' | 'error' | 'info' | 'confirm'
+    title: string
+    message: string
+    onConfirm?: () => void
+  }>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: '',
+  })
   const [allSkills, setAllSkills] = useState<Skill[]>([])
   const [selectedSkills, setSelectedSkills] = useState<Map<string, { level: number; yearsUsed: number }>>(new Map())
   const [showExpForm, setShowExpForm] = useState(false)
@@ -79,6 +93,9 @@ export default function EngineerProfilePage() {
     displayName: null,
     birthDate: null,
     phoneNumber: null,
+    nationality: null,
+    residenceStatus: null,
+    residenceExpiry: null,
     address: null,
     nearestStation: null,
     bio: null,
@@ -113,6 +130,7 @@ export default function EngineerProfilePage() {
         setFormData({
           ...data,
           birthDate: data.birthDate ? data.birthDate.split('T')[0] : null,
+          residenceExpiry: data.residenceExpiry ? data.residenceExpiry.split('T')[0] : null,
           isITEngineer: data.isITEngineer ?? true,
           experiences: data.experiences || [],
           skills: data.skills || [],
@@ -130,11 +148,21 @@ export default function EngineerProfilePage() {
           setSelectedSkills(skillMap)
         }
       } else {
-        setError('プロフィールの取得に失敗しました')
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          title: 'エラー',
+          message: 'プロフィールの取得に失敗しました',
+        })
       }
     } catch (error) {
       console.error('Error fetching profile:', error)
-      setError('プロフィールの取得中にエラーが発生しました')
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: 'エラー',
+        message: 'プロフィールの取得中にエラーが発生しました',
+      })
     } finally {
       setLoading(false)
     }
@@ -170,8 +198,6 @@ export default function EngineerProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setSuccess(false)
     setSaving(true)
 
     try {
@@ -191,20 +217,36 @@ export default function EngineerProfilePage() {
       console.log('Response data:', data)
 
       if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          title: '保存成功',
+          message: 'プロフィールを正常に更新しました。',
+        })
       } else {
+        let errorMessage = 'プロフィールの更新に失敗しました'
         if (Array.isArray(data.error)) {
           // Zod validation errors
-          const errorMessages = data.error.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ')
-          setError(errorMessages)
-        } else {
-          setError(data.error || 'プロフィールの更新に失敗しました')
+          errorMessage = data.error.map((err: any) => `${err.path.join('.')}: ${err.message}`).join('\n')
+        } else if (data.error) {
+          errorMessage = data.error
         }
+
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          title: '保存失敗',
+          message: errorMessage,
+        })
       }
     } catch (error) {
       console.error('Error updating profile:', error)
-      setError('プロフィールの更新中にエラーが発生しました: ' + (error as Error).message)
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: 'エラー',
+        message: 'プロフィールの更新中にエラーが発生しました。\nもう一度お試しください。',
+      })
     } finally {
       setSaving(false)
     }
@@ -257,16 +299,30 @@ export default function EngineerProfilePage() {
       })
 
       if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
         await fetchProfile()
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          title: '保存成功',
+          message: 'スキル情報を正常に更新しました。',
+        })
       } else {
         const data = await response.json()
-        setError(data.error || 'スキル情報の更新に失敗しました')
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          title: '保存失敗',
+          message: data.error || 'スキル情報の更新に失敗しました',
+        })
       }
     } catch (error) {
       console.error('Error updating skills:', error)
-      setError('スキル情報の更新中にエラーが発生しました')
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: 'エラー',
+        message: 'スキル情報の更新中にエラーが発生しました。\nもう一度お試しください。',
+      })
     } finally {
       setSavingSkills(false)
     }
@@ -281,19 +337,59 @@ export default function EngineerProfilePage() {
     }))
   }
 
-  const handleExpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleExpSubmit = async () => {
+    // バリデーション
+    if (!expFormData.companyName.trim()) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '会社名は必須です。',
+      })
+      return
+    }
+
+    if (!expFormData.position.trim()) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '役職は必須です。',
+      })
+      return
+    }
+
+    if (!expFormData.startDate) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '開始日は必須です。',
+      })
+      return
+    }
+
     try {
       const url = editingExpId
         ? `/api/engineer/experiences/${editingExpId}`
         : '/api/engineer/experiences'
+
+      // 空文字列をundefinedに変換
+      const submitData = {
+        companyName: expFormData.companyName,
+        position: expFormData.position,
+        description: expFormData.description || undefined,
+        startDate: expFormData.startDate,
+        endDate: expFormData.endDate || null,
+        isCurrent: expFormData.isCurrent,
+      }
 
       const response = await fetch(url, {
         method: editingExpId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(expFormData),
+        body: JSON.stringify(submitData),
       })
 
       if (response.ok) {
@@ -303,15 +399,29 @@ export default function EngineerProfilePage() {
         // プロフィールを再取得して最新の職歴を表示
         await fetchProfile()
         resetExpForm()
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          title: '保存成功',
+          message: '職歴を正常に保存しました。',
+        })
       } else {
         const data = await response.json()
-        setError(data.error || '職歴の保存に失敗しました')
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          title: '保存失敗',
+          message: data.error || '職歴の保存に失敗しました',
+        })
       }
     } catch (error) {
       console.error('Error saving experience:', error)
-      setError('職歴の保存中にエラーが発生しました')
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: 'エラー',
+        message: '職歴の保存中にエラーが発生しました。\nもう一度お試しください。',
+      })
     }
   }
 
@@ -328,11 +438,18 @@ export default function EngineerProfilePage() {
     setShowExpForm(true)
   }
 
-  const handleExpDelete = async (id: string) => {
-    if (!confirm('この職歴を削除してもよろしいですか？')) {
-      return
-    }
+  const handleExpDelete = (id: string) => {
+    // 削除確認ダイアログを表示
+    setDialog({
+      isOpen: true,
+      type: 'confirm',
+      title: '職歴の削除',
+      message: 'この職歴を削除してもよろしいですか？\nこの操作は取り消せません。',
+      onConfirm: () => confirmExpDelete(id),
+    })
+  }
 
+  const confirmExpDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/engineer/experiences/${id}`, {
         method: 'DELETE',
@@ -340,14 +457,28 @@ export default function EngineerProfilePage() {
 
       if (response.ok) {
         await fetchProfile()
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          title: '削除成功',
+          message: '職歴を正常に削除しました。',
+        })
       } else {
-        setError('職歴の削除に失敗しました')
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          title: '削除失敗',
+          message: '職歴の削除に失敗しました',
+        })
       }
     } catch (error) {
       console.error('Error deleting experience:', error)
-      setError('職歴の削除中にエラーが発生しました')
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: 'エラー',
+        message: '職歴の削除中にエラーが発生しました。\nもう一度お試しください。',
+      })
     }
   }
 
@@ -379,6 +510,16 @@ export default function EngineerProfilePage() {
   return (
     <>
       <Header />
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        onConfirm={dialog.onConfirm}
+        confirmText={dialog.type === 'confirm' ? '削除' : 'OK'}
+        cancelText="キャンセル"
+      />
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-6">
@@ -391,18 +532,6 @@ export default function EngineerProfilePage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">プロフィール編集</h1>
             <p className="text-gray-600">あなたの情報を更新して、企業にアピールしましょう</p>
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-              プロフィールを更新しました
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 基本情報 */}
@@ -486,6 +615,91 @@ export default function EngineerProfilePage() {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-2">
+                    国籍
+                  </label>
+                  <select
+                    id="nationality"
+                    name="nationality"
+                    value={formData.nationality || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  >
+                    <option value="">選択してください</option>
+                    <option value="日本">日本</option>
+                    <option value="中国">中国</option>
+                    <option value="韓国">韓国</option>
+                    <option value="アメリカ">アメリカ</option>
+                    <option value="イギリス">イギリス</option>
+                    <option value="フランス">フランス</option>
+                    <option value="ドイツ">ドイツ</option>
+                    <option value="インド">インド</option>
+                    <option value="ベトナム">ベトナム</option>
+                    <option value="フィリピン">フィリピン</option>
+                    <option value="タイ">タイ</option>
+                    <option value="インドネシア">インドネシア</option>
+                    <option value="その他">その他</option>
+                  </select>
+                </div>
+
+                {/* 在留資格情報（日本以外の国籍の場合のみ表示） */}
+                {formData.nationality && formData.nationality !== '日本' && (
+                  <>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm font-semibold text-yellow-800 mb-2">
+                        ⚠️ 在留資格情報の入力が必要です
+                      </p>
+                      <p className="text-xs text-yellow-700">
+                        日本国籍以外の方は、在留資格の種類と在留期限の入力が必須となります。
+                      </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="residenceStatus" className="block text-sm font-medium text-gray-700 mb-2">
+                          在留資格の種類 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          id="residenceStatus"
+                          name="residenceStatus"
+                          value={formData.residenceStatus || ''}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        >
+                          <option value="">選択してください</option>
+                          <option value="永住者">永住者</option>
+                          <option value="特別永住者">特別永住者</option>
+                          <option value="日本人の配偶者等">日本人の配偶者等</option>
+                          <option value="永住者の配偶者等">永住者の配偶者等</option>
+                          <option value="定住者">定住者</option>
+                          <option value="技術・人文知識・国際業務">技術・人文知識・国際業務</option>
+                          <option value="高度専門職">高度専門職</option>
+                          <option value="技能">技能</option>
+                          <option value="留学">留学</option>
+                          <option value="家族滞在">家族滞在</option>
+                          <option value="特定活動">特定活動</option>
+                          <option value="その他">その他</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label htmlFor="residenceExpiry" className="block text-sm font-medium text-gray-700 mb-2">
+                          在留期限 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          id="residenceExpiry"
+                          name="residenceExpiry"
+                          type="date"
+                          value={formData.residenceExpiry || ''}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
@@ -676,7 +890,7 @@ export default function EngineerProfilePage() {
               {showExpForm && (
                 <div className="mb-6 border border-gray-300 rounded-lg p-4 bg-gray-50">
                   <h3 className="text-lg font-semibold mb-4">{editingExpId ? '職歴を編集' : '職歴を追加'}</h3>
-                  <form onSubmit={handleExpSubmit} className="space-y-4">
+                  <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -685,7 +899,6 @@ export default function EngineerProfilePage() {
                         <input
                           name="companyName"
                           type="text"
-                          required
                           value={expFormData.companyName}
                           onChange={handleExpChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
@@ -698,7 +911,6 @@ export default function EngineerProfilePage() {
                         <input
                           name="position"
                           type="text"
-                          required
                           value={expFormData.position}
                           onChange={handleExpChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
@@ -725,7 +937,6 @@ export default function EngineerProfilePage() {
                         <input
                           name="startDate"
                           type="date"
-                          required
                           value={expFormData.startDate}
                           onChange={handleExpChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
@@ -766,13 +977,14 @@ export default function EngineerProfilePage() {
                         キャンセル
                       </button>
                       <button
-                        type="submit"
+                        type="button"
+                        onClick={handleExpSubmit}
                         className="flex-1 bg-primary-500 text-white py-2 rounded-lg hover:bg-primary-600 transition text-sm"
                       >
                         保存
                       </button>
                     </div>
-                  </form>
+                  </div>
                 </div>
               )}
 
@@ -948,7 +1160,21 @@ export default function EngineerProfilePage() {
                     }
                     acc[skill.category].push(skill)
                     return acc
-                  }, {} as Record<string, Skill[]>)).map(([category, skills]) => (
+                  }, {} as Record<string, Skill[]>))
+                    .sort(([categoryA], [categoryB]) => {
+                      // プログラミング言語とデータベースを最初に表示
+                      const priorityCategories = ['プログラミング言語', 'データベース']
+                      const aIndex = priorityCategories.indexOf(categoryA)
+                      const bIndex = priorityCategories.indexOf(categoryB)
+
+                      if (aIndex !== -1 && bIndex !== -1) {
+                        return aIndex - bIndex
+                      }
+                      if (aIndex !== -1) return -1
+                      if (bIndex !== -1) return 1
+                      return categoryA.localeCompare(categoryB)
+                    })
+                    .map(([category, skills]) => (
                     <div key={category} className="border-t pt-4">
                       <h4 className="text-md font-semibold text-gray-800 mb-3">{category}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">

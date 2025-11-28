@@ -5,12 +5,15 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
+import { useDialog } from '@/hooks/useDialog'
 
 interface Application {
   id: string
   status: string
   coverLetter: string | null
   createdAt: string
+  hasContactPermission: boolean
   job: {
     id: string
     title: string
@@ -73,6 +76,7 @@ export default function ApplicationDetailPage() {
   const [sending, setSending] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { dialog, showConfirm, showSuccess, showError, closeDialog } = useDialog()
 
   // メッセージテンプレート
   const messageTemplates = [
@@ -123,10 +127,12 @@ export default function ApplicationDetailPage() {
         const data = await response.json()
         setApplication(data)
       } else {
-        console.error('Application not found')
+        console.error('Application not found:', response.status)
+        setApplication(null) // 明示的にnullを設定
       }
     } catch (error) {
       console.error('Error fetching application:', error)
+      setApplication(null) // エラー時もnullを設定
     } finally {
       setLoading(false)
     }
@@ -138,9 +144,13 @@ export default function ApplicationDetailPage() {
       if (response.ok) {
         const data = await response.json()
         setMessages(data)
+      } else {
+        console.error('Messages not found:', response.status)
+        setMessages([]) // 404の場合は空配列を設定
       }
     } catch (error) {
       console.error('Error fetching messages:', error)
+      setMessages([]) // エラー時も空配列を設定
     }
   }
 
@@ -168,46 +178,50 @@ export default function ApplicationDetailPage() {
       if (response.ok) {
         setNewMessage('')
         fetchMessages()
+        // Refresh application data to update contact permission
+        fetchApplication()
       } else {
         const data = await response.json()
-        alert(data.error || 'メッセージの送信に失敗しました')
+        showError(data.error || 'メッセージの送信に失敗しました')
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      alert('メッセージの送信中にエラーが発生しました')
+      showError('メッセージの送信中にエラーが発生しました')
     } finally {
       setSending(false)
     }
   }
 
   const updateStatus = async (newStatus: string) => {
-    if (!confirm(`ステータスを「${statusLabels[newStatus]}」に変更しますか？`)) {
-      return
-    }
+    showConfirm(
+      `ステータスを「${statusLabels[newStatus]}」に変更しますか？`,
+      async () => {
+        setUpdating(true)
+        try {
+          const response = await fetch(`/api/applications/${params.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus }),
+          })
 
-    setUpdating(true)
-    try {
-      const response = await fetch(`/api/applications/${params.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      })
-
-      if (response.ok) {
-        alert('ステータスを更新しました')
-        fetchApplication()
-      } else {
-        const data = await response.json()
-        alert(data.error || 'ステータスの更新に失敗しました')
-      }
-    } catch (error) {
-      console.error('Error updating status:', error)
-      alert('ステータスの更新中にエラーが発生しました')
-    } finally {
-      setUpdating(false)
-    }
+          if (response.ok) {
+            showSuccess('ステータスを更新しました')
+            fetchApplication()
+          } else {
+            const data = await response.json()
+            showError(data.error || 'ステータスの更新に失敗しました')
+          }
+        } catch (error) {
+          console.error('Error updating status:', error)
+          showError('ステータスの更新中にエラーが発生しました')
+        } finally {
+          setUpdating(false)
+        }
+      },
+      '確認'
+    )
   }
 
   const statusLabels: Record<string, string> = {
@@ -464,13 +478,22 @@ export default function ApplicationDetailPage() {
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4">基本情報</h2>
                 <div className="space-y-3">
+                  {!application.hasContactPermission && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <p className="text-sm text-yellow-800">
+                        <span className="font-semibold">📧 連絡先情報</span>
+                        <br />
+                        応募者がメッセージを送信すると、連絡先情報が表示されます。
+                      </p>
+                    </div>
+                  )}
                   {application.engineer.displayName && (
                     <div>
                       <p className="text-sm text-gray-600">表示名</p>
                       <p className="font-semibold">{application.engineer.displayName}</p>
                     </div>
                   )}
-                  {application.engineer.phoneNumber && (
+                  {application.hasContactPermission && application.engineer.phoneNumber && (
                     <div>
                       <p className="text-sm text-gray-600">電話番号</p>
                       <p className="font-semibold">{application.engineer.phoneNumber}</p>
@@ -571,6 +594,17 @@ export default function ApplicationDetailPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+        onConfirm={dialog.onConfirm}
+      />
     </>
   )
 }

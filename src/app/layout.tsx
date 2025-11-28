@@ -3,7 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'TechJob - IT技術者求人プラットフォーム',
+  title: 'seekjob - IT技術者求人プラットフォーム',
   description: 'IT技術者と企業をつなぐ求人プラットフォーム',
 }
 

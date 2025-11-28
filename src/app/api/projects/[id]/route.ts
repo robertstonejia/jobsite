@@ -93,7 +93,7 @@ export async function PUT(
     }
 
     if (project.companyId !== user.company.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      return NextResponse.json({ error: 'この案件を編集する権限がありません。自社が作成した案件のみ編集できます。' }, { status: 403 })
     }
 
     // Update project
@@ -153,7 +153,7 @@ export async function DELETE(
     }
 
     if (project.companyId !== user.company.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      return NextResponse.json({ error: 'この案件を編集する権限がありません。自社が作成した案件のみ編集できます。' }, { status: 403 })
     }
 
     // Soft delete by setting isActive to false

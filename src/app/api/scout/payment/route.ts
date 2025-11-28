@@ -31,6 +31,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
+    // Check if company has active subscription
+    const now = new Date()
+    const hasActiveSubscription =
+      user.company.subscriptionPlan !== 'FREE' &&
+      user.company.subscriptionExpiry &&
+      user.company.subscriptionExpiry > now
+
+    if (!hasActiveSubscription) {
+      return NextResponse.json(
+        { error: 'スカウト機能を利用するには、月額会員プランへの登録が必要です' },
+        { status: 403 }
+      )
+    }
+
     // Calculate amount based on payment method
     let amount: number
     let currency: string

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { checkTrialStatus, canAccessPaidFeatures, getTrialMessage } from '@/lib/trial'
 
 interface Job {
   id: string
@@ -25,6 +26,7 @@ interface Application {
   status: string
   createdAt: string
   unreadCount?: number
+  applicationType?: 'job' | 'project'
   job: {
     id: string
     title: string
@@ -65,6 +67,17 @@ export default function CompanyDashboard() {
     plan: string
     expiry: string | null
     isActive: boolean
+    trialStatus?: {
+      isActive: boolean
+      daysRemaining: number
+      hasExpired: boolean
+      trialEndDate: Date | null
+    }
+    trialMessage?: {
+      message: string
+      type: 'success' | 'warning' | 'error'
+    }
+    canAccessFeatures?: boolean
   } | null>(null)
   const firstUnreadRef = useRef<HTMLDivElement>(null)
 
@@ -110,11 +123,37 @@ export default function CompanyDashboard() {
 
   const fetchData = async () => {
     try {
-      const [jobsRes, appsRes, projectsRes, profileRes] = await Promise.all([
+      // まずプロフィールを取得して企業IDを確認
+      const profileRes = await fetch('/api/company/profile')
+      let companyId = ''
+
+      if (profileRes.ok) {
+        const profileData = await profileRes.json()
+        companyId = profileData.id
+        const now = new Date()
+        const expiry = profileData.subscriptionExpiry ? new Date(profileData.subscriptionExpiry) : null
+        const isActive = profileData.subscriptionPlan !== 'FREE' && expiry && expiry > now
+
+        // トライアル情報を計算
+        const trialStatus = checkTrialStatus(profileData)
+        const trialMessage = getTrialMessage(profileData)
+        const canAccessFeatures = canAccessPaidFeatures(profileData)
+
+        setSubscriptionInfo({
+          plan: profileData.subscriptionPlan,
+          expiry: profileData.subscriptionExpiry,
+          isActive: isActive || false,
+          trialStatus,
+          trialMessage,
+          canAccessFeatures,
+        })
+      }
+
+      // 企業IDを使って自社のデータのみを取得
+      const [jobsRes, appsRes, projectsRes] = await Promise.all([
         fetch('/api/jobs'),
         fetch('/api/applications/with-unread'),
-        fetch('/api/projects'),
-        fetch('/api/company/profile'),
+        fetch(companyId ? `/api/projects?companyId=${companyId}` : '/api/projects'),
       ])
 
       if (jobsRes.ok) {
@@ -130,19 +169,6 @@ export default function CompanyDashboard() {
       if (projectsRes.ok) {
         const projectsData = await projectsRes.json()
         setProjects(projectsData)
-      }
-
-      if (profileRes.ok) {
-        const profileData = await profileRes.json()
-        const now = new Date()
-        const expiry = profileData.subscriptionExpiry ? new Date(profileData.subscriptionExpiry) : null
-        const isActive = profileData.subscriptionPlan !== 'FREE' && expiry && expiry > now
-
-        setSubscriptionInfo({
-          plan: profileData.subscriptionPlan,
-          expiry: profileData.subscriptionExpiry,
-          isActive: isActive || false,
-        })
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -187,8 +213,11 @@ export default function CompanyDashboard() {
   }
 
   const handleJobAction = (path: string) => {
-    if (!subscriptionInfo?.isActive) {
-      if (confirm('求人の作成・編集には有料プランへの登録が必要です。登録ページに移動しますか?')) {
+    if (!subscriptionInfo?.canAccessFeatures) {
+      const message = subscriptionInfo?.trialStatus?.hasExpired
+        ? 'トライアル期間が終了しました。求人の作成・編集を利用するには有料プランへの登録が必要です。登録ページに移動しますか?'
+        : '求人の作成・編集には有料プランへの登録が必要です。登録ページに移動しますか?'
+      if (confirm(message)) {
         router.push('/dashboard/company/subscription')
       }
     } else {
@@ -197,8 +226,11 @@ export default function CompanyDashboard() {
   }
 
   const handleProjectAction = (path: string) => {
-    if (!subscriptionInfo?.isActive) {
-      if (confirm('IT案件の投稿・編集には有料プランへの登録が必要です。登録ページに移動しますか?')) {
+    if (!subscriptionInfo?.canAccessFeatures) {
+      const message = subscriptionInfo?.trialStatus?.hasExpired
+        ? 'トライアル期間が終了しました。IT案件の投稿・編集を利用するには有料プランへの登録が必要です。登録ページに移動しますか?'
+        : 'IT案件の投稿・編集には有料プランへの登録が必要です。登録ページに移動しますか?'
+      if (confirm(message)) {
         router.push('/dashboard/company/subscription')
       }
     } else {
@@ -249,15 +281,35 @@ export default function CompanyDashboard() {
             </div>
           )}
 
-          {/* Subscription Status */}
-          {subscriptionInfo && !subscriptionInfo.isActive && (
+          {/* Trial Status */}
+          {subscriptionInfo?.trialStatus && subscriptionInfo.trialStatus.isActive && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3">🎉</span>
+                <div className="flex-1">
+                  <p className="font-semibold text-green-800 mb-1">無料トライアル期間中</p>
+                  <p className="text-sm text-green-700 mb-2">
+                    {subscriptionInfo.trialMessage?.message}
+                  </p>
+                  <p className="text-xs text-green-600">
+                    すべての機能を無料でご利用いただけます。引き続きご利用いただくには、トライアル終了前に月額プランへの登録をお願いします。
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Trial Expired or No Access */}
+          {subscriptionInfo && !subscriptionInfo.canAccessFeatures && (
             <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">⚠️</span>
                 <div className="flex-1">
-                  <p className="font-semibold text-yellow-800 mb-1">有料プランの登録が必要です</p>
+                  <p className="font-semibold text-yellow-800 mb-1">
+                    {subscriptionInfo.trialStatus?.hasExpired ? 'トライアル期間が終了しました' : '有料プランの登録が必要です'}
+                  </p>
                   <p className="text-sm text-yellow-700 mb-3">
-                    求人投稿とIT案件投稿を利用するには、月額会員プランへの登録が必要です。
+                    {subscriptionInfo.trialMessage?.message || '求人投稿とIT案件投稿を利用するには、月額会員プランへの登録が必要です。'}
                   </p>
                   <button
                     onClick={() => router.push('/dashboard/company/subscription')}
@@ -277,7 +329,7 @@ export default function CompanyDashboard() {
                   <span className="text-2xl mr-3">💳</span>
                   <div>
                     <p className="font-semibold text-blue-800">
-                      プラン: {subscriptionInfo.plan}
+                      プラン: {subscriptionInfo.plan === 'BASIC' ? '基本プラン' : subscriptionInfo.plan}
                     </p>
                     <p className="text-sm text-blue-700">
                       有効期限: {subscriptionInfo.expiry ? new Date(subscriptionInfo.expiry).toLocaleDateString('ja-JP') : 'なし'}
@@ -633,7 +685,13 @@ export default function CompanyDashboard() {
                                 応募日: {new Date(application.createdAt).toLocaleDateString('ja-JP')}
                               </p>
                               <button
-                                onClick={() => router.push(`/dashboard/company/applications/${application.id}`)}
+                                onClick={() => {
+                                  if (application.applicationType === 'project') {
+                                    router.push(`/dashboard/company/project-applications/${application.id}`)
+                                  } else {
+                                    router.push(`/dashboard/company/applications/${application.id}`)
+                                  }
+                                }}
                                 className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition relative"
                               >
                                 詳細を見る

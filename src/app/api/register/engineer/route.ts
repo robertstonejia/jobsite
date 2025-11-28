@@ -14,6 +14,13 @@ const registerSchema = z.object({
   lastName: z.string().min(1),
   birthDate: z.string().optional(), // ISO日付文字列
   gender: z.string().optional(),
+  nationality: z.string().min(1), // 国籍（必須）
+  residenceStatus: z.string().optional(), // 在留資格の種類
+  residenceExpiry: z.string().optional(), // 在留期限（ISO日付文字列）
+  finalEducation: z.string().optional(),
+  graduationSchool: z.string().optional(),
+  major: z.string().optional(),
+  graduationYear: z.number().optional(),
   phoneNumber: z.string().optional(),
   address: z.string().optional(),
   nearestStation: z.string().optional(),
@@ -38,6 +45,12 @@ const registerSchema = z.object({
     startDate: z.string(), // ISO日付文字列
     endDate: z.string().optional(), // ISO日付文字列
     isCurrent: z.boolean().default(false),
+  })).optional(),
+  // スキル情報（配列）
+  skills: z.array(z.object({
+    skillId: z.string(),
+    level: z.number().int().min(1).max(5),
+    yearsUsed: z.number().int().min(0),
   })).optional(),
 })
 
@@ -72,6 +85,14 @@ export async function POST(req: Request) {
             firstName: validatedData.firstName,
             lastName: validatedData.lastName,
             birthDate: validatedData.birthDate ? new Date(validatedData.birthDate) : null,
+            gender: validatedData.gender,
+            nationality: validatedData.nationality,
+            residenceStatus: validatedData.residenceStatus,
+            residenceExpiry: validatedData.residenceExpiry ? new Date(validatedData.residenceExpiry) : null,
+            finalEducation: validatedData.finalEducation,
+            graduationSchool: validatedData.graduationSchool,
+            major: validatedData.major,
+            graduationYear: validatedData.graduationYear,
             phoneNumber: validatedData.phoneNumber,
             address: validatedData.address,
             nearestStation: validatedData.nearestStation,
@@ -96,6 +117,15 @@ export async function POST(req: Request) {
                 isCurrent: exp.isCurrent,
               })),
             } : undefined,
+            // スキル情報を作成
+            skills: validatedData.skills ? {
+              create: validatedData.skills.map(skill => ({
+                skillId: skill.skillId,
+                level: skill.level,
+                yearsUsed: skill.yearsUsed,
+              })),
+            } : undefined,
+            isITEngineer: validatedData.isITEngineer ?? false,
           },
         },
       },
@@ -103,6 +133,7 @@ export async function POST(req: Request) {
         engineer: {
           include: {
             experiences: true,
+            skills: true,
           },
         },
       },

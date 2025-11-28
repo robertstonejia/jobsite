@@ -21,7 +21,16 @@
       "Bash(npm run:*)",
       "Bash(cmd /c \"if not exist src\\app\\api\\engineer\\scout-emails mkdir src\\app\\api\\engineer\\scout-emails\")",
       "Bash(npx prisma migrate:*)",
-      "Bash(npx prisma db push:*)"
+      "Bash(npx prisma db push:*)",
+      "Bash(cat:*)",
+      "Bash(cmd /c \"if not exist src\\app\\scout\\payment mkdir src\\app\\scout\\payment\")",
+      "Bash(cmd /c \"if not exist src\\app\\api\\scout\\payment mkdir src\\app\\api\\scout\\payment\")",
+      "Bash(cmd /c \"if not exist src\\app\\dashboard\\engineer\\scout-emails\\[id] mkdir src\\app\\dashboard\\engineer\\scout-emails\\[id]\")",
+      "Bash(cmd /c \"if not exist src\\app\\api\\engineer\\scout-emails\\[id] mkdir src\\app\\api\\engineer\\scout-emails\\[id]\")",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx prisma studio)"
     ],
     "deny": [],
     "ask": []

@@ -42,16 +42,17 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [company, setCompany] = useState<any>(null)
 
-  // Redirect to login if not authenticated
-  if (status === 'unauthenticated') {
-    router.push('/login?redirect=/projects')
-    return null
-  }
-
   const categories = ['すべて', 'Java', 'C#', 'PHP', 'Ruby', 'Python', 'JavaScript', 'AWS', 'Linux', 'Go', 'Kotlin', 'その他']
 
   // Check if user is a company
   const isCompany = session?.user && (session.user as any).role === 'COMPANY'
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login?redirect=/projects')
+    }
+  }, [status, router])
 
   // Fetch company profile if user is a company
   useEffect(() => {
@@ -72,15 +73,24 @@ export default function ProjectsPage() {
     }
   }
 
-  // Check if company has active subscription
+  // Check if company has active subscription or trial
   const hasActiveSubscription = () => {
     if (!company) return false
     const now = new Date()
-    return (
+
+    // Check paid subscription
+    const hasActivePaidPlan =
       company.subscriptionPlan !== 'FREE' &&
       company.subscriptionExpiry &&
       new Date(company.subscriptionExpiry) > now
-    )
+
+    // Check trial period
+    const hasActiveTrial =
+      company.isTrialActive &&
+      company.trialEndDate &&
+      new Date(company.trialEndDate) > now
+
+    return hasActivePaidPlan || hasActiveTrial
   }
 
   const handleProjectClick = (e: React.MouseEvent, projectId: string) => {

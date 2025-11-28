@@ -40,6 +40,38 @@ export async function POST(req: Request) {
 
     const company = user.company
 
+    // Check if company has active subscription or trial
+    const now = new Date()
+    const hasActiveSubscription =
+      company.subscriptionPlan !== 'FREE' &&
+      company.subscriptionExpiry &&
+      company.subscriptionExpiry > now
+
+    const hasActiveTrial =
+      company.isTrialActive &&
+      company.trialEndDate &&
+      new Date(company.trialEndDate) > now
+
+    if (!hasActiveSubscription && !hasActiveTrial) {
+      return NextResponse.json(
+        { error: 'スカウト機能を利用するには、月額会員プランへの登録が必要です' },
+        { status: 403 }
+      )
+    }
+
+    // Check if company has scout access
+    const hasScoutAccess =
+      company.hasScoutAccess &&
+      company.scoutAccessExpiry &&
+      company.scoutAccessExpiry > now
+
+    if (!hasScoutAccess) {
+      return NextResponse.json(
+        { error: 'スカウト機能を利用するには、スカウト機能の購入が必要です' },
+        { status: 403 }
+      )
+    }
+
     // Handle bulk sending
     const engineerIds = validatedData.engineerIds || (validatedData.engineerId ? [validatedData.engineerId] : [])
 

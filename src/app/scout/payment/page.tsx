@@ -70,6 +70,12 @@ export default function ScoutPaymentPage() {
     company?.scoutAccessExpiry &&
     new Date(company.scoutAccessExpiry) > now
 
+  // Check if subscription is active
+  const hasActiveSubscription =
+    company?.subscriptionPlan !== 'FREE' &&
+    company?.subscriptionExpiry &&
+    new Date(company.subscriptionExpiry) > now
+
   return (
     <>
       <Header />
@@ -85,8 +91,29 @@ export default function ScoutPaymentPage() {
             </button>
           </div>
 
-          {/* Current Status */}
-          {hasScoutAccess && (
+          {/* Subscription Required Warning - Show first */}
+          {!hasActiveSubscription && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3">🚫</span>
+                <div>
+                  <h3 className="text-lg font-bold text-red-800 mb-2">月額会員プランへの登録が必要です</h3>
+                  <p className="text-red-700 mb-3">
+                    スカウト機能を利用する前に、月額会員プランへの登録が必要です。
+                  </p>
+                  <button
+                    onClick={() => router.push('/dashboard/company/subscription')}
+                    className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition"
+                  >
+                    月額会員プランに登録する
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Current Status - Only show if subscription is active */}
+          {hasActiveSubscription && hasScoutAccess && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">✅</span>
@@ -94,20 +121,6 @@ export default function ScoutPaymentPage() {
                   <h3 className="text-lg font-bold text-green-800 mb-2">スカウト機能は有効です</h3>
                   <p className="text-green-700">
                     <strong>有効期限:</strong> {new Date(company.scoutAccessExpiry).toLocaleDateString('ja-JP')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!hasScoutAccess && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
-              <div className="flex items-start">
-                <span className="text-2xl mr-3">⚠️</span>
-                <div>
-                  <h3 className="text-lg font-bold text-yellow-800 mb-2">スカウト機能をご利用いただけません</h3>
-                  <p className="text-yellow-700">
-                    スカウト機能を利用するには、下記のお支払いが必要です。
                   </p>
                 </div>
               </div>
@@ -206,15 +219,16 @@ export default function ScoutPaymentPage() {
                 <li>• 初回: 今すぐ{getAmount()}をお支払いいただき、即座にスカウト機能が有効になります</li>
                 <li>• 有効期間: 30日間</li>
                 <li>• 自動更新はありません。継続利用の場合は再度お支払いが必要です</li>
+                <li className="font-semibold text-red-700">• 注意: 一度購入されたプラン・サービスの料金については、理由の如何を問わず返金はいたしません</li>
               </ul>
             </div>
 
             <button
               onClick={handlePurchase}
-              disabled={loading || hasScoutAccess}
+              disabled={loading || hasScoutAccess || !hasActiveSubscription}
               className="w-full bg-primary-500 text-white py-4 rounded-lg font-semibold hover:bg-primary-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? '処理中...' : hasScoutAccess ? 'すでに購入済みです' : `${getAmount()} で購入する`}
+              {loading ? '処理中...' : !hasActiveSubscription ? '月額会員プランへの登録が必要です' : hasScoutAccess ? 'すでに購入済みです' : `${getAmount()} で購入する`}
             </button>
           </div>
         </div>

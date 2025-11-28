@@ -7,26 +7,26 @@ import { z } from 'zod'
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic'
 
-// GET - Get a single application by ID
+// GET - Get a single project application by ID
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    console.log('🔍 [Application GET] Starting - ID:', params.id)
+    console.log('🔍 [Project Application GET] Starting - ID:', params.id)
     const session = await getServerSession(authOptions)
 
     if (!session) {
-      console.log('❌ [Application GET] No session found')
+      console.log('❌ [Project Application GET] No session found')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    console.log('✅ [Application GET] Session found:', session.user.email, 'Role:', (session.user as any).role)
+    console.log('✅ [Project Application GET] Session found:', session.user.email, 'Role:', (session.user as any).role)
 
-    const application = await prisma.application.findUnique({
+    const projectApplication = await prisma.projectApplication.findUnique({
       where: { id: params.id },
       include: {
-        job: {
+        project: {
           include: {
             company: true,
           },
@@ -53,12 +53,12 @@ export async function GET(
       },
     })
 
-    if (!application) {
-      console.log('❌ [Application GET] Application not found in database:', params.id)
-      return NextResponse.json({ error: 'Application not found' }, { status: 404 })
+    if (!projectApplication) {
+      console.log('❌ [Project Application GET] Project application not found in database:', params.id)
+      return NextResponse.json({ error: 'Project application not found' }, { status: 404 })
     }
 
-    console.log('✅ [Application GET] Application found - JobID:', application.jobId, 'EngineerID:', application.engineerId, 'CompanyID:', application.job.companyId)
+    console.log('✅ [Project Application GET] Project application found - ProjectID:', projectApplication.projectId, 'EngineerID:', projectApplication.engineerId, 'CompanyID:', projectApplication.project.companyId)
 
     // Verify access (only the company or the engineer can view)
     const user = await prisma.user.findUnique({
@@ -67,64 +67,37 @@ export async function GET(
     })
 
     if (!user) {
-      console.log('❌ [Application GET] User not found:', session.user.email)
+      console.log('❌ [Project Application GET] User not found:', session.user.email)
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    console.log('✅ [Application GET] User found - Role:', user.role, 'CompanyID:', user.company?.id, 'EngineerID:', user.engineer?.id)
+    console.log('✅ [Project Application GET] User found - Role:', user.role, 'CompanyID:', user.company?.id, 'EngineerID:', user.engineer?.id)
 
     const isCompanyOwner = user.role === 'COMPANY' &&
-                          user.company?.id === application.job.companyId
+                          user.company?.id === projectApplication.project.companyId
     const isEngineerOwner = user.role === 'ENGINEER' &&
-                           user.engineer?.id === application.engineerId
+                           user.engineer?.id === projectApplication.engineerId
 
-    console.log('🔐 [Application GET] Access check - IsCompanyOwner:', isCompanyOwner, 'IsEngineerOwner:', isEngineerOwner)
+    console.log('🔐 [Project Application GET] Access check - IsCompanyOwner:', isCompanyOwner, 'IsEngineerOwner:', isEngineerOwner)
 
     if (!isCompanyOwner && !isEngineerOwner) {
-      console.log('❌ [Application GET] Access forbidden - User does not own this application')
+      console.log('❌ [Project Application GET] Access forbidden - User does not own this project application')
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    console.log('✅ [Application GET] Access granted')
-
-    // For companies: check if they have permission to view contact info
-    // Permission granted when engineer has sent a message
-    let hasContactPermission = true // Default to true for engineers viewing their own application
-
-    if (isCompanyOwner) {
-      const engineerMessage = await prisma.message.findFirst({
-        where: {
-          applicationId: application.id,
-          senderType: 'ENGINEER',
-        },
-      })
-      hasContactPermission = !!engineerMessage
-      console.log('🔐 [Application GET] Contact permission check - Has engineer message:', hasContactPermission)
-    }
-
-    // Hide contact info if no permission
-    const responseData = {
-      ...application,
-      hasContactPermission,
-      engineer: {
-        ...application.engineer,
-        phoneNumber: hasContactPermission ? application.engineer.phoneNumber : null,
-      },
-    }
-
-    console.log('✅ [Application GET] Returning application data with contact permission:', hasContactPermission)
-    return NextResponse.json(responseData)
+    console.log('✅ [Project Application GET] Access granted - Returning project application data')
+    return NextResponse.json(projectApplication)
   } catch (error) {
-    console.error('❌ [Application GET] Error:', error)
+    console.error('❌ [Project Application GET] Error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch application' },
+      { error: 'Failed to fetch project application' },
       { status: 500 }
     )
   }
 }
 
-// PATCH - Update application status (company only)
-const updateApplicationSchema = z.object({
+// PATCH - Update project application status (company only)
+const updateProjectApplicationSchema = z.object({
   status: z.enum(['PENDING', 'REVIEWED', 'INTERVIEW', 'ACCEPTED', 'REJECTED']),
 })
 
@@ -140,18 +113,18 @@ export async function PATCH(
     }
 
     const body = await req.json()
-    const validatedData = updateApplicationSchema.parse(body)
+    const validatedData = updateProjectApplicationSchema.parse(body)
 
-    // Get application
-    const application = await prisma.application.findUnique({
+    // Get project application
+    const projectApplication = await prisma.projectApplication.findUnique({
       where: { id: params.id },
       include: {
-        job: true,
+        project: true,
       },
     })
 
-    if (!application) {
-      return NextResponse.json({ error: 'Application not found' }, { status: 404 })
+    if (!projectApplication) {
+      return NextResponse.json({ error: 'Project application not found' }, { status: 404 })
     }
 
     // Verify company ownership
@@ -160,18 +133,18 @@ export async function PATCH(
       include: { company: true },
     })
 
-    if (!user?.company || user.company.id !== application.job.companyId) {
+    if (!user?.company || user.company.id !== projectApplication.project.companyId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Update application
-    const updatedApplication = await prisma.application.update({
+    // Update project application
+    const updatedProjectApplication = await prisma.projectApplication.update({
       where: { id: params.id },
       data: {
         status: validatedData.status,
       },
       include: {
-        job: {
+        project: {
           include: {
             company: true,
           },
@@ -198,15 +171,15 @@ export async function PATCH(
       },
     })
 
-    return NextResponse.json(updatedApplication)
+    return NextResponse.json(updatedProjectApplication)
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 })
     }
 
-    console.error('Error updating application:', error)
+    console.error('Error updating project application:', error)
     return NextResponse.json(
-      { error: 'Failed to update application' },
+      { error: 'Failed to update project application' },
       { status: 500 }
     )
   }

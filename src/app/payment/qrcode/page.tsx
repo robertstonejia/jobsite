@@ -4,17 +4,22 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
+import { useDialog } from '@/hooks/useDialog'
 
 export default function QRCodePaymentPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const paymentId = searchParams.get('paymentId')
   const method = searchParams.get('method')
+  const type = searchParams.get('type') // 'scout' or null (subscription)
 
   const [loading, setLoading] = useState(true)
   const [payment, setPayment] = useState<any>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [checking, setChecking] = useState(false)
+
+  const { dialog, showConfirm, showSuccess, showError, closeDialog } = useDialog()
 
   useEffect(() => {
     if (paymentId) {
@@ -87,31 +92,33 @@ export default function QRCodePaymentPage() {
   }
   // 支払い完了リクエストを送信
   const handleRequestApproval = async () => {
-    if (!confirm('支払いを完了しましたか？\n\n管理者に確認メールを送信します。')) {
-      return
-    }
+    showConfirm(
+      '支払いを完了しましたか？\n\n管理者に確認メールを送信します。',
+      async () => {
+        try {
+          const response = await fetch(`/api/payments/${paymentId}/mark-complete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
 
-    try {
-      const response = await fetch(`/api/payments/${paymentId}/mark-complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+          const data = await response.json()
+
+          if (response.ok) {
+            showSuccess(data.message || '管理者に確認メールを送信しました。承認をお待ちください。')
+            // 承認待ち状態を表示
+            setPayment({ ...payment, status: 'pending_approval' })
+          } else {
+            showError('エラー: ' + (data.error || 'Unknown error'))
+          }
+        } catch (error) {
+          console.error('Error requesting approval:', error)
+          showError('エラーが発生しました')
         }
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        alert(data.message || '管理者に確認メールを送信しました。承認をお待ちください。')
-        // 承認待ち状態を表示
-        setPayment({ ...payment, status: 'pending_approval' })
-      } else {
-        alert('エラー: ' + (data.error || 'Unknown error'))
-      }
-    } catch (error) {
-      console.error('Error requesting approval:', error)
-      alert('エラーが発生しました')
-    }
+      },
+      '確認'
+    )
   }
 
   const getPaymentMethodName = (method: string) => {
@@ -145,12 +152,17 @@ export default function QRCodePaymentPage() {
   }
 
   const getPaymentAmount = (method: string) => {
+    // Check if this is a scout payment
+    const isScout = type === 'scout'
+
     switch (method) {
       case 'wechat':
       case 'alipay':
-        return { amount: 168, currency: '元 (CNY)', displayText: '168元' }
+        const cnyAmount = isScout ? 150 : 180
+        return { amount: cnyAmount, currency: '元 (CNY)', displayText: `${cnyAmount}元` }
       case 'paypay':
-        return { amount: 3680, currency: '円 (JPY)', displayText: '3,680円' }
+        const jpyAmount = isScout ? 3000 : 3680
+        return { amount: jpyAmount, currency: '円 (JPY)', displayText: `${jpyAmount.toLocaleString()}円` }
       default:
         return { amount: payment.amount, currency: '円 (JPY)', displayText: `¥${payment.amount.toLocaleString()}` }
     }
@@ -158,6 +170,17 @@ export default function QRCodePaymentPage() {
 
   const getPayPayId = () => {
     return 'robertstonejia'
+  }
+
+  const getPlanName = (plan: string) => {
+    switch (plan) {
+      case 'BASIC':
+        return '基本プラン'
+      case 'PREMIUM':
+        return 'プレミアムプラン'
+      default:
+        return plan
+    }
   }
 
   if (loading) {
@@ -223,7 +246,7 @@ export default function QRCodePaymentPage() {
                   {getPaymentAmount(payment.paymentMethod).currency}
                 </p>
                 <p className="text-sm text-blue-700 mt-2">
-                  プラン: {payment.plan}
+                  プラン: {getPlanName(payment.plan)}
                 </p>
                 {payment.paymentMethod === 'paypay' && (
                   <div className="mt-4 pt-4 border-t border-blue-300">
@@ -267,21 +290,21 @@ export default function QRCodePaymentPage() {
                   <li>1. {getPaymentMethodName(payment.paymentMethod)}アプリを開く</li>
                   <li>2. スキャン機能を選択</li>
                   <li>3. 上のQRコードをスキャン</li>
-                  <li>4. 支払い金額（<span className="font-bold text-red-700">168元</span>）を確認</li>
+                  <li>4. 支払い金額（<span className="font-bold text-red-700">{getPaymentAmount(payment.paymentMethod).displayText}</span>）を確認</li>
                   <li>5. 中国元(CNY)での支払いを完了</li>
-                  <li>6. 支払い完了後、自動的に確認されます</li>
-                  <li className="text-red-700 font-semibold">※ 金額は<span className="underline">168元（人民元）</span>です。</li>
+                  <li>6. 「支払いを完了しました」ボタンを押してください</li>
+                  <li className="text-red-700 font-semibold">※ 金額は<span className="underline">{getPaymentAmount(payment.paymentMethod).displayText}（人民元）</span>です。</li>
                 </ol>
               ) : payment.paymentMethod === 'paypay' ? (
                 <ol className="text-sm text-yellow-800 space-y-1 ml-4">
                   <li>1. PayPayアプリを開く</li>
                   <li>2. 「送る」を選択</li>
                   <li>3. PayPay ID「<span className="font-bold">{getPayPayId()}</span>」を入力</li>
-                  <li>4. 支払い金額（<span className="font-bold text-red-700">3,680円</span>）を入力</li>
+                  <li>4. 支払い金額（<span className="font-bold text-red-700">{getPaymentAmount(payment.paymentMethod).displayText}</span>）を入力</li>
                   <li>5. 送金を完了</li>
-                  <li>6. 支払い完了後、自動的に確認されます</li>
+                  <li>6. 「支払いを完了しました」ボタンを押してください</li>
                   <li className="text-red-700 font-semibold">※ PayPay ID: {getPayPayId()}</li>
-                  <li className="text-red-700 font-semibold">※ 金額: 3,680円</li>
+                  <li className="text-red-700 font-semibold">※ 金額: {getPaymentAmount(payment.paymentMethod).displayText}</li>
                 </ol>
               ) : (
                 <ol className="text-sm text-yellow-800 space-y-1 ml-4">
@@ -290,7 +313,7 @@ export default function QRCodePaymentPage() {
                   <li>3. 上のQRコードをスキャン</li>
                   <li>4. 支払い金額を確認</li>
                   <li>5. 支払いを完了</li>
-                  <li>6. 支払い完了後、自動的に確認されます</li>
+                  <li>6. 「支払いを完了しました」ボタンを押してください</li>
                 </ol>
               )}
             </div>
@@ -343,6 +366,17 @@ export default function QRCodePaymentPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+        onConfirm={dialog.onConfirm}
+      />
     </>
   )
 }

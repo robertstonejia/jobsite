@@ -54,14 +54,19 @@ export async function POST(req: Request) {
       )
     }
 
-    // Check subscription status
+    // Check subscription status or trial status
     const now = new Date()
     const hasActiveSubscription =
       user.company.subscriptionPlan !== 'FREE' &&
       user.company.subscriptionExpiry &&
       new Date(user.company.subscriptionExpiry) > now
 
-    if (!hasActiveSubscription) {
+    const hasActiveTrial =
+      user.company.isTrialActive &&
+      user.company.trialEndDate &&
+      new Date(user.company.trialEndDate) > now
+
+    if (!hasActiveSubscription && !hasActiveTrial) {
       return NextResponse.json(
         {
           error: 'IT案件を投稿するには有料プランへの登録が必要です。',

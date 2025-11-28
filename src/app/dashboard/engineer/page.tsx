@@ -13,6 +13,7 @@ interface Application {
   coverLetter: string | null
   createdAt: string
   unreadCount?: number
+  applicationType?: 'job' | 'project'
   job: {
     id: string
     title: string
@@ -132,7 +133,7 @@ export default function EngineerDashboard() {
         <div className="max-w-7xl mx-auto px-4">
           {/* ヘッダー */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">技術者ダッシュボード</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">マイページ</h1>
             <p className="text-gray-600">応募状況の確認と求人検索</p>
           </div>
 
@@ -317,23 +318,34 @@ export default function EngineerDashboard() {
                             応募日: {new Date(application.createdAt).toLocaleDateString('ja-JP')}
                           </p>
                           <div className="flex gap-2">
-                            <Link
-                              href={`/dashboard/engineer/applications/${application.id}`}
-                              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition relative"
-                            >
-                              応募詳細・メッセージ
-                              {application.unreadCount && application.unreadCount > 0 ? (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                                  {application.unreadCount}
-                                </span>
-                              ) : null}
-                            </Link>
-                            <Link
-                              href={`/jobs/${application.job.id}`}
-                              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                            >
-                              求人詳細
-                            </Link>
+                            {application.applicationType === 'project' ? (
+                              <Link
+                                href={`/projects/${application.job.id}`}
+                                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+                              >
+                                IT案件詳細
+                              </Link>
+                            ) : (
+                              <>
+                                <Link
+                                  href={`/dashboard/engineer/applications/${application.id}`}
+                                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition relative"
+                                >
+                                  応募詳細・メッセージ
+                                  {application.unreadCount && application.unreadCount > 0 ? (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                                      {application.unreadCount}
+                                    </span>
+                                  ) : null}
+                                </Link>
+                                <Link
+                                  href={`/jobs/${application.job.id}`}
+                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                                >
+                                  求人詳細
+                                </Link>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>

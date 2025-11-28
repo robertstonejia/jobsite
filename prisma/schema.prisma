@@ -116,6 +116,18 @@ model Engineer {
   profileImage    String?
   bio             String?
 
+  // 基本情報
+  gender          String?       // "男性", "女性", "その他", "回答しない"
+  nationality     String?       // 国籍
+  residenceStatus String?       // 在留資格の種類 (日本国籍以外の場合のみ)
+  residenceExpiry DateTime?     // 在留期限 (日本国籍以外の場合のみ)
+
+  // 学歴情報
+  finalEducation  String?       // 最終学歴: "高校卒業", "専門学校卒業", "短大卒業", "大学卒業", "大学院卒業（修士）", "大学院卒業（博士）"
+  graduationSchool String?      // 卒業学校名
+  major           String?       // 専攻
+  graduationYear  Int?          // 卒業年度
+
   // 職務情報
   yearsOfExperience Int?
   currentPosition   String?
@@ -167,6 +179,7 @@ model EngineerSkill {
   skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
 
   @@unique([engineerId, skillId])
+  @@index([engineerId])
   @@map("engineer_skills")
 }
 
@@ -182,6 +195,7 @@ model Experience {
 
   engineer        Engineer  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
 
+  @@index([engineerId])
   @@map("experiences")
 }
 
@@ -197,6 +211,7 @@ model Education {
 
   engineer        Engineer  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
 
+  @@index([engineerId])
   @@map("educations")
 }
 
@@ -227,6 +242,9 @@ model Job {
   skills          JobSkill[]
   applications    Application[]
 
+  @@index([companyId])
+  @@index([isActive])
+  @@index([createdAt])
   @@map("jobs")
 }
 
@@ -259,6 +277,9 @@ model Application {
   messages        Message[]
 
   @@unique([jobId, engineerId])
+  @@index([jobId])
+  @@index([engineerId])
+  @@index([createdAt])
   @@map("applications")
 }
 

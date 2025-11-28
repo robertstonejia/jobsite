@@ -16,6 +16,9 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const skill = searchParams.get('skill')
     const minExperience = searchParams.get('minExperience')
+    const nationality = searchParams.get('nationality')
+    const minAge = searchParams.get('minAge')
+    const maxAge = searchParams.get('maxAge')
 
     // Build the where clause
     const where: any = {
@@ -45,6 +48,32 @@ export async function GET(req: Request) {
       }
     }
 
+    // Add nationality filter
+    if (nationality) {
+      where.nationality = {
+        contains: nationality,
+        mode: 'insensitive',
+      }
+    }
+
+    // Add age filter (based on birthDate)
+    if (minAge || maxAge) {
+      const now = new Date()
+      where.birthDate = {}
+
+      if (minAge) {
+        // Calculate the maximum birthdate for minimum age
+        const maxBirthDate = new Date(now.getFullYear() - parseInt(minAge), now.getMonth(), now.getDate())
+        where.birthDate.lte = maxBirthDate
+      }
+
+      if (maxAge) {
+        // Calculate the minimum birthdate for maximum age
+        const minBirthDate = new Date(now.getFullYear() - parseInt(maxAge) - 1, now.getMonth(), now.getDate())
+        where.birthDate.gte = minBirthDate
+      }
+    }
+
     const engineers = await prisma.engineer.findMany({
       where,
       select: {
@@ -55,6 +84,8 @@ export async function GET(req: Request) {
         yearsOfExperience: true,
         desiredSalaryMin: true,
         desiredSalaryMax: true,
+        nationality: true,
+        birthDate: true,
         user: {
           select: {
             email: true,

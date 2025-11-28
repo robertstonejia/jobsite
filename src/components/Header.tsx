@@ -80,6 +80,14 @@ export default function Header() {
     return session.user?.email || 'ユーザー'
   }
 
+  const getDashboardText = () => {
+    if (!session) return 'マイページ'
+    const role = (session.user as any).role
+    if (role === 'COMPANY') return '企業ダッシュボード'
+    if (role === 'ENGINEER') return 'マイページ'
+    return 'マイページ'
+  }
+
   const handleMessageClick = async (e: React.MouseEvent) => {
     e.preventDefault()
 
@@ -121,7 +129,7 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <Link href="/" className="text-xl sm:text-2xl font-bold hover:opacity-80 transition">
-            🚀 TechJob
+            🚀 seekjob
           </Link>
 
           {/* Mobile menu button */}
@@ -161,12 +169,17 @@ export default function Header() {
                 高度人材企業
               </Link>
             </li>
+            <li>
+              <Link href="/terms" className="hover:opacity-80 transition whitespace-nowrap">
+                利用契約
+              </Link>
+            </li>
             {status === 'authenticated' ? (
               <>
                 {getDashboardLink() && (
                   <li>
                     <Link href={getDashboardLink()!} className="hover:opacity-80 transition relative whitespace-nowrap">
-                      ダッシュボード
+                      {getDashboardText()}
                       {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                           {unreadCount > 9 ? '9+' : unreadCount}
@@ -175,20 +188,6 @@ export default function Header() {
                     </Link>
                   </li>
                 )}
-                <li>
-                  <a
-                    href="#"
-                    onClick={handleMessageClick}
-                    className="hover:opacity-80 transition relative cursor-pointer whitespace-nowrap"
-                  >
-                    💬 メッセージ
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </a>
-                </li>
                 <li className="flex items-center gap-2 xl:gap-4">
                   <span className="text-xs xl:text-sm opacity-90 hidden xl:inline">
                     👤 {getUserDisplayName()}
@@ -201,25 +200,7 @@ export default function Header() {
                   </button>
                 </li>
               </>
-            ) : (
-              <>
-                <li>
-                  <Link href="/company/register" className="hover:opacity-80 transition whitespace-nowrap">
-                    企業登録
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/engineer/register" className="hover:opacity-80 transition whitespace-nowrap">
-                    応募者登録
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/login" className="bg-white/20 hover:bg-white/30 px-3 xl:px-4 py-2 rounded-lg transition text-sm">
-                    ログイン
-                  </Link>
-                </li>
-              </>
-            )}
+            ) : null}
           </ul>
         </div>
 
@@ -257,7 +238,14 @@ export default function Header() {
             >
               高度人材企業
             </Link>
-            {status === 'authenticated' ? (
+            <Link
+              href="/terms"
+              className="block py-2 hover:opacity-80 transition"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              利用契約
+            </Link>
+            {status === 'authenticated' && (
               <>
                 {getDashboardLink() && (
                   <Link
@@ -265,7 +253,7 @@ export default function Header() {
                     className="block py-2 hover:opacity-80 transition relative"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    ダッシュボード
+                    {getDashboardText()}
                     {unreadCount > 0 && (
                       <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -273,21 +261,6 @@ export default function Header() {
                     )}
                   </Link>
                 )}
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    handleMessageClick(e)
-                    setMobileMenuOpen(false)
-                  }}
-                  className="block py-2 hover:opacity-80 transition cursor-pointer"
-                >
-                  💬 メッセージ
-                  {unreadCount > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
-                </a>
                 <div className="py-2 border-t border-white/20 mt-2">
                   <span className="block text-sm opacity-90 mb-2">
                     👤 {getUserDisplayName()}
@@ -302,30 +275,6 @@ export default function Header() {
                     ログアウト
                   </button>
                 </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/company/register"
-                  className="block py-2 hover:opacity-80 transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  企業登録
-                </Link>
-                <Link
-                  href="/engineer/register"
-                  className="block py-2 hover:opacity-80 transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  応募者登録
-                </Link>
-                <Link
-                  href="/login"
-                  className="block bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition text-sm text-center mt-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  ログイン
-                </Link>
               </>
             )}
           </div>
