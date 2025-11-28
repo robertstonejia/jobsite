@@ -190,6 +190,9 @@ export default function Home() {
         </section>
       )}
 
+      {/* Contact Section */}
+      <ContactSection />
+
       <Footer />
     </>
   )
@@ -231,5 +234,162 @@ function StatItem({ number, label }: { number: string; label: string }) {
       <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-500 mb-1 sm:mb-2">{number}</h3>
       <p className="text-xs sm:text-sm md:text-base text-gray-600">{label}</p>
     </div>
+  )
+}
+
+function ContactSection() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    setSuccess(false)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSuccess(true)
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        })
+      } else {
+        setError(data.error || 'お問い合わせの送信に失敗しました')
+      }
+    } catch (err) {
+      setError('お問い合わせの送信に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <section className="max-w-4xl mx-auto py-8 sm:py-12 md:py-16 px-4">
+      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-500 mb-3">お問い合わせ</h2>
+          <p className="text-sm sm:text-base text-gray-600">
+            ご質問・ご要望などございましたら、お気軽にお問い合わせください
+          </p>
+        </div>
+
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            お問い合わせを受け付けました。ご連絡ありがとうございます。
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                お名前 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                placeholder="山田 太郎"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                メールアドレス <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                placeholder="example@email.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+              件名 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              required
+              value={formData.subject}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              placeholder="お問い合わせの件名を入力してください"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+              お問い合わせ内容 <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              required
+              value={formData.message}
+              onChange={handleChange}
+              rows={6}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              placeholder="お問い合わせ内容を詳しくご記入ください（10文字以上）"
+            />
+          </div>
+
+          <div className="text-center">
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-block bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-bold px-8 py-3 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '送信中...' : '送信する'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
   )
 }

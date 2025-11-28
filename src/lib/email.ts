@@ -315,3 +315,51 @@ seekjob運営チーム
 
   return { to: '', subject, html, text }
 }
+
+// お問い合わせメールのテンプレート
+export function createContactEmail(data: {
+  name: string
+  email: string
+  subject: string
+  message: string
+}): EmailOptions {
+  const emailSubject = `【お問い合わせ】${data.subject}`
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">新しいお問い合わせ</h2>
+
+      <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>お名前:</strong> ${data.name}</p>
+        <p><strong>メールアドレス:</strong> ${data.email}</p>
+        <p><strong>件名:</strong> ${data.subject}</p>
+        <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+        <p><strong>お問い合わせ内容:</strong></p>
+        <p style="white-space: pre-wrap;">${data.message}</p>
+      </div>
+
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+      <p style="color: #666; font-size: 12px;">
+        このメールは自動送信されています。<br>
+        返信する場合は、${data.email}宛に直接ご返信ください。
+      </p>
+    </div>
+  `
+
+  const text = `
+新しいお問い合わせ
+
+お名前: ${data.name}
+メールアドレス: ${data.email}
+件名: ${data.subject}
+
+お問い合わせ内容:
+${data.message}
+
+---
+このメールは自動送信されています。
+返信する場合は、${data.email}宛に直接ご返信ください。
+  `
+
+  return { to: 'kahyousei@gmail.com', subject: emailSubject, html, text }
+}

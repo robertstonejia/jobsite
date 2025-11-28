@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     })
 
     // 管理者に通知メールを送信
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM
+    const adminEmail = 'kahyousei@gmail.com'
     if (adminEmail) {
       const emailContent = {
         to: adminEmail,
