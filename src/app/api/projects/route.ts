@@ -166,40 +166,75 @@ export async function GET(req: Request) {
     const remoteOk = searchParams.get('remoteOk') === 'true'
     const companyId = searchParams.get('companyId')
     const category = searchParams.get('category')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const skip = (page - 1) * limit
 
-    const projects = await prisma.projectPost.findMany({
-      where: {
-        isActive: true,
-        ...(companyId ? { companyId } : {}),
-        ...(category ? { category } : {}),
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { description: { contains: search, mode: 'insensitive' } },
-                ],
-              }
-            : {},
-          location ? { location: { contains: location, mode: 'insensitive' } } : {},
-          remoteOk ? { remoteOk: true } : {},
-        ],
-      },
-      include: {
-        company: {
-          select: {
-            id: true,
-            name: true,
-            logoUrl: true,
+    const where = {
+      isActive: true,
+      ...(companyId ? { companyId } : {}),
+      ...(category ? { category } : {}),
+      AND: [
+        search
+          ? {
+              OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {},
+        location ? { location: { contains: location, mode: 'insensitive' } } : {},
+        remoteOk ? { remoteOk: true } : {},
+      ],
+    }
+
+    const [projects, total] = await Promise.all([
+      prisma.projectPost.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          monthlyRate: true,
+          workingHours: true,
+          contractType: true,
+          location: true,
+          remoteOk: true,
+          foreignNationalityOk: true,
+          category: true,
+          duration: true,
+          nearestStation: true,
+          createdAt: true,
+          company: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+            },
           },
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.projectPost.count({ where }),
+    ])
+
+    return NextResponse.json({
+      projects,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: {
-        createdAt: 'desc',
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     })
-
-    return NextResponse.json(projects)
   } catch (error) {
     console.error('Error fetching projects:', error)
     return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 })

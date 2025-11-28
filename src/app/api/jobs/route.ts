@@ -15,44 +15,85 @@ export async function GET(req: Request) {
     const location = searchParams.get('location') || ''
     const jobType = searchParams.get('jobType') || ''
     const remoteOk = searchParams.get('remoteOk') === 'true'
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const skip = (page - 1) * limit
 
-    const jobs = await prisma.job.findMany({
-      where: {
-        isActive: true,
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { description: { contains: search, mode: 'insensitive' } },
-                ],
-              }
-            : {},
-          location ? { location: { contains: location, mode: 'insensitive' } } : {},
-          jobType ? { jobType: jobType as any } : {},
-          remoteOk ? { remoteOk: true } : {},
-        ],
-      },
-      include: {
-        company: {
-          select: {
-            id: true,
-            name: true,
-            logoUrl: true,
+    const where = {
+      isActive: true,
+      AND: [
+        search
+          ? {
+              OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {},
+        location ? { location: { contains: location, mode: 'insensitive' } } : {},
+        jobType ? { jobType: jobType as any } : {},
+        remoteOk ? { remoteOk: true } : {},
+      ],
+    }
+
+    const [jobs, total] = await Promise.all([
+      prisma.job.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          jobType: true,
+          location: true,
+          remoteOk: true,
+          foreignNationalityOk: true,
+          salaryMin: true,
+          salaryMax: true,
+          createdAt: true,
+          company: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+            },
+          },
+          skills: {
+            select: {
+              id: true,
+              required: true,
+              level: true,
+              skill: {
+                select: {
+                  id: true,
+                  name: true,
+                  category: true,
+                },
+              },
+            },
           },
         },
-        skills: {
-          include: {
-            skill: true,
-          },
+        orderBy: {
+          createdAt: 'desc',
         },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.job.count({ where }),
+    ])
+
+    return NextResponse.json({
+      jobs,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: {
-        createdAt: 'desc',
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     })
-
-    return NextResponse.json(jobs)
   } catch (error) {
     console.error('Error fetching jobs:', error)
     return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 })

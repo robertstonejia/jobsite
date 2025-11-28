@@ -245,6 +245,10 @@ model Job {
   @@index([companyId])
   @@index([isActive])
   @@index([createdAt])
+  @@index([title])
+  @@index([location])
+  @@index([jobType])
+  @@index([remoteOk])
   @@map("jobs")
 }
 
@@ -399,6 +403,10 @@ model ProjectPost {
   @@index([companyId])
   @@index([createdAt])
   @@index([category])
+  @@index([isActive])
+  @@index([title])
+  @@index([location])
+  @@index([remoteOk])
   @@map("project_posts")
 }
 

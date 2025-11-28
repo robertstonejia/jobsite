@@ -38,6 +38,13 @@ export default function JobSearchPage() {
   const [jobType, setJobType] = useState('')
   const [remoteOk, setRemoteOk] = useState(false)
   const [company, setCompany] = useState<any>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 50,
+    total: 0,
+    totalPages: 0,
+  })
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -47,7 +54,7 @@ export default function JobSearchPage() {
     return null
   }
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (page = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -55,15 +62,19 @@ export default function JobSearchPage() {
       if (location) params.append('location', location)
       if (jobType) params.append('jobType', jobType)
       if (remoteOk) params.append('remoteOk', 'true')
+      params.append('page', page.toString())
+      params.append('limit', '50')
 
       const response = await fetch(`/api/jobs?${params.toString()}`)
       const data = await response.json()
 
-      // Ensure data is an array before setting jobs
-      if (Array.isArray(data)) {
-        setJobs(data)
+      // Handle new pagination response format
+      if (data.jobs && Array.isArray(data.jobs)) {
+        setJobs(data.jobs)
+        setPagination(data.pagination)
+        setCurrentPage(page)
       } else {
-        console.error('API response is not an array:', data)
+        console.error('API response format error:', data)
         setJobs([])
       }
     } catch (error) {
@@ -106,7 +117,13 @@ export default function JobSearchPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchJobs()
+    setCurrentPage(1)
+    fetchJobs(1)
+  }
+
+  const handlePageChange = (page: number) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    fetchJobs(page)
   }
 
   return (
@@ -168,7 +185,7 @@ export default function JobSearchPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-6">
             <p className="text-gray-600">
-              {loading ? '検索中...' : `${jobs.length}件の求人が見つかりました`}
+              {loading ? '検索中...' : `${pagination.total}件の求人が見つかりました (${currentPage} / ${pagination.totalPages}ページ)`}
             </p>
           </div>
 
@@ -192,6 +209,60 @@ export default function JobSearchPage() {
                   <p className="text-gray-500 text-lg">求人が見つかりませんでした</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {!loading && pagination.totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                前へ
+              </button>
+
+              <div className="flex gap-2">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show first page, last page, current page, and pages around current page
+                    return (
+                      page === 1 ||
+                      page === pagination.totalPages ||
+                      Math.abs(page - currentPage) <= 2
+                    )
+                  })
+                  .map((page, index, array) => {
+                    // Add ellipsis if there's a gap
+                    const prevPage = array[index - 1]
+                    const showEllipsis = prevPage && page - prevPage > 1
+
+                    return (
+                      <div key={page} className="flex items-center gap-2">
+                        {showEllipsis && <span className="text-gray-400">...</span>}
+                        <button
+                          onClick={() => handlePageChange(page)}
+                          className={`px-4 py-2 rounded-lg transition ${
+                            currentPage === page
+                              ? 'bg-primary-500 text-white'
+                              : 'border border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      </div>
+                    )
+                  })}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pagination.totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                次へ
+              </button>
             </div>
           )}
         </div>
