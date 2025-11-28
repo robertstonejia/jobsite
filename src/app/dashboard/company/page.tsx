@@ -123,55 +123,34 @@ export default function CompanyDashboard() {
 
   const fetchData = async () => {
     try {
-      // まずプロフィールを取得して企業IDを確認
-      const profileRes = await fetch('/api/company/profile')
-      let companyId = ''
+      // 統合APIエンドポイントで全データを1回で取得
+      const response = await fetch('/api/company/dashboard')
 
-      if (profileRes.ok) {
-        const profileData = await profileRes.json()
-        companyId = profileData.id
-        const now = new Date()
-        const expiry = profileData.subscriptionExpiry ? new Date(profileData.subscriptionExpiry) : null
-        const isActive = profileData.subscriptionPlan !== 'FREE' && expiry && expiry > now
-
-        // トライアル情報を計算
-        const trialStatus = checkTrialStatus(profileData)
-        const trialMessage = getTrialMessage(profileData)
-        const canAccessFeatures = canAccessPaidFeatures(profileData)
-
-        setSubscriptionInfo({
-          plan: profileData.subscriptionPlan,
-          expiry: profileData.subscriptionExpiry,
-          isActive: isActive || false,
-          trialStatus,
-          trialMessage,
-          canAccessFeatures,
-        })
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data')
       }
 
-      // 企業IDを使って自社のデータのみを取得
-      const [jobsRes, appsRes, projectsRes] = await Promise.all([
-        fetch('/api/jobs'),
-        fetch('/api/applications/with-unread'),
-        fetch(companyId ? `/api/projects?companyId=${companyId}` : '/api/projects'),
-      ])
+      const data = await response.json()
 
-      if (jobsRes.ok) {
-        const jobsData = await jobsRes.json()
-        setJobs(jobsData)
-      }
+      // データを設定
+      setJobs(data.jobs || [])
+      setProjects(data.projects || [])
+      setApplications(data.applications || [])
 
-      if (appsRes.ok) {
-        const appsData = await appsRes.json()
-        setApplications(appsData)
-      }
+      // トライアル情報を計算
+      const trialStatus = checkTrialStatus(data.company)
+      const trialMessage = getTrialMessage(data.company)
 
-      if (projectsRes.ok) {
-        const projectsData = await projectsRes.json()
-        setProjects(projectsData)
-      }
+      setSubscriptionInfo({
+        plan: data.subscriptionInfo.plan,
+        expiry: data.subscriptionInfo.expiry,
+        isActive: data.subscriptionInfo.isActive,
+        trialStatus,
+        trialMessage,
+        canAccessFeatures: data.subscriptionInfo.canAccessFeatures,
+      })
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
     }

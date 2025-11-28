@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
     error: '/login', // Redirect errors back to login page
   },
-  debug: true, // Enable debug mode to see detailed errors
+  debug: process.env.NODE_ENV === 'development', // Only enable debug in development
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -35,41 +35,36 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          console.log('❌ Missing credentials')
           return null
         }
-
-        console.log('🔍 Attempting login for:', credentials.email)
 
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
+          select: {
+            id: true,
+            email: true,
+            passwordHash: true,
+            role: true,
+            emailVerified: true,
+          },
         })
 
         if (!user) {
-          console.log('❌ User not found:', credentials.email)
           return null
         }
-
-        console.log('✅ User found, checking password...')
 
         const isPasswordValid = await compare(credentials.password, user.passwordHash)
 
         if (!isPasswordValid) {
-          console.log('❌ Invalid password for:', credentials.email)
           return null
         }
-
-        console.log('✅ Password valid, checking email verification...')
 
         // 企業ユーザーまたは応募者ユーザーの場合、メール検証をチェック
         if (!user.emailVerified) {
-          console.log('⚠️ Email not verified for:', credentials.email)
           return null
         }
-
-        console.log('✅ Login successful for:', credentials.email, 'Role:', user.role)
 
         return {
           id: user.id,
