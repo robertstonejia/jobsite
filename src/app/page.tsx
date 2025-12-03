@@ -2,24 +2,17 @@
 
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export default function Home() {
   const { data: session } = useSession()
-  const router = useRouter()
-  const [hasActiveSubscription, setHasActiveSubscription] = useState(false)
   const [stats, setStats] = useState<any>(null)
 
   useEffect(() => {
-    const role = (session?.user as any)?.role
-    if (role === 'COMPANY') {
-      fetchSubscriptionStatus()
-    }
     fetchStats()
-  }, [session])
+  }, [])
 
   const fetchStats = async () => {
     try {
@@ -33,30 +26,6 @@ export default function Home() {
     }
   }
 
-  const fetchSubscriptionStatus = async () => {
-    try {
-      const response = await fetch('/api/company/profile')
-      if (response.ok) {
-        const data = await response.json()
-        const now = new Date()
-        const expiry = data.subscriptionExpiry ? new Date(data.subscriptionExpiry) : null
-        const isActive = data.subscriptionPlan !== 'FREE' && expiry && expiry > now
-        setHasActiveSubscription(isActive || false)
-      }
-    } catch (error) {
-      console.error('Error fetching subscription status:', error)
-    }
-  }
-
-  const handleAdvancedTalentClick = (e: React.MouseEvent) => {
-    const role = (session?.user as any)?.role
-    if (role === 'COMPANY' && !hasActiveSubscription) {
-      e.preventDefault()
-      if (confirm('高度人材企業の閲覧には有料プランへの登録が必要です。登録ページに移動しますか?')) {
-        router.push('/dashboard/company/subscription')
-      }
-    }
-  }
   return (
     <>
       <Header />
@@ -85,39 +54,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick Access Section - Only for logged-in users */}
-      {session && (
-        <section className="bg-blue-50 py-8 sm:py-12 md:py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-500 mb-6">サービスメニュー</h2>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <QuickAccessCard
-                icon="🔍"
-                title="求人検索"
-                description="豊富な求人情報から最適な仕事を見つけよう"
-                href="/jobs"
-                onClick={() => {}}
-              />
-              <QuickAccessCard
-                icon="💼"
-                title="IT案件"
-                description="フリーランス・業務委託のIT案件を探す"
-                href="/projects"
-                onClick={() => {}}
-              />
-              <QuickAccessCard
-                icon="⭐"
-                title="高度人材企業"
-                description="高度人材ポイント制度対応企業を探す"
-                href="/companies/advanced-talent"
-                onClick={handleAdvancedTalentClick}
-              />
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Login Prompt Section - Only for non-logged-in users */}
       {!session && (
@@ -140,12 +76,12 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="max-w-7xl mx-auto py-8 sm:py-12 md:py-16 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12 text-primary-500">選ばれる理由</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12 text-primary-500">サービスの特徴</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           <FeatureCard
             icon="🏢"
             title="企業向け機能"
-            description="簡単登録で企業ページを作成。求人情報の管理から応募者とのマッチングまで、すべてをワンストップで。"
+            description="簡単登録で企業ページを作成。求人情報の管理から応募者とのマッチングまで、すべてをワンストップで。高度人材ポイント加点対応の特集企業も掲載中。"
           />
           <FeatureCard
             icon="👨‍💻"
@@ -195,26 +131,6 @@ export default function Home() {
 
       <Footer />
     </>
-  )
-}
-
-function QuickAccessCard({ icon, title, description, href, onClick }: { icon: string; title: string; description: string; href: string; onClick: (e: React.MouseEvent) => void }) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all transform group"
-    >
-      <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform">{icon}</div>
-      <h3 className="text-lg sm:text-xl font-bold text-primary-500 mb-2 group-hover:text-secondary-500 transition-colors">{title}</h3>
-      <p className="text-sm sm:text-base text-gray-600">{description}</p>
-      <div className="mt-4 text-primary-500 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-        詳しく見る
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </div>
-    </Link>
   )
 }
 
