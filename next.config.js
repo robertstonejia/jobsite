@@ -7,8 +7,6 @@ const nextConfig = {
   // Disable static optimization for pages using useSearchParams
   experimental: {
     missingSuspenseWithCSRBailout: false,
-    // CSS最適化
-    optimizeCss: true,
   },
   // 本番環境でconsole.logを削除
   compiler: {
