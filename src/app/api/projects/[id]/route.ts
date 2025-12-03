@@ -156,10 +156,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'この案件を編集する権限がありません。自社が作成した案件のみ編集できます。' }, { status: 403 })
     }
 
-    // Soft delete by setting isActive to false
-    await prisma.projectPost.update({
+    // Hard delete the project
+    await prisma.projectPost.delete({
       where: { id: params.id },
-      data: { isActive: false },
     })
 
     return NextResponse.json({ message: 'Project deleted successfully' })
