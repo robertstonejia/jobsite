@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -47,10 +47,18 @@ export default function JobSearchPage() {
   })
   const { data: session, status } = useSession()
   const router = useRouter()
+  const wasAuthenticated = useRef(false)
 
-  // Redirect to login if not authenticated
+  // Track if user was authenticated
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'authenticated') {
+      wasAuthenticated.current = true
+    }
+  }, [status])
+
+  // Redirect to login if not authenticated (only for direct access, not logout)
+  useEffect(() => {
+    if (status === 'unauthenticated' && !wasAuthenticated.current) {
       router.push('/login?redirect=/jobs')
     }
   }, [status, router])
