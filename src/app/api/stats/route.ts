@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 300 // 5分間キャッシュ
 
 export async function GET() {
   try {
@@ -23,13 +22,18 @@ export async function GET() {
     // Check thresholds
     const shouldShowStats = companyCount >= 500 && engineerCount >= 1000 && applicationCount >= 1000
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       companyCount,
       engineerCount,
       matchingCount: applicationCount,
-      satisfactionRate: 95, // Fixed at 95%
+      satisfactionRate: 95,
       shouldShowStats
     })
+
+    // 5分間キャッシュ
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+
+    return response
   } catch (error) {
     console.error('Error fetching stats:', error)
     return NextResponse.json(

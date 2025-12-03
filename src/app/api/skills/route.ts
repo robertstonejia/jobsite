@@ -2,17 +2,27 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // 1時間キャッシュ
 
 // GET - Get all skills
 export async function GET() {
   try {
     const skills = await prisma.skill.findMany({
+      select: {
+        id: true,
+        name: true,
+        category: true,
+      },
       orderBy: {
         name: 'asc',
       },
     })
 
-    return NextResponse.json(skills)
+    const response = NextResponse.json(skills)
+    // スキルリストは頻繁に変更されないので1時間キャッシュ
+    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
+
+    return response
   } catch (error) {
     console.error('Error fetching skills:', error)
     return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 })

@@ -7,16 +7,37 @@ const nextConfig = {
   // Disable static optimization for pages using useSearchParams
   experimental: {
     missingSuspenseWithCSRBailout: false,
+    // CSS最適化
+    optimizeCss: true,
   },
   // 本番環境でconsole.logを削除
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],  // エラーと警告は残す
+      exclude: ['error', 'warn'],
     } : false,
   },
-  // Force new build - cache bust v3 - timestamp based
-  generateBuildId: async () => {
-    return `v3-${Date.now()}`
+  // 静的アセットのキャッシュヘッダー
+  async headers() {
+    return [
+      {
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|woff|woff2)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
   },
 }
 
