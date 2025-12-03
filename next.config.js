@@ -8,20 +8,16 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  // 本番環境でconsole.logを削除
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],  // エラーと警告は残す
+    } : false,
+  },
   // Force new build - cache bust v3 - timestamp based
   generateBuildId: async () => {
     return `v3-${Date.now()}`
   },
-  // Completely disable caching
-  webpack: (config, { isServer }) => {
-    config.cache = false
-    // Disable module concatenation which can cache
-    config.optimization = config.optimization || {}
-    config.optimization.concatenateModules = false
-    return config
-  },
-  // Disable SWC minification cache
-  swcMinify: false,
 }
 
 module.exports = nextConfig
