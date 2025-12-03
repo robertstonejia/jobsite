@@ -49,10 +49,11 @@ export default function JobSearchPage() {
   const router = useRouter()
 
   // Redirect to login if not authenticated
-  if (status === 'unauthenticated') {
-    router.push('/login?redirect=/jobs')
-    return null
-  }
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login?redirect=/jobs')
+    }
+  }, [status, router])
 
   const fetchJobs = async (page = 1) => {
     setLoading(true)
