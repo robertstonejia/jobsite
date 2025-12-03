@@ -28,15 +28,17 @@ export default function EngineerRegisterPage() {
   const [error, setError] = useState('')
   const [dialog, setDialog] = useState<{
     isOpen: boolean
-    type: 'success' | 'error' | 'info'
+    type: 'success' | 'error' | 'info' | 'confirm'
     title: string
     message: string
+    onConfirm?: () => void
   }>({
     isOpen: false,
     type: 'info',
     title: '',
     message: '',
   })
+  const [deleteExpIndex, setDeleteExpIndex] = useState<number | null>(null)
   const [allSkills, setAllSkills] = useState<Skill[]>([])
   const [selectedSkills, setSelectedSkills] = useState<Map<string, { level: number; yearsUsed: number }>>(new Map())
   const [experiences, setExperiences] = useState<Experience[]>([])
@@ -114,8 +116,36 @@ export default function EngineerRegisterPage() {
     }))
   }
 
-  const handleExpSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleExpSubmit = () => {
+    // バリデーション
+    if (!expFormData.companyName.trim()) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '会社名を入力してください',
+      })
+      return
+    }
+    if (!expFormData.position.trim()) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '役職を入力してください',
+      })
+      return
+    }
+    if (!expFormData.startDate) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        title: '入力エラー',
+        message: '開始日を入力してください',
+      })
+      return
+    }
+
     if (editingExpIndex !== null) {
       // 編集
       const newExperiences = [...experiences]
@@ -135,10 +165,17 @@ export default function EngineerRegisterPage() {
   }
 
   const handleExpDelete = (index: number) => {
-    if (!confirm('この職歴を削除してもよろしいですか？')) {
-      return
-    }
-    setExperiences(experiences.filter((_, i) => i !== index))
+    setDeleteExpIndex(index)
+    setDialog({
+      isOpen: true,
+      type: 'confirm',
+      title: '職歴の削除',
+      message: 'この職歴を削除してもよろしいですか？',
+      onConfirm: () => {
+        setExperiences(experiences.filter((_, i) => i !== index))
+        setDeleteExpIndex(null)
+      },
+    })
   }
 
   const resetExpForm = () => {
@@ -325,6 +362,9 @@ export default function EngineerRegisterPage() {
         title={dialog.title}
         message={dialog.message}
         type={dialog.type}
+        onConfirm={dialog.onConfirm}
+        confirmText={dialog.type === 'confirm' ? '削除' : 'OK'}
+        cancelText="キャンセル"
       />
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
@@ -853,7 +893,7 @@ export default function EngineerRegisterPage() {
 
                 {/* 職歴フォーム */}
                 {showExpForm && (
-                  <form onSubmit={handleExpSubmit} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
                     <div className="space-y-4">
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -946,7 +986,8 @@ export default function EngineerRegisterPage() {
 
                       <div className="flex gap-2 pt-2">
                         <button
-                          type="submit"
+                          type="button"
+                          onClick={handleExpSubmit}
                           className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
                         >
                           {editingExpIndex !== null ? '更新' : '追加'}
@@ -960,7 +1001,7 @@ export default function EngineerRegisterPage() {
                         </button>
                       </div>
                     </div>
-                  </form>
+                  </div>
                 )}
 
                 {/* 職歴リスト */}
