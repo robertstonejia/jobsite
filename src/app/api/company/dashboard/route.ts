@@ -26,7 +26,6 @@ export async function GET() {
           select: {
             id: true,
             name: true,
-            description: true,
             subscriptionPlan: true,
             subscriptionExpiry: true,
             trialStartDate: true,
@@ -45,12 +44,12 @@ export async function GET() {
     const companyId = user.company.id
 
     // Fetch all data in parallel with optimized queries
-    const [jobs, projectPosts, applications] = await Promise.all([
-      // Get jobs with application counts
+    const [jobs, projectPosts, applications, jobCount, projectCount] = await Promise.all([
+      // Get jobs with application counts (最新20件のみ)
       prisma.job.findMany({
         where: {
           companyId,
-          isActive: true,
+          deletedAt: null,
         },
         select: {
           id: true,
@@ -68,13 +67,14 @@ export async function GET() {
           },
         },
         orderBy: { createdAt: 'desc' },
+        take: 20,
       }),
 
-      // Get project posts
+      // Get project posts (最新20件のみ)
       prisma.projectPost.findMany({
         where: {
           companyId,
-          isActive: true,
+          deletedAt: null,
         },
         select: {
           id: true,
@@ -88,65 +88,86 @@ export async function GET() {
           createdAt: true,
         },
         orderBy: { createdAt: 'desc' },
+        take: 20,
       }),
 
-      // Get applications with unread message counts
-      prisma.$queryRaw`
-        SELECT
-          a.id,
-          a.status,
-          a."jobId",
-          a."createdAt",
-          j.title as "jobTitle",
-          e.id as "engineerId",
-          e."firstName",
-          e."lastName",
-          e."currentPosition",
-          e."yearsOfExperience",
-          COALESCE(
-            (SELECT COUNT(*)::int
-             FROM messages m
-             WHERE m."applicationId" = a.id
-               AND m."senderType" = 'ENGINEER'
-               AND m."isRead" = false
-            ),
-            0
-          ) as "unreadCount"
-        FROM applications a
-        INNER JOIN jobs j ON a."jobId" = j.id
-        INNER JOIN engineers e ON a."engineerId" = e.id
-        WHERE j."companyId" = ${companyId}
-        ORDER BY a."createdAt" DESC
-      ` as Promise<any[]>,
+      // Get applications with optimized query (最新50件のみ)
+      prisma.application.findMany({
+        where: {
+          job: {
+            companyId,
+          },
+        },
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          job: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+          engineer: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              currentPosition: true,
+              yearsOfExperience: true,
+            },
+          },
+          messages: {
+            where: {
+              senderType: 'ENGINEER',
+              isRead: false,
+            },
+            select: {
+              id: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      }),
+
+      // 統計用のカウント
+      prisma.job.count({
+        where: { companyId, deletedAt: null },
+      }),
+
+      prisma.projectPost.count({
+        where: { companyId, deletedAt: null },
+      }),
     ])
 
     // Transform applications to match expected format
-    const transformedApplications = applications.map((app: any) => ({
+    const transformedApplications = applications.map((app) => ({
       id: app.id,
       status: app.status,
       createdAt: app.createdAt,
-      unreadCount: app.unreadCount || 0,
-      applicationType: 'job',
+      unreadCount: app.messages.length,
+      applicationType: 'job' as const,
       job: {
-        id: app.jobId,
-        title: app.jobTitle,
+        id: app.job.id,
+        title: app.job.title,
       },
       engineer: {
-        id: app.engineerId,
-        firstName: app.firstName,
-        lastName: app.lastName,
-        currentPosition: app.currentPosition,
-        yearsOfExperience: app.yearsOfExperience,
+        id: app.engineer.id,
+        firstName: app.engineer.firstName,
+        lastName: app.engineer.lastName,
+        currentPosition: app.engineer.currentPosition,
+        yearsOfExperience: app.engineer.yearsOfExperience,
       },
     }))
 
-    // Calculate statistics (jobs and projects already filtered by isActive: true)
+    // Calculate statistics
     const stats = {
-      activeJobs: jobs.length,
-      totalJobs: jobs.length,
-      totalProjects: projectPosts.length,
+      activeJobs: jobs.filter((j) => j.isActive).length,
+      totalJobs: jobCount,
+      totalProjects: projectCount,
       totalApplications: transformedApplications.length,
-      pendingApplications: transformedApplications.filter((a: any) => a.status === 'PENDING').length,
+      pendingApplications: transformedApplications.filter((a) => a.status === 'PENDING').length,
     }
 
     // Calculate subscription info
