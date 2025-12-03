@@ -49,7 +49,6 @@ export async function GET() {
       prisma.job.findMany({
         where: {
           companyId,
-          deletedAt: null,
         },
         select: {
           id: true,
@@ -74,7 +73,6 @@ export async function GET() {
       prisma.projectPost.findMany({
         where: {
           companyId,
-          deletedAt: null,
         },
         select: {
           id: true,
@@ -133,11 +131,11 @@ export async function GET() {
 
       // 統計用のカウント
       prisma.job.count({
-        where: { companyId, deletedAt: null },
+        where: { companyId },
       }),
 
       prisma.projectPost.count({
-        where: { companyId, deletedAt: null },
+        where: { companyId },
       }),
     ])
 
