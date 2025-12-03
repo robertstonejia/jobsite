@@ -235,6 +235,25 @@ export default function EngineerRegisterPage() {
       return
     }
 
+    // 生年月日の入力は必須
+    if (!formData.birthDate) {
+      setError('生年月日の入力は必須です')
+      return
+    }
+
+    // 18歳以上であることを確認
+    const birthDate = new Date(formData.birthDate)
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    if (age < 18) {
+      setError('ご登録には18歳以上である必要があります')
+      return
+    }
+
     // 国籍の入力は必須
     if (!formData.nationality) {
       setError('国籍の入力は必須です')
@@ -479,12 +498,14 @@ export default function EngineerRegisterPage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-2">
-                        生年月日
+                        生年月日 <span className="text-red-500">*</span>
+                        <span className="text-xs text-gray-500 ml-2">（18歳以上）</span>
                       </label>
                       <input
                         id="birthDate"
                         name="birthDate"
                         type="date"
+                        required
                         value={formData.birthDate}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"

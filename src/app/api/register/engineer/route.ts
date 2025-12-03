@@ -12,7 +12,7 @@ const registerSchema = z.object({
   password: z.string().min(8),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  birthDate: z.string().optional(), // ISO日付文字列
+  birthDate: z.string().min(1), // ISO日付文字列（必須）
   gender: z.string().optional(),
   nationality: z.string().min(1), // 国籍（必須）
   residenceStatus: z.string().optional(), // 在留資格の種類
@@ -58,6 +58,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const validatedData = registerSchema.parse(body)
+
+    // 18歳以上であることを確認
+    const birthDate = new Date(validatedData.birthDate)
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    if (age < 18) {
+      return NextResponse.json(
+        { error: 'ご登録には18歳以上である必要があります' },
+        { status: 400 }
+      )
+    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
