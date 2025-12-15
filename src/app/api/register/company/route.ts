@@ -42,10 +42,10 @@ export async function POST(req: Request) {
     // Hash password
     const passwordHash = await hash(validatedData.password, 12)
 
-    // 無料トライアル期間を計算（30日間）
+    // 無料トライアル期間を計算（180日間 = 半年）
     const trialStartDate = new Date()
     const trialEndDate = new Date()
-    trialEndDate.setDate(trialEndDate.getDate() + 30)
+    trialEndDate.setDate(trialEndDate.getDate() + 180)
 
     // Create user and company with free trial
     const user = await prisma.user.create({
