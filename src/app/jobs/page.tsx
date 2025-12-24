@@ -175,11 +175,18 @@ export default function JobSearchPage() {
     <>
       <Header />
       <div className="min-h-screen bg-gray-50">
-        {/* Search Section */}
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-8 text-center">求人検索</h1>
-            <form onSubmit={handleSearch} className="bg-white rounded-lg p-6 shadow-xl">
+        {/* Search Section - Modern Design */}
+        <div className="relative bg-gradient-to-b from-slate-50 to-white py-12 overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+          <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-20 w-40 h-40 bg-gradient-to-br from-violet-400/10 to-purple-500/10 rounded-full blur-2xl" />
+
+          <div className="relative max-w-7xl mx-auto px-4">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">求人検索</span>
+            </h1>
+            <form onSubmit={handleSearch} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100">
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <input
                   type="text"

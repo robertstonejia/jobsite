@@ -183,10 +183,18 @@ export default function ProjectsPage() {
       <Header />
 
       <main className="min-h-screen bg-gray-50">
-        <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-4">IT案件情報</h1>
-            <p className="text-xl">IT企業が発表する最新のプロジェクト案件情報</p>
+        {/* Header - Modern Design */}
+        <div className="relative bg-gradient-to-b from-slate-50 to-white py-12 sm:py-16 overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+          <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-20 w-40 h-40 bg-gradient-to-br from-violet-400/10 to-purple-500/10 rounded-full blur-2xl" />
+
+          <div className="relative max-w-7xl mx-auto px-4">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">IT案件情報</span>
+            </h1>
+            <p className="text-gray-600 text-lg">IT企業が発表する最新のプロジェクト案件情報</p>
           </div>
         </div>
 
