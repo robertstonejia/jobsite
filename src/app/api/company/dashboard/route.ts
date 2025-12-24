@@ -89,7 +89,7 @@ export async function GET() {
         take: 20,
       }),
 
-      // Get applications with optimized query (最新50件のみ)
+      // Get applications with optimized query using _count (最新50件のみ)
       prisma.application.findMany({
         where: {
           job: {
@@ -115,13 +115,14 @@ export async function GET() {
               yearsOfExperience: true,
             },
           },
-          messages: {
-            where: {
-              senderType: 'ENGINEER',
-              isRead: false,
-            },
+          _count: {
             select: {
-              id: true,
+              messages: {
+                where: {
+                  senderType: 'ENGINEER',
+                  isRead: false,
+                },
+              },
             },
           },
         },
@@ -144,7 +145,7 @@ export async function GET() {
       id: app.id,
       status: app.status,
       createdAt: app.createdAt,
-      unreadCount: app.messages.length,
+      unreadCount: app._count.messages,
       applicationType: 'job' as const,
       job: {
         id: app.job.id,

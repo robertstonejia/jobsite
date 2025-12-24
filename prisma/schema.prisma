@@ -343,6 +343,7 @@ model Message {
   engineer        Engineer            @relation("EngineerReceivedMessages", fields: [engineerId], references: [id], onDelete: Cascade)
 
   @@index([applicationId])
+  @@index([applicationId, senderType, isRead])  // 未読メッセージ検索用の複合インデックス
   @@map("messages")
 }
 
