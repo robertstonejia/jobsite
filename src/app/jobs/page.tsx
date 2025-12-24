@@ -1,11 +1,28 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
 
 interface Job {
   id: string
@@ -48,6 +65,11 @@ export default function JobSearchPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const wasAuthenticated = useRef(false)
+  const isInitialMount = useRef(true)
+
+  // Debounce text inputs (300ms delay)
+  const debouncedSearch = useDebounce(search, 300)
+  const debouncedLocation = useDebounce(location, 300)
 
   // Track if user was authenticated
   useEffect(() => {
@@ -63,14 +85,14 @@ export default function JobSearchPage() {
     }
   }, [status, router])
 
-  const fetchJobs = async (page = 1) => {
+  const fetchJobs = useCallback(async (page = 1, searchVal: string, locationVal: string, jobTypeVal: string, remoteOkVal: boolean) => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (search) params.append('search', search)
-      if (location) params.append('location', location)
-      if (jobType) params.append('jobType', jobType)
-      if (remoteOk) params.append('remoteOk', 'true')
+      if (searchVal) params.append('search', searchVal)
+      if (locationVal) params.append('location', locationVal)
+      if (jobTypeVal) params.append('jobType', jobTypeVal)
+      if (remoteOkVal) params.append('remoteOk', 'true')
       params.append('page', page.toString())
       params.append('limit', '50')
 
@@ -92,15 +114,28 @@ export default function JobSearchPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
+  // Auto-refresh when search conditions change
   useEffect(() => {
-    fetchJobs()
+    // Skip initial mount to avoid double fetch
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      fetchJobs(1, debouncedSearch, debouncedLocation, jobType, remoteOk)
+      return
+    }
+
+    // Reset to page 1 when filters change
+    fetchJobs(1, debouncedSearch, debouncedLocation, jobType, remoteOk)
+  }, [debouncedSearch, debouncedLocation, jobType, remoteOk, fetchJobs])
+
+  // Fetch company profile for COMPANY users
+  useEffect(() => {
     const role = (session?.user as any)?.role
     if (role === 'COMPANY') {
       fetchCompanyProfile()
     }
-  }, [remoteOk, session])
+  }, [session])
 
   const fetchCompanyProfile = async () => {
     try {
@@ -126,13 +161,14 @@ export default function JobSearchPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    setCurrentPage(1)
-    fetchJobs(1)
+    // Form submission is now optional since auto-refresh is enabled
+    // But we keep it for Enter key support
+    fetchJobs(1, search, location, jobType, remoteOk)
   }
 
   const handlePageChange = (page: number) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    fetchJobs(page)
+    fetchJobs(page, debouncedSearch, debouncedLocation, jobType, remoteOk)
   }
 
   return (
