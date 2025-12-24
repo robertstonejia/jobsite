@@ -30,7 +30,21 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
-      "Bash(npx prisma studio)"
+      "Bash(npx prisma studio)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(dir C:Userska-hyousei /b)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -f jobsite_backup.sql)",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT ''users'' as table_name, COUNT\\(*\\) as count FROM users UNION ALL SELECT ''companies'', COUNT\\(*\\) FROM companies UNION ALL SELECT ''engineers'', COUNT\\(*\\) FROM engineers UNION ALL SELECT ''jobs'', COUNT\\(*\\) FROM jobs UNION ALL SELECT ''applications'', COUNT\\(*\\) FROM applications UNION ALL SELECT ''project_posts'', COUNT\\(*\\) FROM project_posts;\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"\\\\dt\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -f jobsite_backup.sql)",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\":*)",
+      "Bash(npx prisma db pull:*)",
+      "Bash(git checkout:*)",
+      "Bash(npx vercel env:*)",
+      "Bash(npx vercel --prod)"
     ],
     "deny": [],
     "ask": []

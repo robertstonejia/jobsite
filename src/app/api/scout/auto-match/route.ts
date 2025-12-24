@@ -95,16 +95,58 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    // Get all engineers
+    // 求人に必要なスキルIDを取得
+    const jobSkillIds = job.skills.map((js) => js.skillId)
+
+    // 既にスカウト済みのエンジニアIDを一括取得（N+1問題を回避）
+    const existingScouts = await prisma.scoutEmail.findMany({
+      where: {
+        companyId: user.company.id,
+        jobId: job.id,
+      },
+      select: {
+        engineerId: true,
+      },
+    })
+    const scoutedEngineerIds = new Set(existingScouts.map((s) => s.engineerId))
+
+    // スキルでフィルタリングしたエンジニアのみを取得（パフォーマンス改善）
+    // メール認証済みのエンジニアのみ
     const engineers = await prisma.engineer.findMany({
+      where: {
+        user: {
+          emailVerified: true,
+        },
+        // 求人のスキルを少なくとも1つ持つエンジニアのみ
+        ...(jobSkillIds.length > 0
+          ? {
+              skills: {
+                some: {
+                  skillId: {
+                    in: jobSkillIds,
+                  },
+                },
+              },
+            }
+          : {}),
+        // 既にスカウト済みのエンジニアは除外
+        id: {
+          notIn: Array.from(scoutedEngineerIds),
+        },
+      },
       include: {
-        user: true,
+        user: {
+          select: {
+            email: true,
+          },
+        },
         skills: {
           include: {
             skill: true,
           },
         },
       },
+      take: 100, // 一度に最大100件まで処理
     })
 
     // Calculate match scores and filter
@@ -115,22 +157,11 @@ export async function POST(req: Request) {
       }))
       .filter((match) => match.score >= minScore)
       .sort((a, b) => b.score - a.score)
+      .slice(0, 50) // 最大50件のスカウトメールを送信
 
     // Send scout emails to matched engineers
     const scoutEmails = []
     for (const match of matches) {
-      // Check if already scouted
-      const existingScout = await prisma.scoutEmail.findFirst({
-        where: {
-          companyId: user.company.id,
-          engineerId: match.engineer.id,
-          jobId: job.id,
-        },
-      })
-
-      if (existingScout) {
-        continue // Skip if already scouted
-      }
 
       const subject = `【スカウト】${user.company.name}から${job.title}のオファー`
       const content = `

@@ -128,6 +128,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { searchParams } = new URL(req.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100)
+    const skip = (page - 1) * limit
+
     const user = await prisma.user.findUnique({
       where: { id: (session.user as any).id },
       include: { engineer: true, company: true },
@@ -138,45 +143,96 @@ export async function GET(req: Request) {
     }
 
     let applications
+    let total = 0
 
     if (user.role === 'ENGINEER' && user.engineer) {
+      const where = { engineerId: user.engineer.id }
       // Get applications by engineer
-      applications = await prisma.application.findMany({
-        where: { engineerId: user.engineer.id },
-        include: {
-          job: {
-            include: {
-              company: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-    } else if (user.role === 'COMPANY' && user.company) {
-      // Get applications for company's jobs
-      applications = await prisma.application.findMany({
-        where: {
-          job: {
-            companyId: user.company.id,
-          },
-        },
-        include: {
-          job: true,
-          engineer: {
-            include: {
-              skills: {
-                include: {
-                  skill: true,
+      ;[applications, total] = await Promise.all([
+        prisma.application.findMany({
+          where,
+          include: {
+            job: {
+              select: {
+                id: true,
+                title: true,
+                jobType: true,
+                location: true,
+                salaryMin: true,
+                salaryMax: true,
+                company: {
+                  select: {
+                    id: true,
+                    name: true,
+                    logoUrl: true,
+                  },
                 },
               },
             },
           },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip: skip,
+        }),
+        prisma.application.count({ where }),
+      ])
+    } else if (user.role === 'COMPANY' && user.company) {
+      const where = {
+        job: {
+          companyId: user.company.id,
         },
-        orderBy: { createdAt: 'desc' },
-      })
+      }
+      // Get applications for company's jobs
+      ;[applications, total] = await Promise.all([
+        prisma.application.findMany({
+          where,
+          include: {
+            job: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+            engineer: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                displayName: true,
+                currentPosition: true,
+                yearsOfExperience: true,
+                skills: {
+                  select: {
+                    level: true,
+                    skill: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                  take: 10, // 最多取前10个技能
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip: skip,
+        }),
+        prisma.application.count({ where }),
+      ])
     }
 
-    return NextResponse.json(applications || [])
+    return NextResponse.json({
+      applications: applications || [],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    })
   } catch (error) {
     console.error('Error fetching applications:', error)
     return NextResponse.json(

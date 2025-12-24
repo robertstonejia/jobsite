@@ -38,6 +38,7 @@ export async function GET(req: Request) {
 
     if (user.engineer) {
       // 技術者の場合 - 求人応募とIT案件応募の両方を取得
+      // N+1問題を解決: _countを使って未読メッセージ数を同時に取得
       const jobApplications = await prisma.application.findMany({
         where: { engineerId: user.engineer.id },
         include: {
@@ -48,6 +49,16 @@ export async function GET(req: Request) {
                   id: true,
                   name: true,
                   logoUrl: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              messages: {
+                where: {
+                  senderType: 'COMPANY',
+                  isRead: false,
                 },
               },
             },
@@ -75,23 +86,15 @@ export async function GET(req: Request) {
         orderBy: { createdAt: 'desc' },
       })
 
-      // 求人応募の未読メッセージ数を取得
-      const jobAppsWithUnread = await Promise.all(
-        jobApplications.map(async (app) => {
-          const unreadCount = await prisma.message.count({
-            where: {
-              applicationId: app.id,
-              senderType: 'COMPANY',
-              isRead: false,
-            },
-          })
-          return {
-            ...app,
-            unreadCount,
-            applicationType: 'job' as const
-          }
-        })
-      )
+      // _countから未読数を取得（N+1クエリを回避）
+      const jobAppsWithUnread = jobApplications.map((app) => {
+        const { _count, ...appData } = app
+        return {
+          ...appData,
+          unreadCount: _count.messages,
+          applicationType: 'job' as const
+        }
+      })
 
       // IT案件応募を同じフォーマットに変換
       const projectAppsFormatted = projectApplications.map(app => ({
@@ -122,6 +125,7 @@ export async function GET(req: Request) {
       return NextResponse.json(allApplications)
     } else if (user.company) {
       // 企業の場合 - 求人応募とIT案件応募の両方を取得
+      // N+1問題を解決: _countを使って未読メッセージ数を同時に取得
       const jobApplications = await prisma.application.findMany({
         where: {
           job: {
@@ -144,6 +148,16 @@ export async function GET(req: Request) {
               displayName: true,
               currentPosition: true,
               yearsOfExperience: true,
+            },
+          },
+          _count: {
+            select: {
+              messages: {
+                where: {
+                  senderType: 'ENGINEER',
+                  isRead: false,
+                },
+              },
             },
           },
         },
@@ -178,23 +192,15 @@ export async function GET(req: Request) {
         orderBy: { createdAt: 'desc' },
       })
 
-      // 求人応募の未読メッセージ数を取得
-      const jobAppsWithUnread = await Promise.all(
-        jobApplications.map(async (app) => {
-          const unreadCount = await prisma.message.count({
-            where: {
-              applicationId: app.id,
-              senderType: 'ENGINEER',
-              isRead: false,
-            },
-          })
-          return {
-            ...app,
-            unreadCount,
-            applicationType: 'job' as const
-          }
-        })
-      )
+      // _countから未読数を取得（N+1クエリを回避）
+      const jobAppsWithUnread = jobApplications.map((app) => {
+        const { _count, ...appData } = app
+        return {
+          ...appData,
+          unreadCount: _count.messages,
+          applicationType: 'job' as const
+        }
+      })
 
       // IT案件応募を同じフォーマットに変換
       const projectAppsFormatted = projectApplications.map(app => ({

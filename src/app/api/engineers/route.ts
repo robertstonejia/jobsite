@@ -20,6 +20,11 @@ export async function GET(req: Request) {
     const minAge = searchParams.get('minAge')
     const maxAge = searchParams.get('maxAge')
 
+    // 分页参数（默认返回前50条）
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100) // 最大100条
+    const skip = (page - 1) * limit
+
     // Build the where clause
     const where: any = {
       user: {
@@ -74,42 +79,56 @@ export async function GET(req: Request) {
       }
     }
 
-    const engineers = await prisma.engineer.findMany({
-      where,
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        currentPosition: true,
-        yearsOfExperience: true,
-        desiredSalaryMin: true,
-        desiredSalaryMax: true,
-        nationality: true,
-        birthDate: true,
-        user: {
-          select: {
-            email: true,
+    // 总数查询（用于分页）
+    const [engineers, total] = await Promise.all([
+      prisma.engineer.findMany({
+        where,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          currentPosition: true,
+          yearsOfExperience: true,
+          desiredSalaryMin: true,
+          desiredSalaryMax: true,
+          nationality: true,
+          birthDate: true,
+          user: {
+            select: {
+              email: true,
+            },
           },
-        },
-        skills: {
-          select: {
-            level: true,
-            skill: {
-              select: {
-                id: true,
-                name: true,
-                category: true,
+          skills: {
+            select: {
+              level: true,
+              skill: {
+                select: {
+                  id: true,
+                  name: true,
+                  category: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.engineer.count({ where }),
+    ])
+
+    return NextResponse.json({
+      engineers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     })
-
-    return NextResponse.json(engineers)
   } catch (error) {
     console.error('Error fetching engineers:', error)
     return NextResponse.json(

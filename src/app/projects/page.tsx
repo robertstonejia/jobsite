@@ -192,30 +192,36 @@ export default function ProjectsPage() {
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Category Tabs and Post Button */}
-          <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="overflow-x-auto flex-1">
-              <div className="flex gap-2 min-w-max">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category === 'すべて' ? '' : category)}
-                    className={`px-6 py-2 rounded-lg font-medium transition whitespace-nowrap ${
-                      (category === 'すべて' && !selectedCategory) || selectedCategory === category
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
+          <div className="mb-6 flex flex-col gap-4">
+            {/* Category Tabs with horizontal scroll on mobile */}
+            <div
+              className="flex gap-2 pb-3 overflow-x-auto scrollbar-thin"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'thin',
+                msOverflowStyle: 'auto'
+              }}
+            >
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category === 'すべて' ? '' : category)}
+                  className={`px-4 py-2 rounded-lg font-medium transition whitespace-nowrap text-sm flex-shrink-0 ${
+                    (category === 'すべて' && !selectedCategory) || selectedCategory === category
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
 
             {/* Post Button for Company Users */}
             {isCompany && (
               <button
                 onClick={handleProjectPostClick}
-                className="bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition whitespace-nowrap shadow-md"
+                className="w-full md:w-auto self-start bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition whitespace-nowrap shadow-md"
               >
                 + IT案件を投稿
               </button>

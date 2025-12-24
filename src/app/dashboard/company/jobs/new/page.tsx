@@ -148,6 +148,15 @@ export default function NewJobPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <div className="mb-8">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center text-gray-600 hover:text-primary-500 mb-4 transition"
+              >
+                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                戻る
+              </button>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">新規求人作成</h1>
               <p className="text-gray-600">求人情報を入力してください</p>
             </div>

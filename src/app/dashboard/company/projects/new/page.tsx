@@ -131,6 +131,15 @@ export default function NewProjectPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-6">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-gray-600 hover:text-primary-500 mb-4 transition"
+            >
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              戻る
+            </button>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">IT案件投稿</h1>
             <p className="text-gray-600">1日5件まで投稿可能です</p>
           </div>
