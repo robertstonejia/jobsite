@@ -44,7 +44,8 @@
       "Bash(npx prisma db pull:*)",
       "Bash(git checkout:*)",
       "Bash(npx vercel env:*)",
-      "Bash(npx vercel --prod)"
+      "Bash(npx vercel --prod)",
+      "WebFetch(domain:jobpin.ai)"
     ],
     "deny": [],
     "ask": []

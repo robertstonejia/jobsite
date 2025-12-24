@@ -133,8 +133,37 @@ export default function Header() {
     <header className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-4 shadow-lg sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link href="/" className="text-xl sm:text-2xl font-bold hover:opacity-80 transition">
-            🚀 seekjob
+          <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-bold hover:opacity-80 transition">
+            <svg
+              className="w-7 h-7 sm:w-8 sm:h-8"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* 外側のリング - グラデーション */}
+              <circle cx="16" cy="16" r="14" stroke="url(#logoGradient)" strokeWidth="2.5" fill="none" />
+              {/* 中心のノード */}
+              <circle cx="16" cy="16" r="4" fill="white" />
+              {/* 接続線 - 上 */}
+              <line x1="16" y1="12" x2="16" y2="5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              {/* 接続線 - 右下 */}
+              <line x1="19" y1="18.5" x2="24" y2="24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              {/* 接続線 - 左下 */}
+              <line x1="13" y1="18.5" x2="8" y2="24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              {/* 小さなノード - 上 */}
+              <circle cx="16" cy="5" r="2.5" fill="white" />
+              {/* 小さなノード - 右下 */}
+              <circle cx="24" cy="24" r="2.5" fill="white" />
+              {/* 小さなノード - 左下 */}
+              <circle cx="8" cy="24" r="2.5" fill="white" />
+              <defs>
+                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span>seekjob</span>
           </Link>
 
           {/* Mobile menu button */}
