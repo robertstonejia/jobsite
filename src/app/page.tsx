@@ -30,39 +30,44 @@ export default function Home() {
     <>
       <Header />
 
-      {/* Hero Section - Modern Minimal Design */}
-      <section className="relative bg-white overflow-hidden">
-        {/* Background decoration */}
+      {/* Hero Section - Tech-Forward Design */}
+      <section className="relative bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+        {/* Background decoration - tech style */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full opacity-60 blur-3xl" />
-          <div className="absolute top-20 -left-20 w-60 h-60 bg-gradient-to-br from-purple-50 to-pink-100 rounded-full opacity-40 blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-gradient-to-br from-cyan-50 to-blue-100 rounded-full opacity-50 blur-2xl" />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+          {/* Gradient orbs */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 -left-40 w-80 h-80 bg-gradient-to-br from-violet-400/15 to-purple-500/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/3 w-60 h-60 bg-gradient-to-br from-cyan-400/10 to-blue-500/10 rounded-full blur-2xl" />
         </div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 md:py-32">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm mb-6">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              日本最大級のIT人材プラットフォーム
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm mb-8 border border-blue-100">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+              </svg>
+              IT人材とIT案件のマッチングプラットフォーム
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
               <span className="block">キャリアの次のステップを</span>
-              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
                 seekjobで見つけよう
               </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              2,000件以上の求人と500件以上のIT案件から、<br className="hidden sm:block" />
+              豊富な求人とIT案件から、<br className="hidden sm:block" />
               あなたにぴったりの機会を見つけましょう。
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/engineer/register"
-                className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 w-full sm:w-auto"
               >
                 <span>エンジニアとして登録</span>
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,20 +76,25 @@ export default function Home() {
               </Link>
               <Link
                 href="/company/register"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 w-full sm:w-auto"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full hover:bg-white hover:border-gray-300 hover:shadow-lg transition-all duration-300 w-full sm:w-auto"
               >
                 企業として登録
               </Link>
             </div>
 
-            {/* Trust indicators */}
-            <div className="mt-12 pt-8 border-t border-gray-100">
-              <p className="text-sm text-gray-500 mb-4">多くの企業様にご利用いただいています</p>
-              <div className="flex justify-center items-center gap-8 flex-wrap opacity-60">
-                <div className="text-2xl font-bold text-gray-400">TECH</div>
-                <div className="text-2xl font-bold text-gray-400">DEV</div>
-                <div className="text-2xl font-bold text-gray-400">CODE</div>
-                <div className="text-2xl font-bold text-gray-400">BUILD</div>
+            {/* Stats preview */}
+            <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">2,000+</div>
+                <div className="text-sm text-gray-500">求人数</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">500+</div>
+                <div className="text-sm text-gray-500">IT案件</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">300+</div>
+                <div className="text-sm text-gray-500">登録企業</div>
               </div>
             </div>
           </div>
