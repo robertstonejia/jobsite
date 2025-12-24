@@ -30,93 +30,142 @@ export default function Home() {
     <>
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-12 sm:py-16 md:py-24 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">
-            求人検索・IT案件をご利用になるには<br className="hidden sm:block" />
-            新規会員登録が必要です
-          </h1>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link
-              href="/engineer/register"
-              className="bg-white text-primary-500 font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform text-sm sm:text-base"
-            >
-              応募者として登録
-            </Link>
-            <Link
-              href="/company/register"
-              className="bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform text-sm sm:text-base"
-            >
-              企業として登録
-            </Link>
+      {/* Hero Section - Modern Minimal Design */}
+      <section className="relative bg-white overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full opacity-60 blur-3xl" />
+          <div className="absolute top-20 -left-20 w-60 h-60 bg-gradient-to-br from-purple-50 to-pink-100 rounded-full opacity-40 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-gradient-to-br from-cyan-50 to-blue-100 rounded-full opacity-50 blur-2xl" />
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 md:py-32">
+          <div className="text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm mb-6">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              日本最大級のIT人材プラットフォーム
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+              <span className="block">キャリアの次のステップを</span>
+              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                seekjobで見つけよう
+              </span>
+            </h1>
+
+            <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              2,000件以上の求人と500件以上のIT案件から、<br className="hidden sm:block" />
+              あなたにぴったりの機会を見つけましょう。
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                href="/engineer/register"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
+              >
+                <span>エンジニアとして登録</span>
+                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+              <Link
+                href="/company/register"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 w-full sm:w-auto"
+              >
+                企業として登録
+              </Link>
+            </div>
+
+            {/* Trust indicators */}
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <p className="text-sm text-gray-500 mb-4">多くの企業様にご利用いただいています</p>
+              <div className="flex justify-center items-center gap-8 flex-wrap opacity-60">
+                <div className="text-2xl font-bold text-gray-400">TECH</div>
+                <div className="text-2xl font-bold text-gray-400">DEV</div>
+                <div className="text-2xl font-bold text-gray-400">CODE</div>
+                <div className="text-2xl font-bold text-gray-400">BUILD</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-
       {/* Login Prompt Section - Only for non-logged-in users */}
       {!session && (
-        <section className="bg-blue-50 py-8 sm:py-12 md:py-16">
+        <section className="bg-gray-50 py-8 sm:py-10">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-500 mb-4">
-              すでにアカウントを持ってます。
-            </h2>
-            <div className="flex justify-center">
-              <Link
-                href="/login"
-                className="inline-block bg-primary-500 text-white font-bold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform text-sm sm:text-base"
-              >
-                ログイン
-              </Link>
-            </div>
+            <p className="text-gray-600 mb-4">
+              すでにアカウントをお持ちですか？
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 transition"
+            >
+              ログインはこちら
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </section>
       )}
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto py-8 sm:py-12 md:py-16 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12 text-primary-500">サービスの特徴</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          <FeatureCard
-            icon="🏢"
-            title="企業向け機能"
-            description="簡単登録で企業ページを作成。求人情報の管理から応募者とのマッチングまで、すべてをワンストップで。高度人材ポイント加点対応の特集企業も掲載中。"
-          />
-          <FeatureCard
-            icon="👨‍💻"
-            title="応募者向け機能"
-            description="スキルセットを登録して、最適な求人情報を受け取ろう。プロフィールで自分をアピール。"
-          />
-          <FeatureCard
-            icon="🎯"
-            title="精密なマッチング"
-            description="AIを活用した高精度なマッチングで、企業と応募者の最適な組み合わせを実現。"
-          />
-          <FeatureCard
-            icon="📊"
-            title="充実の管理機能"
-            description="応募状況の確認、メッセージのやり取り、面接日程の調整など、採用活動を効率化。"
-          />
-          <FeatureCard
-            icon="🔒"
-            title="安心のセキュリティ"
-            description="個人情報は厳重に管理。安心して利用できる環境を提供します。"
-          />
-          <FeatureCard
-            icon="💬"
-            title="充実のサポート"
-            description="登録から採用まで、専任スタッフがしっかりサポート。"
-          />
+      <section className="bg-white py-16 sm:py-20 md:py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              なぜseekjobが選ばれるのか
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              求職者と企業の双方にとって最適なマッチングを実現するための機能を提供しています
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <FeatureCard
+              icon={<BuildingIcon />}
+              title="企業向け機能"
+              description="簡単登録で企業ページを作成。求人情報の管理から応募者とのマッチングまで、すべてをワンストップで。"
+            />
+            <FeatureCard
+              icon={<UserIcon />}
+              title="応募者向け機能"
+              description="スキルセットを登録して、最適な求人情報を受け取ろう。プロフィールで自分をアピール。"
+            />
+            <FeatureCard
+              icon={<TargetIcon />}
+              title="精密なマッチング"
+              description="AIを活用した高精度なマッチングで、企業と応募者の最適な組み合わせを実現。"
+            />
+            <FeatureCard
+              icon={<ChartIcon />}
+              title="充実の管理機能"
+              description="応募状況の確認、メッセージのやり取り、面接日程の調整など、採用活動を効率化。"
+            />
+            <FeatureCard
+              icon={<ShieldIcon />}
+              title="安心のセキュリティ"
+              description="個人情報は厳重に管理。安心して利用できる環境を提供します。"
+            />
+            <FeatureCard
+              icon={<SupportIcon />}
+              title="充実のサポート"
+              description="登録から採用まで、専任スタッフがしっかりサポート。"
+            />
+          </div>
         </div>
       </section>
 
       {/* Stats Section */}
       {stats && stats.shouldShowStats && (
-        <section className="bg-gray-50 py-8 sm:py-12 md:py-16">
+        <section className="bg-gradient-to-b from-gray-50 to-white py-16 sm:py-20 md:py-24">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12">seekjobの実績</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">数字で見るseekjob</h2>
+              <p className="text-gray-600">多くの求職者と企業様にご利用いただいています</p>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
               <StatItem number={`${stats.companyCount.toLocaleString()}+`} label="登録企業数" />
               <StatItem number={`${stats.engineerCount.toLocaleString()}+`} label="登録応募者数" />
               <StatItem number={`${stats.matchingCount.toLocaleString()}+`} label="マッチング成功数" />
@@ -134,21 +183,72 @@ export default function Home() {
   )
 }
 
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg hover:-translate-y-2 transition transform">
-      <div className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4">{icon}</div>
-      <h3 className="text-lg sm:text-xl font-bold text-primary-500 mb-2 sm:mb-3">{title}</h3>
-      <p className="text-sm sm:text-base text-gray-600">{description}</p>
+    <div className="group bg-gray-50 hover:bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+      <div className="w-12 h-12 mb-5 text-gray-700 group-hover:text-blue-600 transition-colors">
+        {icon}
+      </div>
+      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+      <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{description}</p>
     </div>
+  )
+}
+
+// Icon Components
+function BuildingIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+  )
+}
+
+function UserIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  )
+}
+
+function TargetIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  )
+}
+
+function ChartIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  )
+}
+
+function ShieldIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  )
+}
+
+function SupportIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
   )
 }
 
 function StatItem({ number, label }: { number: string; label: string }) {
   return (
-    <div>
-      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-500 mb-1 sm:mb-2">{number}</h3>
-      <p className="text-xs sm:text-sm md:text-base text-gray-600">{label}</p>
+    <div className="text-center">
+      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-1 sm:mb-2">{number}</h3>
+      <p className="text-xs sm:text-sm md:text-base text-gray-500">{label}</p>
     </div>
   )
 }
@@ -207,14 +307,16 @@ function ContactSection() {
   }
 
   return (
-    <section className="max-w-4xl mx-auto py-8 sm:py-12 md:py-16 px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-500 mb-3">お問い合わせ</h2>
-          <p className="text-sm sm:text-base text-gray-600">
+    <section className="bg-gray-50 py-16 sm:py-20 md:py-24 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">お問い合わせ</h2>
+          <p className="text-gray-600">
             ご質問・ご要望などございましたら、お気軽にお問い合わせください
           </p>
         </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
 
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
@@ -241,7 +343,7 @@ function ContactSection() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
                 placeholder="山田 太郎"
               />
             </div>
@@ -257,7 +359,7 @@ function ContactSection() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
                 placeholder="example@email.com"
               />
             </div>
@@ -274,7 +376,7 @@ function ContactSection() {
               required
               value={formData.subject}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
               placeholder="お問い合わせの件名を入力してください"
             />
           </div>
@@ -290,21 +392,22 @@ function ContactSection() {
               value={formData.message}
               onChange={handleChange}
               rows={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow resize-none"
               placeholder="お問い合わせ内容を詳しくご記入ください（10文字以上）"
             />
           </div>
 
-          <div className="text-center">
+          <div className="text-center pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="inline-block bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-bold px-8 py-3 rounded-full hover:-translate-y-1 hover:shadow-xl transition transform disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '送信中...' : '送信する'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </section>
   )
