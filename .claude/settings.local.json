@@ -46,7 +46,10 @@
       "Bash(npx vercel env:*)",
       "Bash(npx vercel --prod)",
       "WebFetch(domain:jobpin.ai)",
-      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT COUNT\\(*\\) as total_projects FROM project_posts; SELECT COUNT\\(*\\) as active_projects FROM project_posts WHERE \"\"isActive\"\" = true; SELECT title, category, \"\"isActive\"\" FROM project_posts ORDER BY \"\"createdAt\"\" DESC LIMIT 5;\")"
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT COUNT\\(*\\) as total_projects FROM project_posts; SELECT COUNT\\(*\\) as active_projects FROM project_posts WHERE \"\"isActive\"\" = true; SELECT title, category, \"\"isActive\"\" FROM project_posts ORDER BY \"\"createdAt\"\" DESC LIMIT 5;\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT category, COUNT\\(*\\) as count FROM project_posts WHERE \"\"isActive\"\" = true GROUP BY category ORDER BY count DESC;\")",
+      "Bash(curl:*)",
+      "Bash(npx vercel:*)"
     ],
     "deny": [],
     "ask": []

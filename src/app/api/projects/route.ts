@@ -170,40 +170,62 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const skip = (page - 1) * limit
 
-    const where = {
+    // Build where clause without empty objects in AND
+    const whereClause: any = {
       isActive: true,
-      ...(companyId ? { companyId } : {}),
-      ...(category ? { category } : {}),
-      AND: [
-        search
-          ? {
-              OR: [
-                { title: { contains: search, mode: 'insensitive' as const } },
-                { description: { contains: search, mode: 'insensitive' as const } },
-              ],
-            }
-          : {},
-        location ? { location: { contains: location, mode: 'insensitive' as const } } : {},
-        remoteOk ? { remoteOk: true } : {},
-      ],
+    }
+
+    if (companyId) {
+      whereClause.companyId = companyId
+    }
+
+    if (category) {
+      whereClause.category = category
+    }
+
+    const andConditions: any[] = []
+
+    if (search) {
+      andConditions.push({
+        OR: [
+          { title: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ],
+      })
+    }
+
+    if (location) {
+      andConditions.push({ location: { contains: location, mode: 'insensitive' } })
+    }
+
+    if (remoteOk) {
+      andConditions.push({ remoteOk: true })
+    }
+
+    if (andConditions.length > 0) {
+      whereClause.AND = andConditions
     }
 
     const [projects, total] = await Promise.all([
       prisma.projectPost.findMany({
-        where,
+        where: whereClause,
         select: {
           id: true,
           title: true,
           description: true,
+          requirements: true,
+          preferredSkills: true,
           monthlyRate: true,
           workingHours: true,
           contractType: true,
+          interviewCount: true,
+          nearestStation: true,
+          paymentTerms: true,
           location: true,
           remoteOk: true,
           foreignNationalityOk: true,
           category: true,
           duration: true,
-          nearestStation: true,
           createdAt: true,
           company: {
             select: {
@@ -219,7 +241,7 @@ export async function GET(req: Request) {
         take: limit,
         skip: skip,
       }),
-      prisma.projectPost.count({ where }),
+      prisma.projectPost.count({ where: whereClause }),
     ])
 
     return NextResponse.json({
@@ -232,7 +254,7 @@ export async function GET(req: Request) {
       },
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     })
   } catch (error) {
