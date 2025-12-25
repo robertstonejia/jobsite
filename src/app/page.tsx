@@ -43,31 +43,26 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 md:py-32">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm mb-8 border border-blue-100">
+            <div className="inline-flex items-center gap-2 bg-white/80 text-blue-700 px-4 py-2 rounded-full text-sm mb-6 border border-blue-200 shadow-sm">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
               </svg>
               総合求人マッチングプラットフォーム
             </div>
 
-            {!session && (
-              <div className="mb-8">
-                <p className="text-gray-600 mb-2">
-                  すでにアカウントをお持ちですか？
-                </p>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 transition"
-                >
-                  ログインはこちら
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            )}
+            {/* Main Title */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+              <span className="block">キャリアの次のステップを</span>
+              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                seekjobで見つけよう
+              </span>
+            </h1>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              豊富な求人とIT案件から、あなたにぴったりの機会を見つけましょう。
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               <Link
                 href="/engineer/register"
                 className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 w-full sm:w-auto"
@@ -84,6 +79,21 @@ export default function Home() {
                 企業として登録
               </Link>
             </div>
+
+            {/* Login Link */}
+            {!session && (
+              <div className="text-center">
+                <p className="text-gray-500 text-sm">
+                  すでにアカウントをお持ちですか？{' '}
+                  <Link
+                    href="/login"
+                    className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition"
+                  >
+                    ログイン
+                  </Link>
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -136,7 +146,7 @@ export default function Home() {
 
       {/* Stats Section */}
       {stats && stats.shouldShowStats && (
-        <section className="bg-white/50 backdrop-blur-sm py-16 sm:py-20 md:py-24">
+        <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-16 sm:py-20 md:py-24">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">数字で見るseekjob</h2>
@@ -162,8 +172,8 @@ export default function Home() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="group bg-white/60 hover:bg-white p-6 sm:p-8 rounded-2xl border border-white/50 hover:border-gray-200 hover:shadow-lg transition-all duration-300 backdrop-blur-sm">
-      <div className="w-12 h-12 mb-5 text-gray-700 group-hover:text-blue-600 transition-colors">
+    <div className="group bg-white p-6 sm:p-8 rounded-2xl border border-blue-100 hover:border-blue-200 shadow-sm hover:shadow-xl transition-all duration-300">
+      <div className="w-12 h-12 mb-5 p-2.5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl text-blue-600 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors">
         {icon}
       </div>
       <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">{title}</h3>
@@ -223,9 +233,9 @@ function SupportIcon() {
 
 function StatItem({ number, label }: { number: string; label: string }) {
   return (
-    <div className="text-center">
-      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-1 sm:mb-2">{number}</h3>
-      <p className="text-xs sm:text-sm md:text-base text-gray-500">{label}</p>
+    <div className="text-center bg-white p-6 rounded-2xl border border-blue-100 shadow-sm">
+      <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-1 sm:mb-2">{number}</h3>
+      <p className="text-xs sm:text-sm md:text-base text-gray-600">{label}</p>
     </div>
   )
 }
@@ -284,7 +294,7 @@ function ContactSection() {
   }
 
   return (
-    <section className="bg-white/60 backdrop-blur-sm py-16 sm:py-20 md:py-24 px-4">
+    <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-16 sm:py-20 md:py-24 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">お問い合わせ</h2>
@@ -293,7 +303,7 @@ function ContactSection() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6 sm:p-8">
 
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
