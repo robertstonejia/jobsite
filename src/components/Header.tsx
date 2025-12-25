@@ -180,17 +180,17 @@ export default function Header() {
           {/* Desktop menu */}
           <ul className="hidden lg:flex gap-6 xl:gap-8 items-center text-sm xl:text-base text-gray-800 font-medium">
             <li>
-              <Link href="/" className="text-blue-600 hover:text-blue-700 transition">
+              <Link href="/" className="text-gray-700 hover:text-blue-600 transition">
                 ホーム
               </Link>
             </li>
             <li>
-              <Link href="/jobs" className="text-blue-600 hover:text-blue-700 transition">
+              <Link href="/jobs" className="text-gray-700 hover:text-blue-600 transition">
                 求人検索
               </Link>
             </li>
             <li>
-              <Link href="/projects" className="text-blue-600 hover:text-blue-700 transition">
+              <Link href="/projects" className="text-gray-700 hover:text-blue-600 transition">
                 IT案件
               </Link>
             </li>
@@ -198,13 +198,13 @@ export default function Header() {
               <Link
                 href="/companies/advanced-talent"
                 onClick={handleAdvancedTalentClick}
-                className="text-blue-600 hover:text-blue-700 transition whitespace-nowrap"
+                className="text-gray-700 hover:text-blue-600 transition whitespace-nowrap"
               >
                 高度人材企業
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-blue-600 hover:text-blue-700 transition whitespace-nowrap">
+              <Link href="/terms" className="text-gray-700 hover:text-blue-600 transition whitespace-nowrap">
                 利用契約
               </Link>
             </li>
@@ -212,7 +212,7 @@ export default function Header() {
               <>
                 {getDashboardLink() && (
                   <li>
-                    <Link href={getDashboardLink()!} className="text-blue-600 hover:text-blue-700 transition relative whitespace-nowrap">
+                    <Link href={getDashboardLink()!} className="text-gray-700 hover:text-blue-600 transition relative whitespace-nowrap">
                       {getDashboardText()}
                       {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -243,21 +243,21 @@ export default function Header() {
           <div className="lg:hidden mt-4 pb-4 space-y-3">
             <Link
               href="/"
-              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
+              className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               ホーム
             </Link>
             <Link
               href="/jobs"
-              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
+              className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               求人検索
             </Link>
             <Link
               href="/projects"
-              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
+              className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               IT案件
@@ -268,13 +268,13 @@ export default function Header() {
                 handleAdvancedTalentClick(e)
                 setMobileMenuOpen(false)
               }}
-              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
+              className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium"
             >
               高度人材企業
             </Link>
             <Link
               href="/terms"
-              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
+              className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               利用契約
@@ -284,7 +284,7 @@ export default function Header() {
                 {getDashboardLink() && (
                   <Link
                     href={getDashboardLink()!}
-                    className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium relative"
+                    className="block py-2 text-gray-700 hover:text-blue-600 transition font-medium relative"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {getDashboardText()}
