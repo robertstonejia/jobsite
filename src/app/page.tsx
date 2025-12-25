@@ -51,7 +51,7 @@ export default function Home() {
             </div>
 
             {/* Main Title */}
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-6 tracking-tight">
+            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-6 tracking-tight">
               <span className="block">キャリアの次のステップを</span>
               <span className="block mt-2 text-blue-600" style={{ background: 'linear-gradient(to right, #2563eb, #4f46e5, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 seekjobで見つけよう
