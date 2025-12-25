@@ -124,7 +124,7 @@ export default function ScoutEmailDetailPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
         <Footer />
@@ -136,7 +136,7 @@ export default function ScoutEmailDetailPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">スカウトメールが見つかりません</h1>
             <button
@@ -165,7 +165,7 @@ export default function ScoutEmailDetailPage() {
         confirmText={dialog.type === 'confirm' ? '返信する' : 'OK'}
         cancelText="キャンセル"
       />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* ヘッダー */}
           <div className="mb-6">

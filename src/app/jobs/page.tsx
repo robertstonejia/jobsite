@@ -174,7 +174,7 @@ export default function JobSearchPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
         {/* Search Section - Modern Design */}
         <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 overflow-hidden">
           {/* Background decoration */}

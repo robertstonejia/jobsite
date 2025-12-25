@@ -95,7 +95,7 @@ export default function CompanyRegisterPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <div className="text-center mb-8">

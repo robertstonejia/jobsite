@@ -95,7 +95,7 @@ export default function WithdrawalPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">退会について</h1>
             <div className="bg-white rounded-lg shadow p-8">
@@ -129,7 +129,7 @@ export default function WithdrawalPage() {
         confirmText={dialog.type === 'confirm' ? '退会する' : 'OK'}
         cancelText="キャンセル"
       />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">退会について</h1>
 

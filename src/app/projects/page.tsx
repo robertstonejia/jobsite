@@ -182,7 +182,7 @@ export default function ProjectsPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
         {/* Header - Modern Design */}
         <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 sm:py-16 overflow-hidden">
           {/* Background decoration */}

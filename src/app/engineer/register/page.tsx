@@ -385,7 +385,7 @@ export default function EngineerRegisterPage() {
         confirmText={dialog.type === 'confirm' ? '削除' : 'OK'}
         cancelText="キャンセル"
       />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">応募者登録</h1>

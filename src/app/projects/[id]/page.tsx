@@ -138,7 +138,7 @@ export default function ProjectDetailPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
         <Footer />
@@ -150,7 +150,7 @@ export default function ProjectDetailPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
           <div className="max-w-4xl mx-auto px-4">
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
               {error || '案件が見つかりませんでした'}
@@ -171,7 +171,7 @@ export default function ProjectDetailPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* Back Button */}
           <button
