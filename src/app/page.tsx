@@ -85,7 +85,7 @@ export default function Home() {
 
       {/* Login Prompt Section - Only for non-logged-in users */}
       {!session && (
-        <section className="bg-white/60 backdrop-blur-sm py-8 sm:py-10">
+        <section className="py-8 sm:py-10">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <p className="text-gray-600 mb-4">
               すでにアカウントをお持ちですか？
