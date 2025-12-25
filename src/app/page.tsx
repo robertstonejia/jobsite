@@ -50,17 +50,22 @@ export default function Home() {
               総合求人マッチングプラットフォーム
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
-              <span className="block">キャリアの次のステップを</span>
-              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                seekjobで見つけよう
-              </span>
-            </h1>
-
-            <p className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent font-medium">
-              豊富な求人とIT案件から、<br className="hidden sm:block" />
-              あなたにぴったりの機会を見つけましょう。
-            </p>
+            {!session && (
+              <div className="mb-8">
+                <p className="text-gray-600 mb-2">
+                  すでにアカウントをお持ちですか？
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 transition"
+                >
+                  ログインはこちら
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
@@ -82,26 +87,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Login Prompt Section - Only for non-logged-in users */}
-      {!session && (
-        <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-8 sm:py-10">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <p className="text-gray-600 mb-4">
-              すでにアカウントをお持ちですか？
-            </p>
-            <Link
-              href="/login"
-              className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 transition"
-            >
-              ログインはこちら
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-        </section>
-      )}
 
       {/* Features Section */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-16 sm:py-20 md:py-24 px-4">
