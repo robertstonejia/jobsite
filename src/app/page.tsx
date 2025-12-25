@@ -57,7 +57,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent font-medium">
               豊富な求人とIT案件から、<br className="hidden sm:block" />
               あなたにぴったりの機会を見つけましょう。
             </p>
