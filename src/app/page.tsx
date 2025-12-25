@@ -104,7 +104,7 @@ export default function Home() {
       )}
 
       {/* Features Section */}
-      <section className="bg-white/70 backdrop-blur-sm py-16 sm:py-20 md:py-24 px-4">
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-16 sm:py-20 md:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
