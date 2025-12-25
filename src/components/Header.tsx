@@ -130,7 +130,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-4 shadow-lg sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-100 py-4 sticky top-0 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-bold hover:opacity-80 transition">
@@ -141,29 +141,29 @@ export default function Header() {
               xmlns="http://www.w3.org/2000/svg"
             >
               {/* 外側のリング - グラデーション */}
-              <circle cx="16" cy="16" r="14" stroke="url(#logoGradient)" strokeWidth="2.5" fill="none" />
+              <circle cx="16" cy="16" r="14" stroke="url(#logoGradientBlue)" strokeWidth="2.5" fill="none" />
               {/* 中心のノード */}
-              <circle cx="16" cy="16" r="4" fill="white" />
+              <circle cx="16" cy="16" r="4" fill="#3b82f6" />
               {/* 接続線 - 上 */}
-              <line x1="16" y1="12" x2="16" y2="5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              <line x1="16" y1="12" x2="16" y2="5" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
               {/* 接続線 - 右下 */}
-              <line x1="19" y1="18.5" x2="24" y2="24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              <line x1="19" y1="18.5" x2="24" y2="24" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
               {/* 接続線 - 左下 */}
-              <line x1="13" y1="18.5" x2="8" y2="24" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              <line x1="13" y1="18.5" x2="8" y2="24" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
               {/* 小さなノード - 上 */}
-              <circle cx="16" cy="5" r="2.5" fill="white" />
+              <circle cx="16" cy="5" r="2.5" fill="#3b82f6" />
               {/* 小さなノード - 右下 */}
-              <circle cx="24" cy="24" r="2.5" fill="white" />
+              <circle cx="24" cy="24" r="2.5" fill="#6366f1" />
               {/* 小さなノード - 左下 */}
-              <circle cx="8" cy="24" r="2.5" fill="white" />
+              <circle cx="8" cy="24" r="2.5" fill="#6366f1" />
               <defs>
-                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
+                <linearGradient id="logoGradientBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3b82f6" />
+                  <stop offset="100%" stopColor="#6366f1" />
                 </linearGradient>
               </defs>
             </svg>
-            <span>seekjob</span>
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">seekjob</span>
           </Link>
 
           {/* Mobile menu button */}
@@ -172,25 +172,25 @@ export default function Header() {
             className="lg:hidden flex flex-col gap-1.5 p-2"
             aria-label="メニュー"
           >
-            <span className={`w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-            <span className={`w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-            <span className={`w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+            <span className={`w-6 h-0.5 bg-gray-700 transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+            <span className={`w-6 h-0.5 bg-gray-700 transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+            <span className={`w-6 h-0.5 bg-gray-700 transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
           </button>
 
           {/* Desktop menu */}
-          <ul className="hidden lg:flex gap-6 xl:gap-8 items-center text-sm xl:text-base">
+          <ul className="hidden lg:flex gap-6 xl:gap-8 items-center text-sm xl:text-base text-gray-800 font-medium">
             <li>
-              <Link href="/" className="hover:opacity-80 transition">
+              <Link href="/" className="text-blue-600 hover:text-blue-700 transition">
                 ホーム
               </Link>
             </li>
             <li>
-              <Link href="/jobs" className="hover:opacity-80 transition">
+              <Link href="/jobs" className="text-blue-600 hover:text-blue-700 transition">
                 求人検索
               </Link>
             </li>
             <li>
-              <Link href="/projects" className="hover:opacity-80 transition">
+              <Link href="/projects" className="text-blue-600 hover:text-blue-700 transition">
                 IT案件
               </Link>
             </li>
@@ -198,13 +198,13 @@ export default function Header() {
               <Link
                 href="/companies/advanced-talent"
                 onClick={handleAdvancedTalentClick}
-                className="hover:opacity-80 transition whitespace-nowrap"
+                className="text-blue-600 hover:text-blue-700 transition whitespace-nowrap"
               >
                 高度人材企業
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="hover:opacity-80 transition whitespace-nowrap">
+              <Link href="/terms" className="text-blue-600 hover:text-blue-700 transition whitespace-nowrap">
                 利用契約
               </Link>
             </li>
@@ -212,7 +212,7 @@ export default function Header() {
               <>
                 {getDashboardLink() && (
                   <li>
-                    <Link href={getDashboardLink()!} className="hover:opacity-80 transition relative whitespace-nowrap">
+                    <Link href={getDashboardLink()!} className="text-blue-600 hover:text-blue-700 transition relative whitespace-nowrap">
                       {getDashboardText()}
                       {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -223,12 +223,12 @@ export default function Header() {
                   </li>
                 )}
                 <li className="flex items-center gap-2 xl:gap-4">
-                  <span className="text-xs xl:text-sm opacity-90 hidden xl:inline">
+                  <span className="text-xs xl:text-sm text-gray-500 hidden xl:inline">
                     👤 {getUserDisplayName()}
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="bg-white/20 hover:bg-white/30 px-3 xl:px-4 py-2 rounded-lg transition text-sm"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 xl:px-4 py-2 rounded-lg transition text-sm"
                   >
                     ログアウト
                   </button>
@@ -243,21 +243,21 @@ export default function Header() {
           <div className="lg:hidden mt-4 pb-4 space-y-3">
             <Link
               href="/"
-              className="block py-2 hover:opacity-80 transition"
+              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               ホーム
             </Link>
             <Link
               href="/jobs"
-              className="block py-2 hover:opacity-80 transition"
+              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               求人検索
             </Link>
             <Link
               href="/projects"
-              className="block py-2 hover:opacity-80 transition"
+              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               IT案件
@@ -268,13 +268,13 @@ export default function Header() {
                 handleAdvancedTalentClick(e)
                 setMobileMenuOpen(false)
               }}
-              className="block py-2 hover:opacity-80 transition"
+              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
             >
               高度人材企業
             </Link>
             <Link
               href="/terms"
-              className="block py-2 hover:opacity-80 transition"
+              className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               利用契約
@@ -284,7 +284,7 @@ export default function Header() {
                 {getDashboardLink() && (
                   <Link
                     href={getDashboardLink()!}
-                    className="block py-2 hover:opacity-80 transition relative"
+                    className="block py-2 text-blue-600 hover:text-blue-700 transition font-medium relative"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {getDashboardText()}
@@ -295,8 +295,8 @@ export default function Header() {
                     )}
                   </Link>
                 )}
-                <div className="py-2 border-t border-white/20 mt-2">
-                  <span className="block text-sm opacity-90 mb-2">
+                <div className="py-2 border-t border-gray-200 mt-2">
+                  <span className="block text-sm text-gray-500 mb-2">
                     👤 {getUserDisplayName()}
                   </span>
                   <button
@@ -304,7 +304,7 @@ export default function Header() {
                       handleLogout()
                       setMobileMenuOpen(false)
                     }}
-                    className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition text-sm w-full text-left"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm w-full text-left"
                   >
                     ログアウト
                   </button>

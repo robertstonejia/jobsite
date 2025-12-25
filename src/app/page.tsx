@@ -31,11 +31,9 @@ export default function Home() {
       <Header />
 
       {/* Hero Section - Tech-Forward Design */}
-      <section className="relative bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-white overflow-hidden">
         {/* Background decoration - tech style */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Grid pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
           {/* Gradient orbs */}
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl" />
           <div className="absolute top-1/2 -left-40 w-80 h-80 bg-gradient-to-br from-violet-400/15 to-purple-500/15 rounded-full blur-3xl" />
@@ -49,7 +47,7 @@ export default function Home() {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
               </svg>
-              IT人材とIT案件のマッチングプラットフォーム
+              総合求人マッチングプラットフォーム
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
@@ -69,7 +67,7 @@ export default function Home() {
                 href="/engineer/register"
                 className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 w-full sm:w-auto"
               >
-                <span>エンジニアとして登録</span>
+                <span>求職者として登録</span>
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -81,29 +79,13 @@ export default function Home() {
                 企業として登録
               </Link>
             </div>
-
-            {/* Stats preview */}
-            <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-gray-900">2,000+</div>
-                <div className="text-sm text-gray-500">求人数</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-gray-900">500+</div>
-                <div className="text-sm text-gray-500">IT案件</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-gray-900">300+</div>
-                <div className="text-sm text-gray-500">登録企業</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Login Prompt Section - Only for non-logged-in users */}
       {!session && (
-        <section className="bg-gray-50 py-8 sm:py-10">
+        <section className="bg-white/60 backdrop-blur-sm py-8 sm:py-10">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <p className="text-gray-600 mb-4">
               すでにアカウントをお持ちですか？
@@ -122,7 +104,7 @@ export default function Home() {
       )}
 
       {/* Features Section */}
-      <section className="bg-white py-16 sm:py-20 md:py-24 px-4">
+      <section className="bg-white/70 backdrop-blur-sm py-16 sm:py-20 md:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -169,7 +151,7 @@ export default function Home() {
 
       {/* Stats Section */}
       {stats && stats.shouldShowStats && (
-        <section className="bg-gradient-to-b from-gray-50 to-white py-16 sm:py-20 md:py-24">
+        <section className="bg-white/50 backdrop-blur-sm py-16 sm:py-20 md:py-24">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">数字で見るseekjob</h2>
@@ -195,7 +177,7 @@ export default function Home() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="group bg-gray-50 hover:bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+    <div className="group bg-white/60 hover:bg-white p-6 sm:p-8 rounded-2xl border border-white/50 hover:border-gray-200 hover:shadow-lg transition-all duration-300 backdrop-blur-sm">
       <div className="w-12 h-12 mb-5 text-gray-700 group-hover:text-blue-600 transition-colors">
         {icon}
       </div>
@@ -317,7 +299,7 @@ function ContactSection() {
   }
 
   return (
-    <section className="bg-gray-50 py-16 sm:py-20 md:py-24 px-4">
+    <section className="bg-white/60 backdrop-blur-sm py-16 sm:py-20 md:py-24 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">お問い合わせ</h2>
@@ -353,7 +335,7 @@ function ContactSection() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
                 placeholder="山田 太郎"
               />
             </div>
@@ -369,7 +351,7 @@ function ContactSection() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
                 placeholder="example@email.com"
               />
             </div>
@@ -386,7 +368,7 @@ function ContactSection() {
               required
               value={formData.subject}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-shadow"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
               placeholder="お問い合わせの件名を入力してください"
             />
           </div>
@@ -411,7 +393,7 @@ function ContactSection() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '送信中...' : '送信する'}
             </button>

@@ -174,11 +174,10 @@ export default function JobSearchPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Search Section - Modern Design */}
-        <div className="relative bg-gradient-to-b from-slate-50 to-white py-12 overflow-hidden">
+        <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 overflow-hidden">
           {/* Background decoration */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 -left-20 w-40 h-40 bg-gradient-to-br from-violet-400/10 to-purple-500/10 rounded-full blur-2xl" />
 
