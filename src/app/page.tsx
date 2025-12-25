@@ -51,14 +51,14 @@ export default function Home() {
             </div>
 
             {/* Main Title */}
-            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-6 tracking-tight">
-              <span className="block">キャリアの次のステップを</span>
-              <span className="block mt-2 text-blue-600" style={{ background: 'linear-gradient(to right, #2563eb, #4f46e5, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-6 tracking-tight">
+              <span className="block text-gray-800">キャリアの次のステップを</span>
+              <span className="block mt-2" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                 seekjobで見つけよう
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg mb-8 max-w-2xl mx-auto leading-relaxed" style={{ background: 'linear-gradient(90deg, #4b5563, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               豊富な求人とIT案件から、あなたにぴったりの機会を見つけましょう。
             </p>
 
