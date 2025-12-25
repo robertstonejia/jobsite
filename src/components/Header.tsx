@@ -130,7 +130,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-100 py-4 sticky top-0 z-50 shadow-sm">
+    <header className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100/50 py-4 sticky top-0 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-bold hover:opacity-80 transition">
