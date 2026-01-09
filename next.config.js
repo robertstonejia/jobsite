@@ -14,9 +14,20 @@ const nextConfig = {
       exclude: ['error', 'warn'],
     } : false,
   },
-  // 静的アセットのキャッシュヘッダー
+  // キャッシュヘッダー設定
   async headers() {
     return [
+      // ダッシュボードページはキャッシュしない（動的コンテンツ）
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          },
+        ],
+      },
+      // 静的アセットは長期キャッシュ
       {
         source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|woff|woff2)',
         headers: [
