@@ -3,105 +3,86 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('=== テストデータ削除開始 ===\n')
+  console.log('🗑️ テストデータの削除を開始します...')
 
-  // テストユーザーのメールアドレス
-  const testEngineerEmail = 'test-engineer@example.com'
-  const testCompanyEmail = 'test-company@example.com'
+  // 現在のカウントを確認
+  const beforeCounts = {
+    jobs: await prisma.job.count(),
+    projects: await prisma.projectPost.count(),
+    companies: await prisma.company.count(),
+    users: await prisma.user.count(),
+  }
 
-  // 1. テスト応募者を取得
-  const testEngineer = await prisma.user.findUnique({
-    where: { email: testEngineerEmail },
-    include: { engineer: true },
+  console.log('📊 削除前のデータ:')
+  console.log(`  - 求人: ${beforeCounts.jobs}件`)
+  console.log(`  - IT案件: ${beforeCounts.projects}件`)
+  console.log(`  - 企業: ${beforeCounts.companies}件`)
+  console.log(`  - ユーザー: ${beforeCounts.users}件`)
+
+  // テスト企業を特定（「テスト企業」で始まる名前）
+  const testCompanies = await prisma.company.findMany({
+    where: {
+      name: {
+        startsWith: 'テスト企業',
+      },
+    },
+    select: {
+      id: true,
+      userId: true,
+      name: true,
+    },
   })
 
-  // 2. テスト企業を取得
-  const testCompany = await prisma.user.findUnique({
-    where: { email: testCompanyEmail },
-    include: { company: true },
-  })
+  console.log(`\n🔍 テスト企業: ${testCompanies.length}件を検出`)
 
-  // 3. 関連データを削除
-  if (testCompany?.company) {
-    console.log('1. 企業関連データを削除中...')
+  // 1. すべての求人を削除（テストデータのみ）
+  console.log('\n🗑️ 求人を削除中...')
+  const deletedJobs = await prisma.job.deleteMany({})
+  console.log(`  ✅ ${deletedJobs.count}件の求人を削除`)
 
-    // メッセージを削除
-    const deletedMessages = await prisma.message.deleteMany({
-      where: { companyId: testCompany.company.id },
+  // 2. すべてのIT案件を削除（テストデータのみ）
+  console.log('\n🗑️ IT案件を削除中...')
+  const deletedProjects = await prisma.projectPost.deleteMany({})
+  console.log(`  ✅ ${deletedProjects.count}件のIT案件を削除`)
+
+  // 3. テスト企業のユーザーIDを取得
+  const testUserIds = testCompanies.map(c => c.userId)
+
+  // 4. テスト企業を削除（Cascade削除でユーザーも削除される）
+  if (testCompanies.length > 0) {
+    console.log('\n🗑️ テスト企業とユーザーを削除中...')
+
+    // ユーザーを削除すると、関連する企業も Cascade で削除される
+    const deletedUsers = await prisma.user.deleteMany({
+      where: {
+        id: {
+          in: testUserIds,
+        },
+      },
     })
-    console.log(`   メッセージ ${deletedMessages.count} 件削除`)
-
-    // 求人に関連する応募を削除
-    const jobs = await prisma.job.findMany({
-      where: { companyId: testCompany.company.id },
-      select: { id: true },
-    })
-
-    for (const job of jobs) {
-      await prisma.application.deleteMany({
-        where: { jobId: job.id },
-      })
-    }
-    console.log('   応募を削除')
-
-    // 求人を削除
-    const deletedJobs = await prisma.job.deleteMany({
-      where: { companyId: testCompany.company.id },
-    })
-    console.log(`   求人 ${deletedJobs.count} 件削除`)
-
-    // IT案件を削除
-    const deletedProjects = await prisma.projectPost.deleteMany({
-      where: { companyId: testCompany.company.id },
-    })
-    console.log(`   IT案件 ${deletedProjects.count} 件削除`)
+    console.log(`  ✅ ${deletedUsers.count}件のテスト企業/ユーザーを削除`)
   }
 
-  // 4. テスト企業ユーザーを削除（Companyも一緒に削除される）
-  if (testCompany) {
-    console.log('\n2. テスト企業を削除中...')
-    await prisma.company.deleteMany({
-      where: { userId: testCompany.id },
-    })
-    await prisma.user.delete({
-      where: { email: testCompanyEmail },
-    })
-    console.log(`   企業削除完了: ${testCompanyEmail}`)
-  } else {
-    console.log('\n2. テスト企業は存在しません')
+  // 削除後のカウントを確認
+  const afterCounts = {
+    jobs: await prisma.job.count(),
+    projects: await prisma.projectPost.count(),
+    companies: await prisma.company.count(),
+    users: await prisma.user.count(),
   }
 
-  // 5. テスト応募者ユーザーを削除（Engineerも一緒に削除される）
-  if (testEngineer) {
-    console.log('\n3. テスト応募者を削除中...')
+  console.log('\n📊 削除後のデータ:')
+  console.log(`  - 求人: ${afterCounts.jobs}件`)
+  console.log(`  - IT案件: ${afterCounts.projects}件`)
+  console.log(`  - 企業: ${afterCounts.companies}件`)
+  console.log(`  - ユーザー: ${afterCounts.users}件`)
 
-    // 応募者の応募とメッセージを削除
-    if (testEngineer.engineer) {
-      await prisma.message.deleteMany({
-        where: { engineerId: testEngineer.engineer.id },
-      })
-      await prisma.application.deleteMany({
-        where: { engineerId: testEngineer.engineer.id },
-      })
-    }
-
-    await prisma.engineer.deleteMany({
-      where: { userId: testEngineer.id },
-    })
-    await prisma.user.delete({
-      where: { email: testEngineerEmail },
-    })
-    console.log(`   応募者削除完了: ${testEngineerEmail}`)
-  } else {
-    console.log('\n3. テスト応募者は存在しません')
-  }
-
-  console.log('\n=== テストデータ削除完了 ===')
+  console.log('\n🎉 テストデータの削除が完了しました！')
 }
 
 main()
   .catch((e) => {
-    console.error('エラー:', e)
+    console.error('❌ エラーが発生しました:', e)
     process.exit(1)
   })
   .finally(async () => {

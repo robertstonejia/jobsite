@@ -50,7 +50,16 @@
       "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT category, COUNT\\(*\\) as count FROM project_posts WHERE \"\"isActive\"\" = true GROUP BY category ORDER BY count DESC;\")",
       "Bash(curl:*)",
       "Bash(npx vercel:*)",
-      "Bash(set \"DATABASE_URL=postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\")"
+      "Bash(set \"DATABASE_URL=postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT COUNT\\(*\\) as test_users FROM users WHERE email LIKE ''%@example.com'';\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT name FROM companies WHERE name LIKE ''テスト企業%'' LIMIT 5;\")",
+      "Bash(\"C:/Program Files/PostgreSQL/18/bin/psql.exe\" \"postgresql://neondb_owner:npg_htAfK6wzV7SP@ep-aged-river-ad5lg73e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require\" -c \"SELECT COUNT\\(*\\) as test_companies FROM companies WHERE name LIKE ''%Test%'' OR name LIKE ''%企業%'';\")",
+      "WebFetch(domain:www.seekjob.jp)",
+      "WebSearch",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx prisma:*)",
+      "Bash(tasklist:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
