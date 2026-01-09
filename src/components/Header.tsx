@@ -16,8 +16,11 @@ export default function Header() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      fetchUnreadCount()
-      fetchSubscriptionStatus()
+      // 並列で両方のAPIを呼び出し
+      Promise.all([
+        fetchUnreadCount(),
+        fetchSubscriptionStatus()
+      ])
       // 30秒ごとに未読メッセージ数を更新
       const interval = setInterval(fetchUnreadCount, 30000)
       return () => clearInterval(interval)
@@ -40,13 +43,11 @@ export default function Header() {
     const role = (session?.user as any)?.role
     if (role === 'COMPANY') {
       try {
-        const response = await fetch('/api/company/profile')
+        // 軽量なAPIエンドポイントを使用
+        const response = await fetch('/api/company/subscription-status')
         if (response.ok) {
           const data = await response.json()
-          const now = new Date()
-          const expiry = data.subscriptionExpiry ? new Date(data.subscriptionExpiry) : null
-          const isActive = data.subscriptionPlan !== 'FREE' && expiry && expiry > now
-          setHasActiveSubscription(isActive || false)
+          setHasActiveSubscription(data.isActive || false)
         }
       } catch (error) {
         console.error('Error fetching subscription status:', error)
