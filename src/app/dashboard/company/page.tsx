@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import DashboardSkeleton from '@/components/DashboardSkeleton'
 import { checkTrialStatus, canAccessPaidFeatures, getTrialMessage } from '@/lib/trial'
 
 interface Job {
@@ -160,9 +161,7 @@ export default function CompanyDashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-        </div>
+        <DashboardSkeleton />
         <Footer />
       </>
     )

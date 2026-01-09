@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import DashboardSkeleton from '@/components/DashboardSkeleton'
 
 interface Application {
   id: string
@@ -88,9 +89,7 @@ export default function EngineerDashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-        </div>
+        <DashboardSkeleton />
         <Footer />
       </>
     )
