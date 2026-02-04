@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
 
 interface Job {
   id: string
@@ -48,6 +49,17 @@ export default function JobDetailPage() {
   const [coverLetter, setCoverLetter] = useState('')
   const [hasApplied, setHasApplied] = useState(false)
   const [company, setCompany] = useState<any>(null)
+  const [dialog, setDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    type: 'success' | 'error' | 'info' | 'warning'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  })
 
   useEffect(() => {
     fetchJob()
@@ -126,7 +138,12 @@ export default function JobDetailPage() {
     }
 
     if (hasApplied) {
-      alert('この求人には既に応募済みです')
+      setDialog({
+        isOpen: true,
+        title: '応募済み',
+        message: 'この求人には既に応募済みです',
+        type: 'info'
+      })
       return
     }
 
@@ -144,16 +161,31 @@ export default function JobDetailPage() {
       })
 
       if (response.ok) {
-        alert('応募が完了しました!')
+        setDialog({
+          isOpen: true,
+          title: '応募完了',
+          message: '応募が完了しました！企業からの連絡をお待ちください。',
+          type: 'success'
+        })
         setHasApplied(true)
         setCoverLetter('')
       } else {
         const error = await response.json()
-        alert(error.error || '応募に失敗しました')
+        setDialog({
+          isOpen: true,
+          title: 'エラー',
+          message: error.error || '応募に失敗しました',
+          type: 'error'
+        })
       }
     } catch (error) {
       console.error('Error applying:', error)
-      alert('応募に失敗しました')
+      setDialog({
+        isOpen: true,
+        title: 'エラー',
+        message: '応募に失敗しました。もう一度お試しください。',
+        type: 'error'
+      })
     } finally {
       setApplying(false)
     }
@@ -401,6 +433,14 @@ export default function JobDetailPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </>
   )
 }

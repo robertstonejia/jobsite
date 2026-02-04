@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Dialog from '@/components/Dialog'
 
 interface ProjectPost {
   id: string
@@ -47,6 +48,17 @@ export default function ProjectDetailPage() {
   const [isApplying, setIsApplying] = useState(false)
   const [showApplyModal, setShowApplyModal] = useState(false)
   const [coverLetter, setCoverLetter] = useState('')
+  const [dialog, setDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    type: 'success' | 'error' | 'info' | 'warning'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  })
 
   useEffect(() => {
     if (params.id) {
@@ -98,7 +110,12 @@ export default function ProjectDetailPage() {
     }
 
     if ((session.user as any).role !== 'ENGINEER') {
-      alert('エンジニアのみ応募できます')
+      setDialog({
+        isOpen: true,
+        title: '応募不可',
+        message: 'エンジニアのみ応募できます',
+        type: 'warning'
+      })
       return
     }
 
@@ -116,17 +133,32 @@ export default function ProjectDetailPage() {
       })
 
       if (response.ok) {
-        alert('応募が完了しました')
+        setDialog({
+          isOpen: true,
+          title: '応募完了',
+          message: '応募が完了しました！企業からの連絡をお待ちください。',
+          type: 'success'
+        })
         setHasApplied(true)
         setShowApplyModal(false)
         setCoverLetter('')
       } else {
         const data = await response.json()
-        alert(data.error || '応募に失敗しました')
+        setDialog({
+          isOpen: true,
+          title: 'エラー',
+          message: data.error || '応募に失敗しました',
+          type: 'error'
+        })
       }
     } catch (error) {
       console.error('Error applying:', error)
-      alert('応募中にエラーが発生しました')
+      setDialog({
+        isOpen: true,
+        title: 'エラー',
+        message: '応募中にエラーが発生しました。もう一度お試しください。',
+        type: 'error'
+      })
     } finally {
       setIsApplying(false)
     }
@@ -404,6 +436,14 @@ export default function ProjectDetailPage() {
         </div>
       </div>
       <Footer />
+
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </>
   )
 }
