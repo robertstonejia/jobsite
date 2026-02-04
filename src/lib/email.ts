@@ -35,15 +35,18 @@ function createTransporter() {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
+    console.log('[Email] Attempting to send email...')
+    console.log('[Email] SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET')
+    console.log('[Email] SMTP_PASSWORD:', process.env.SMTP_PASSWORD ? 'SET' : 'NOT SET')
+    console.log('[Email] To:', options.to)
+    console.log('[Email] Subject:', options.subject)
+
     // SMTP設定が未設定の場合
     if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
-      console.log('📧 Email would be sent (SMTP not configured):', {
-        to: options.to,
-        subject: options.subject,
-        preview: options.text || options.html.substring(0, 100),
-      })
-      console.warn('⚠️ SMTP settings not configured. Please set SMTP_USER and SMTP_PASSWORD in .env')
-      return true // 開発中はtrueを返して処理を続行
+      console.error('❌ [Email] SMTP settings not configured!')
+      console.log('SMTP_USER value:', process.env.SMTP_USER)
+      console.log('SMTP_PASSWORD length:', process.env.SMTP_PASSWORD?.length || 0)
+      return false // 本番環境ではfalseを返す
     }
 
     // メールを送信
