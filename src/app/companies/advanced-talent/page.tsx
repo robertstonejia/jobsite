@@ -40,14 +40,17 @@ export default function AdvancedTalentCompaniesPage() {
   const [loading, setLoading] = useState(true)
 
   // Redirect to login if not authenticated
-  if (status === 'unauthenticated') {
-    router.push('/login?redirect=/companies/advanced-talent')
-    return null
-  }
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login?redirect=/companies/advanced-talent')
+    }
+  }, [status, router])
 
   useEffect(() => {
-    fetchCompanies()
-  }, [])
+    if (status === 'authenticated') {
+      fetchCompanies()
+    }
+  }, [status])
 
   const fetchCompanies = async () => {
     try {
@@ -71,6 +74,19 @@ export default function AdvancedTalentCompaniesPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     fetchCompanies()
+  }
+
+  // Show loading while checking authentication
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex items-center justify-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+        </div>
+        <Footer />
+      </>
+    )
   }
 
   return (
