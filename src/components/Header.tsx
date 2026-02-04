@@ -69,8 +69,12 @@ export default function Header() {
   }
 
   const handleLogout = async () => {
-    await signOut({ redirect: false })
-    router.push('/')
+    try {
+      await signOut({ callbackUrl: '/', redirect: true })
+    } catch (error) {
+      console.error('Logout error:', error)
+      window.location.href = '/'
+    }
   }
 
   const getDashboardLink = () => {
