@@ -18,11 +18,16 @@ export default function LoginPage() {
   const [emailNotVerified, setEmailNotVerified] = useState(false)
   const [resendingEmail, setResendingEmail] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
+  const [showPasswordResetMessage, setShowPasswordResetMessage] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true') {
       setShowVerifiedMessage(true)
       setTimeout(() => setShowVerifiedMessage(false), 5000)
+    }
+    if (searchParams.get('passwordReset') === 'true') {
+      setShowPasswordResetMessage(true)
+      setTimeout(() => setShowPasswordResetMessage(false), 5000)
     }
   }, [searchParams])
 
@@ -163,6 +168,12 @@ export default function LoginPage() {
             </div>
           )}
 
+          {showPasswordResetMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+              パスワードがリセットされました。新しいパスワードでログインしてください。
+            </div>
+          )}
+
           {resendSuccess && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
               検証メールを再送信しました。メールをご確認ください。
@@ -213,6 +224,11 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition"
                 placeholder="パスワードを入力"
               />
+              <div className="mt-2 text-right">
+                <Link href="/forgot-password" className="text-sm text-primary-500 hover:text-primary-600">
+                  パスワードをお忘れですか？
+                </Link>
+              </div>
             </div>
 
             <button

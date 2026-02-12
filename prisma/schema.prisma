@@ -51,6 +51,7 @@ model User {
   company       Company?
   engineer      Engineer?
   emailVerifications EmailVerification[]
+  passwordResets     PasswordReset[]
 
   @@map("users")
 }
@@ -449,6 +450,23 @@ model EmailVerification {
   @@index([userId])
   @@index([verificationCode])
   @@map("email_verifications")
+}
+
+// パスワードリセット
+model PasswordReset {
+  id              String              @id @default(cuid())
+  userId          String
+  token           String              @unique
+  expiresAt       DateTime
+  used            Boolean             @default(false)
+
+  createdAt       DateTime            @default(now())
+
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("password_resets")
 }
 
 // お問い合わせ

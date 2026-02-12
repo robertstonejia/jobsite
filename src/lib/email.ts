@@ -319,6 +319,62 @@ seekjob運営チーム
   return { to: '', subject, html, text }
 }
 
+// パスワードリセットメールのテンプレート
+export function createPasswordResetEmail(data: {
+  resetUrl: string
+}): EmailOptions {
+  const subject = '【seekjob】パスワードリセットのご案内'
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">パスワードリセットのご案内</h2>
+      <p>パスワードリセットのリクエストを受け付けました。</p>
+      <p>以下のボタンをクリックして、新しいパスワードを設定してください:</p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${data.resetUrl}"
+           style="display: inline-block; background-color: #007bff; color: white; padding: 14px 40px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+          パスワードをリセットする
+        </a>
+      </div>
+
+      <p style="color: #666; font-size: 14px;">
+        ボタンが機能しない場合は、以下のURLをブラウザに貼り付けてください:<br>
+        <a href="${data.resetUrl}" style="color: #007bff; word-break: break-all;">${data.resetUrl}</a>
+      </p>
+
+      <p style="color: #666; font-size: 14px; margin-top: 30px;">
+        ※ このリンクは30分間有効です。<br>
+        ※ このメールに心当たりがない場合は、無視していただいて問題ありません。
+      </p>
+
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+      <p style="color: #666; font-size: 12px;">
+        このメールは自動送信されています。<br>
+        seekjob運営チーム
+      </p>
+    </div>
+  `
+
+  const text = `
+パスワードリセットのご案内
+
+パスワードリセットのリクエストを受け付けました。
+
+以下のURLにアクセスして、新しいパスワードを設定してください:
+${data.resetUrl}
+
+※ このリンクは30分間有効です。
+※ このメールに心当たりがない場合は、無視していただいて問題ありません。
+
+---
+このメールは自動送信されています。
+seekjob運営チーム
+  `
+
+  return { to: '', subject, html, text }
+}
+
 // お問い合わせメールのテンプレート
 export function createContactEmail(data: {
   name: string
